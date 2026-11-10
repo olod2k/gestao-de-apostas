@@ -1,0 +1,6 @@
+node_modules/
+*.png
+!tests/print_exemplo.png
+tests/*.json
+tests/exp.xlsx
+__pycache__/

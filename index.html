@@ -1,0 +1,2330 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0f1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Gestão de Apostas">
+<title>Gestão de Apostas</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%23111a2b%22/%3E%3Crect%20x%3D%2210%22%20y%3D%2236%22%20width%3D%2211%22%20height%3D%2218%22%20rx%3D%223%22%20fill%3D%22%23d4a24c%22%20opacity%3D%220.5%22/%3E%3Crect%20x%3D%2226%22%20y%3D%2224%22%20width%3D%2211%22%20height%3D%2230%22%20rx%3D%223%22%20fill%3D%22%23d4a24c%22%20opacity%3D%220.75%22/%3E%3Crect%20x%3D%2243%22%20y%3D%2210%22%20width%3D%2211%22%20height%3D%2244%22%20rx%3D%223%22%20fill%3D%22%23d4a24c%22/%3E%3C/svg%3E" type="image/svg+xml">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20fill%3D%22%23111a2b%22/%3E%3Crect%20x%3D%2210%22%20y%3D%2236%22%20width%3D%2211%22%20height%3D%2218%22%20rx%3D%223%22%20fill%3D%22%23d4a24c%22%20opacity%3D%220.5%22/%3E%3Crect%20x%3D%2226%22%20y%3D%2224%22%20width%3D%2211%22%20height%3D%2230%22%20rx%3D%223%22%20fill%3D%22%23d4a24c%22%20opacity%3D%220.75%22/%3E%3Crect%20x%3D%2243%22%20y%3D%2210%22%20width%3D%2211%22%20height%3D%2244%22%20rx%3D%223%22%20fill%3D%22%23d4a24c%22/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0f1a; --surface:#111a2b; --surface-2:#16223a; --border:#253248;
+    --gold:#d4a24c; --gold-soft:#8c7238;
+    --win:#3fa66b; --win-text:#4fc07e; --win-dim:rgba(63,166,107,0.14);
+    --loss:#e5605c; --loss-text:#ec6a66; --loss-dim:rgba(229,96,92,0.13);
+    --void:#8892a6; --cash:#e0913d;
+    --text:#ece9e0; --text-2:#c9c6bd; --text-muted:#8f99ad;
+    --font-display:'Big Shoulders Display',sans-serif; --font-body:'Inter',sans-serif; --font-mono:'JetBrains Mono',monospace;
+    --side:232px;
+  }
+  *{box-sizing:border-box;}
+  html{background:var(--bg);overflow-x:hidden;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-body);-webkit-font-smoothing:antialiased;overflow-x:hidden;min-height:100vh;}
+  button{font-family:var(--font-mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;border-radius:7px;padding:10px 16px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);cursor:pointer;transition:filter .15s ease,transform .05s ease;}
+  button:hover{filter:brightness(1.15);} button:active{transform:scale(.98);}
+  button:disabled{opacity:.4;cursor:default;}
+  .btn-primary{background:var(--gold);border-color:var(--gold);color:#1a1204;font-weight:700;}
+  .btn-ghost{background:transparent;}
+  .btn-danger{background:transparent;border-color:var(--loss);color:var(--loss-text);}
+  .btn-sm{padding:6px 10px;font-size:10.5px;}
+  .link-btn{background:none;border:none;padding:6px 0;color:var(--text-muted);font-size:11px;text-transform:uppercase;}
+  .link-btn:hover{color:var(--gold);filter:none;}
+  input,select,textarea{font-family:var(--font-body);}
+  .pos{color:var(--win-text);} .neg{color:var(--loss-text);}
+  .muted{color:var(--text-muted);}
+  .mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums;}
+  .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+
+  /* LAYOUT */
+  .sidebar{display:none;}
+  .main{padding:18px 14px 104px;max-width:1240px;margin:0 auto;}
+  .bottomnav{position:fixed;left:0;right:0;bottom:0;z-index:60;display:grid;grid-template-columns:repeat(5,1fr);background:var(--surface);border-top:1px solid var(--border);padding:6px 4px calc(8px + env(safe-area-inset-bottom));}
+  .nav-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:50px;background:none;border:none;color:var(--text-muted);font-family:var(--font-body);font-size:10.5px;letter-spacing:0;text-transform:none;padding:4px 2px;border-radius:10px;}
+  .nav-btn svg{width:22px;height:22px;}
+  .nav-btn.active{color:var(--gold);font-weight:700;}
+  .nav-btn.nav-new svg{background:var(--gold);color:#1a1204;border-radius:9px;padding:3px;width:30px;height:30px;}
+  @media(min-width:1024px){
+    .sidebar{display:flex;flex-direction:column;gap:22px;position:fixed;top:0;bottom:0;left:0;width:var(--side);background:var(--surface);border-right:1px solid var(--border);padding:24px 14px;z-index:40;}
+    .sidebar .nav-btn{flex-direction:row;justify-content:flex-start;gap:12px;font-size:14px;min-height:44px;padding:0 12px;}
+    .sidebar .nav-btn.active{background:var(--surface-2);}
+    .sidebar .nav-btn.nav-new svg{width:24px;height:24px;padding:2px;}
+    .bottomnav{display:none;}
+    .main{margin-left:var(--side);padding:28px 36px 60px;max-width:calc(1240px + var(--side));}
+  }
+  .brand-eyebrow,.eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;margin:0 0 5px;}
+  .brand-name{font-family:var(--font-display);font-weight:800;font-size:27px;text-transform:uppercase;line-height:1;}
+  .side-status{margin-top:auto;font-size:12px;color:var(--text-muted);display:flex;gap:8px;align-items:flex-start;line-height:1.4;}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--void);flex:none;margin-top:4px;}
+  .dot.ok{background:var(--win);} .dot.err{background:var(--loss);} .dot.warn{background:var(--gold);}
+
+  .topbar{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px;margin-bottom:16px;}
+  h1{font-family:var(--font-display);font-weight:800;font-size:clamp(32px,6vw,44px);text-transform:uppercase;margin:0;line-height:.95;}
+  .bank-pick{display:flex;flex-direction:column;gap:4px;}
+  .bank-pick label{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.1em;color:var(--text-muted);text-transform:uppercase;}
+  .bank-pick select{background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px 12px;font-size:14px;min-height:44px;}
+  .mobile-status{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--text-muted);margin:-6px 0 14px;}
+  @media(min-width:1024px){.mobile-status{display:none;}}
+
+  .view{display:none;} .view.active{display:block;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;}
+  .card-title{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);margin:0 0 12px;font-weight:500;}
+  .card-title.gold{color:var(--gold);font-weight:700;}
+  .card-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;}
+  .card-head .card-title{margin:0;}
+  .cols{display:grid;gap:0 16px;}
+  @media(min-width:1024px){.cols{grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);align-items:start;}}
+  .help{font-size:12px;color:var(--text-muted);line-height:1.55;margin:8px 0 0;}
+  .status-line{font-size:12.5px;margin-top:10px;min-height:16px;line-height:1.5;white-space:pre-line;color:var(--text-muted);}
+  .status-line.ok{color:var(--win-text);} .status-line.err{color:var(--loss-text);}
+
+  /* TOGGLES */
+  .seg{display:flex;gap:6px;flex-wrap:wrap;}
+  .seg button{font-size:10.5px;padding:8px 12px;color:var(--text-muted);min-height:36px;}
+  .seg button.active{background:var(--gold);color:#1a1204;border-color:var(--gold);font-weight:700;}
+  .month-nav{display:flex;align-items:center;gap:10px;font-family:var(--font-mono);font-size:12.5px;}
+  .month-nav button{width:34px;height:34px;padding:0;font-size:16px;display:flex;align-items:center;justify-content:center;}
+  .month-nav span{min-width:120px;text-align:center;font-weight:700;}
+
+  /* SALDO + BOARD */
+  .balance{background:linear-gradient(180deg,var(--surface-2),var(--surface));}
+  .balance-main{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-top:4px;}
+  .balance-value{font-family:var(--font-mono);font-weight:700;font-size:clamp(26px,6vw,34px);color:var(--gold);}
+  .balance-sub{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-top:8px;font-size:13px;}
+  .board{background:linear-gradient(180deg,var(--surface-2),var(--surface));border:1px solid var(--border);border-radius:12px;padding:16px 8px;margin:10px 0 16px;display:grid;grid-template-columns:repeat(5,1fr);}
+  .cell{text-align:center;padding:6px 8px;border-right:1px solid var(--border);}
+  .cell:last-child{border-right:none;}
+  .cell-label{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;}
+  .cell-value{font-family:var(--font-mono);font-weight:700;font-size:clamp(16px,3.2vw,23px);font-variant-numeric:tabular-nums;color:var(--gold);}
+  .cell-value.pos{color:var(--win-text);} .cell-value.neg{color:var(--loss-text);}
+  .cell-sub{font-family:var(--font-mono);font-size:11px;margin-top:4px;color:var(--text-muted);}
+  .cell-sub.pos{color:var(--win-text);} .cell-sub.neg{color:var(--loss-text);}
+  @media(max-width:640px){
+    .board{grid-template-columns:repeat(2,1fr);}
+    .cell{border-right:none;border-bottom:1px solid var(--border);padding:10px 4px;}
+    .cell:first-child{grid-column:span 2;}
+    .cell:nth-last-child(-n+2){border-bottom:none;}
+  }
+  .banner{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;border:1px solid var(--gold-soft);background:rgba(212,162,76,.08);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:13px;line-height:1.45;}
+
+  /* LIMITS */
+  .limit{margin-bottom:12px;} .limit:last-child{margin-bottom:0;}
+  .limit-head{display:flex;justify-content:space-between;font-size:13px;margin-bottom:7px;}
+  .bar{height:8px;background:var(--surface-2);border-radius:4px;overflow:hidden;}
+  .bar>div{height:8px;background:var(--gold);border-radius:4px;transition:width .3s ease;}
+  .bar.hot>div{background:var(--loss);}
+
+  /* PENDING QUICK */
+  .pend{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;}
+  .pend-top{display:flex;justify-content:space-between;gap:10px;}
+  .pend-meta{font-size:10.5px;font-weight:600;letter-spacing:.04em;color:var(--text-muted);text-transform:uppercase;}
+  .pend-event{font-size:14px;font-weight:600;margin-top:2px;}
+  .pend-market{font-size:12.5px;color:var(--text-2);margin-top:2px;}
+  .pend-nums{text-align:right;font-family:var(--font-mono);font-size:12.5px;white-space:nowrap;}
+  .pend-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px;}
+  .pend-actions button{min-height:42px;font-weight:700;}
+  .q-win{border-color:var(--win);background:var(--win-dim);color:var(--win-text);}
+  .q-loss{border-color:var(--loss);background:var(--loss-dim);color:var(--loss-text);}
+
+  /* CHART */
+  .chart-info{font-family:var(--font-mono);font-size:12px;color:var(--text-muted);margin-bottom:10px;min-height:16px;}
+  .chart-info.win{color:var(--win-text);font-weight:700;} .chart-info.loss{color:var(--loss-text);font-weight:700;}
+  .chart-holder{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .chart-holder::-webkit-scrollbar{height:5px;} .chart-holder::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+  .bar-hit{cursor:pointer;} .bar-hit:hover{filter:brightness(1.25);}
+  .empty{color:var(--text-muted);font-size:13px;padding:22px 0;text-align:center;}
+
+  /* TABLES */
+  .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .table-scroll::-webkit-scrollbar{height:5px;} .table-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+  table.data{width:100%;border-collapse:collapse;font-family:var(--font-mono);font-size:12px;min-width:540px;}
+  table.data th{text-align:right;color:var(--gold);font-weight:700;padding:8px 10px;border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none;}
+  table.data th.nosort{cursor:default;}
+  table.data td{padding:8px 10px;border-bottom:1px solid var(--surface-2);text-align:right;white-space:nowrap;}
+  table.data th:first-child,table.data td:first-child{text-align:left;}
+  table.data tbody tr:hover{background:var(--surface-2);}
+  table.data tfoot td{font-weight:700;border-top:2px solid var(--border);border-bottom:none;}
+  .sub{display:block;font-size:10px;color:var(--text-muted);font-weight:400;margin-top:1px;}
+
+  /* FORM */
+  .ticket{position:relative;padding:20px;background-image:radial-gradient(circle at 0 50%,var(--bg) 8px,transparent 8.5px),radial-gradient(circle at 100% 50%,var(--bg) 8px,transparent 8.5px);background-repeat:no-repeat;max-width:920px;}
+  .ticket-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;border-bottom:1px dashed var(--border);padding-bottom:12px;margin-bottom:14px;}
+  .ticket-head h2{font-family:var(--font-display);font-size:22px;text-transform:uppercase;letter-spacing:.03em;margin:0;font-weight:700;}
+  .form-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+  .field{display:flex;flex-direction:column;gap:5px;min-width:0;}
+  .field.span2{grid-column:span 2;} .field.span4{grid-column:1/-1;}
+  .field label,.field .label{font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);}
+  .label-row{display:flex;align-items:center;justify-content:space-between;gap:6px;}
+  .field input,.field select,.field textarea{background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:14px;outline:none;min-width:0;width:100%;}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold);}
+  .field input::placeholder{color:#5f6a80;}
+  .field input:disabled{color:var(--text);opacity:1;}
+  .mini-toggle{display:flex;gap:3px;}
+  .mini-toggle button{font-size:10px;padding:3px 9px;text-transform:none;color:var(--text-muted);}
+  .mini-toggle button.active{background:var(--gold);color:#1a1204;border-color:var(--gold);font-weight:700;}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;}
+  .chip{font-family:var(--font-mono);font-size:11.5px;text-transform:none;letter-spacing:0;padding:8px 13px;border-radius:18px;border:1.5px solid var(--border);background:var(--surface-2);color:var(--text-2);min-height:38px;}
+  .chip.active{font-weight:700;color:#0a0f1a;}
+  .chip.active[data-r="pendente"]{background:var(--gold);border-color:var(--gold);}
+  .chip.active[data-r="win"],.chip.active[data-r="halfwin"]{background:var(--win);border-color:var(--win);}
+  .chip.active[data-r="loss"],.chip.active[data-r="halfloss"]{background:var(--loss);border-color:var(--loss);}
+  .chip.active[data-r="void"]{background:var(--void);border-color:var(--void);}
+  .chip.active[data-r="cashout"]{background:var(--cash);border-color:var(--cash);}
+  .preview-box{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--surface-2);border-radius:8px;padding:12px;font-size:13px;}
+  .warn{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--gold-soft);background:rgba(212,162,76,.08);border-radius:8px;padding:10px 12px;font-size:13px;line-height:1.45;}
+  .warn.hot{border-color:var(--loss);background:var(--loss-dim);}
+  .form-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;}
+  .form-actions .btn-primary{flex:1 1 200px;min-height:48px;font-size:13px;}
+  @media(max-width:760px){
+    .form-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+    .field input,.field select,.field textarea{font-size:16px;padding:11px 10px;}
+  }
+  .quick{max-width:920px;}
+  .quick-row{display:flex;gap:10px;flex-wrap:wrap;}
+  .quick-row input{flex:1 1 240px;min-width:0;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:11px 10px;color:var(--text);font-family:var(--font-mono);font-size:13px;}
+  .drop{display:flex;align-items:center;gap:14px;border:1.5px dashed var(--gold-soft);background:var(--surface-2);border-radius:12px;padding:16px;cursor:pointer;color:var(--gold);min-height:76px;transition:border-color .15s ease,background .15s ease;}
+  .drop:hover,.drop.over{border-color:var(--gold);background:#1a2742;}
+  .drop.busy{cursor:progress;opacity:.85;}
+  .drop img{width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid var(--border);flex:none;}
+  .drop-text{display:flex;flex-direction:column;gap:3px;color:var(--text);}
+  .drop-text strong{font-size:15px;}
+  .drop-text span{font-size:12.5px;color:var(--text-muted);}
+  .help code{background:var(--surface-2);padding:1px 5px;border-radius:4px;font-family:var(--font-mono);font-size:11px;}
+
+  /* FILTERS + LEDGER */
+  .filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px;}
+  .filters input,.filters select{background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px;font-size:14px;min-height:42px;}
+  .filters .grow{flex:1 1 200px;min-width:0;}
+  .filters .count{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-left:auto;}
+  .date-tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:12px;-webkit-overflow-scrolling:touch;}
+  .date-tabs::-webkit-scrollbar{height:5px;} .date-tabs::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+  .date-tab{flex:0 0 auto;padding:8px 15px;border-radius:20px;background:var(--surface);color:var(--text-muted);font-size:12px;text-transform:none;letter-spacing:.02em;}
+  .date-tab.active{background:var(--gold);color:#1a1204;border-color:var(--gold);font-weight:700;}
+  .date-tab .n{opacity:.7;margin-left:5px;}
+  .ledger{display:flex;flex-direction:column;gap:8px;}
+  .bet-row{display:grid;grid-template-columns:4px 78px minmax(110px,1.1fr) minmax(130px,1.3fr) minmax(70px,.7fr) 66px 58px 112px 84px auto;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:11px 13px;min-height:56px;}
+  .strip{align-self:stretch;border-radius:3px;background:var(--void);}
+  .strip.win,.strip.halfwin{background:var(--win);} .strip.loss,.strip.halfloss{background:var(--loss);} .strip.pendente{background:var(--gold);} .strip.cashout{background:var(--cash);}
+  .r-date{font-family:var(--font-mono);font-size:12px;color:var(--text-muted);}
+  .r-event{min-width:0;display:flex;flex-direction:column;gap:2px;}
+  .r-meta{font-size:10px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .r-teams{font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase;letter-spacing:.02em;}
+  .r-market{font-size:12.5px;font-weight:700;line-height:1.3;overflow-wrap:anywhere;}
+  .r-market .tag{display:inline-block;font-family:var(--font-mono);font-size:9.5px;font-weight:700;color:var(--gold);border:1px solid var(--gold-soft);border-radius:4px;padding:0 4px;margin-right:5px;vertical-align:1px;}
+  .r-bookie{font-size:12px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .r-num{font-family:var(--font-mono);font-size:13px;text-align:right;}
+  .badge{font-family:var(--font-mono);font-size:11px;letter-spacing:.04em;font-weight:700;padding:7px 10px;border-radius:20px;text-align:center;border:1.5px solid var(--border);background:var(--surface-2);color:var(--text-muted);cursor:pointer;-webkit-appearance:none;appearance:none;}
+  .badge.win,.badge.halfwin{background:var(--win);color:#08210f;border-color:var(--win);}
+  .badge.loss,.badge.halfloss{background:var(--loss);color:#2b0906;border-color:var(--loss);}
+  .badge.void{background:var(--void);color:#12161f;border-color:var(--void);}
+  .badge.cashout{background:var(--cash);color:#2a1600;border-color:var(--cash);}
+  .badge.pendente{color:var(--gold);border-color:var(--gold-soft);}
+  .r-profit{font-family:var(--font-mono);font-weight:700;font-size:13px;text-align:right;}
+  .r-actions{display:flex;justify-content:flex-end;}
+  .load-more{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:14px;font-family:var(--font-mono);font-size:11.5px;color:var(--text-muted);}
+  @media(max-width:900px){
+    .bet-row{grid-template-columns:1fr auto;grid-template-areas:"date badge" "event event" "market market" "bookie nums" "profit actions";row-gap:6px;gap:8px;padding:11px 12px 11px 14px;position:relative;overflow:hidden;}
+    .strip{position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:0;}
+    .r-date{grid-area:date;} .badge{grid-area:badge;justify-self:end;}
+    .r-event{grid-area:event;} .r-market{grid-area:market;font-weight:600;color:var(--text-2);}
+    .r-bookie{grid-area:bookie;} .r-stake{grid-area:nums;} .r-odd{display:none;}
+    .r-profit{grid-area:profit;text-align:left;} .r-actions{grid-area:actions;}
+    .r-teams,.r-meta,.r-bookie{white-space:normal;}
+  }
+  .r-stake .o{display:none;}
+  @media(max-width:900px){.r-stake .o{display:inline;color:var(--text-muted);}}
+
+  /* KPI GRID */
+  .kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:16px;}
+  .kpi{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px;}
+  .kpi-label{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);}
+  .kpi-value{font-family:var(--font-mono);font-weight:700;font-size:20px;margin-top:5px;color:var(--gold);}
+  .kpi-value.pos{color:var(--win-text);} .kpi-value.neg{color:var(--loss-text);}
+  .kpi-sub{font-size:11.5px;color:var(--text-muted);margin-top:3px;}
+  @media(max-width:420px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr));}.kpi-value{font-size:18px;}}
+
+  /* BANCA VIEW */
+  .row-item{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:11px 0;border-top:1px solid var(--surface-2);}
+  .row-item:first-of-type{border-top:none;}
+  .row-item .name{font-weight:600;font-size:14px;}
+  .row-item .meta{font-size:12px;color:var(--text-muted);margin-top:2px;}
+  .row-item .acts{display:flex;gap:6px;flex-wrap:wrap;}
+  .tag-active{font-family:var(--font-mono);font-size:10px;color:var(--gold);border:1px solid var(--gold-soft);border-radius:4px;padding:2px 6px;margin-left:6px;}
+  .inline-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;align-items:end;margin-top:12px;}
+  .tool-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;}
+  .tool{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:14px;}
+  .tool h3{margin:0 0 10px;font-size:14px;}
+  .tool .field input{background:var(--surface);}
+  .tool-out{font-family:var(--font-mono);font-size:12.5px;line-height:1.7;margin-top:10px;min-height:20px;}
+  .file-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px;}
+  .file-row input[type=file]{max-width:100%;font-size:12.5px;color:var(--text-2);}
+  .file-row select,.file-row input[type=number]{background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:9px 10px;font-size:13px;}
+
+  /* TOAST */
+  #toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(140%);max-width:min(560px,92vw);width:max-content;background:var(--surface-2);border:1px solid var(--border);border-left:4px solid var(--gold);border-radius:8px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start;box-shadow:0 8px 30px rgba(0,0,0,.45);z-index:9999;opacity:0;transition:transform .25s ease,opacity .25s ease;pointer-events:none;}
+  #toast.show{transform:translateX(-50%) translateY(0);opacity:1;pointer-events:auto;}
+  #toast.err{border-left-color:var(--loss);} #toast.ok{border-left-color:var(--win);}
+  #toast .t-title{font-weight:700;font-size:13px;margin-bottom:2px;}
+  #toast .t-msg{font-size:12.5px;color:var(--text-muted);line-height:1.4;}
+  #toast .t-close{background:none;border:none;color:var(--text-muted);font-size:18px;padding:0 4px;line-height:1;}
+  @media(min-width:1024px){#toast{bottom:24px;margin-left:calc(var(--side)/2);}}
+  .foot-note{text-align:center;color:var(--text-muted);font-size:11px;font-family:var(--font-mono);margin-top:24px;letter-spacing:.04em;}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-home" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></symbol>
+  <symbol id="i-wallet" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M3 7h18v12H3zM16 13h2M3 7l3-3h12l3 3"/></symbol>
+</svg>
+
+<aside class="sidebar" aria-label="Menu">
+  <div>
+    <p class="brand-eyebrow">Ledger pessoal</p>
+    <div class="brand-name">Gestão de Apostas</div>
+  </div>
+  <nav style="display:flex;flex-direction:column;gap:4px;" aria-label="Navegação principal">
+    <button type="button" class="nav-btn" data-nav="painel"><svg><use href="#i-home"/></svg><span>Painel</span></button>
+    <button type="button" class="nav-btn" data-nav="historico"><svg><use href="#i-list"/></svg><span>Histórico</span></button>
+    <button type="button" class="nav-btn nav-new" data-nav="nova"><svg><use href="#i-plus"/></svg><span>Nova aposta</span></button>
+    <button type="button" class="nav-btn" data-nav="analise"><svg><use href="#i-chart"/></svg><span>Análise</span></button>
+    <button type="button" class="nav-btn" data-nav="banca"><svg><use href="#i-wallet"/></svg><span>Banca e dados</span></button>
+  </nav>
+  <div class="side-status"><span class="dot" data-sync-dot></span><span data-sync-text>Modo local</span></div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div>
+      <p class="eyebrow" id="view-eyebrow">Ledger pessoal</p>
+      <h1 id="view-title">Painel</h1>
+    </div>
+    <div class="bank-pick">
+      <label for="bank-select">Banca</label>
+      <select id="bank-select"></select>
+    </div>
+  </div>
+  <div class="mobile-status"><span class="dot" data-sync-dot></span><span data-sync-text>Modo local</span></div>
+
+  <!-- ===================== PAINEL ===================== -->
+  <section class="view" data-view-panel="painel">
+    <div class="banner" id="backup-banner" style="display:none;">
+      <span id="backup-banner-text">Faz mais de 7 dias desde o último backup baixado.</span>
+      <button type="button" class="btn-primary btn-sm" id="backup-banner-btn">Baixar backup</button>
+    </div>
+
+    <div class="card balance">
+      <div class="card-title" style="margin:0;">Saldo atual · <span id="bal-name">Principal</span></div>
+      <div class="balance-main">
+        <span class="balance-value" id="bal-value">R$ 0,00</span>
+        <span class="mono muted" id="bal-units">0,00u</span>
+      </div>
+      <div class="balance-sub">
+        <span class="muted" id="bal-initial">Inicial</span>
+        <span class="mono" id="bal-growth" style="font-weight:700;"></span>
+      </div>
+    </div>
+
+    <div class="card-head" style="margin-bottom:0;">
+      <div class="seg" id="board-toggle">
+        <button type="button" data-mode="all" class="active">Geral</button>
+        <button type="button" data-mode="month">Por mês</button>
+      </div>
+      <div class="month-nav" id="board-month-nav" style="display:none;">
+        <button type="button" id="board-prev" aria-label="Mês anterior">‹</button>
+        <span id="board-month">—</span>
+        <button type="button" id="board-next" aria-label="Próximo mês">›</button>
+      </div>
+    </div>
+    <div class="board">
+      <div class="cell"><div class="cell-label">Apostas</div><div class="cell-value" id="st-count">0</div><div class="cell-sub" id="st-count-sub"></div></div>
+      <div class="cell"><div class="cell-label">Total investido</div><div class="cell-value" id="st-staked">R$ 0,00</div><div class="cell-sub" id="st-staked-u"></div></div>
+      <div class="cell"><div class="cell-label">Lucro</div><div class="cell-value" id="st-profit">R$ 0,00</div><div class="cell-sub" id="st-profit-u"></div></div>
+      <div class="cell"><div class="cell-label">ROI</div><div class="cell-value" id="st-roi">0,0%</div></div>
+      <div class="cell"><div class="cell-label">Taxa de acerto</div><div class="cell-value" id="st-winrate">0,0%</div><div class="cell-sub" id="st-wl"></div></div>
+    </div>
+
+    <div class="cols">
+      <div>
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title" id="chart-title">Resultados por dia</div>
+            <div class="seg" id="chart-toggle">
+              <button type="button" data-mode="day" class="active">Por dia</button>
+              <button type="button" data-mode="month">Por mês</button>
+            </div>
+          </div>
+          <div class="month-nav" id="chart-month-nav" style="display:none;margin-bottom:10px;">
+            <button type="button" id="chart-prev" aria-label="Mês anterior">‹</button>
+            <span id="chart-month">—</span>
+            <button type="button" id="chart-next" aria-label="Próximo mês">›</button>
+          </div>
+          <div class="chart-info" id="chart-info">Toque ou passe o mouse numa barra para ver os detalhes</div>
+          <div class="chart-holder" id="chart-holder"></div>
+          <button type="button" class="link-btn" id="detail-toggle">Ver dados detalhados ▾</button>
+          <div id="detail-wrap" style="display:none;margin-top:10px;border-top:1px dashed var(--border);padding-top:10px;">
+            <div class="table-scroll">
+              <table class="data" id="detail-table">
+                <thead><tr>
+                  <th data-sort="key">Data</th><th data-sort="profitU">Lucro (u)</th><th data-sort="stakedU">Investido (u)</th><th data-sort="count">Nº apostas</th><th data-sort="cumU">Acumulado (u)</th>
+                </tr></thead>
+                <tbody id="detail-body"></tbody><tfoot id="detail-foot"></tfoot>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card" id="limits-card">
+          <div class="card-head"><div class="card-title">Limites (anti-tilt)</div><button type="button" class="link-btn" data-goto="banca" data-anchor="limits-section">ajustar</button></div>
+          <div id="limits-body"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-title" id="pend-title">Pendentes</div><button type="button" class="link-btn" id="pend-all">ver no histórico</button></div>
+          <div id="pend-list"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== HISTÓRICO ===================== -->
+  <section class="view" data-view-panel="historico">
+    <form class="filters" autocomplete="off" onsubmit="return false;">
+      <label class="sr-only" for="f-search">Buscar</label>
+      <input type="search" id="f-search" class="grow" placeholder="Buscar time, competição, mercado, tipster…" autocomplete="off" data-lpignore="true" data-1p-ignore>
+      <label class="sr-only" for="f-fbookie">Casa</label>
+      <select id="f-fbookie"><option value="">Todas as casas</option></select>
+      <label class="sr-only" for="f-fsport">Esporte</label>
+      <select id="f-fsport"><option value="">Todos os esportes</option></select>
+      <label class="sr-only" for="f-fresult">Resultado</label>
+      <select id="f-fresult"><option value="">Todos os resultados</option></select>
+      <span class="count" id="f-count"></span>
+    </form>
+    <div class="date-tabs" id="date-tabs"></div>
+    <div class="ledger" id="ledger"></div>
+    <div class="load-more" id="load-more" style="display:none;"><span></span><button type="button" id="load-more-btn">Mostrar mais</button></div>
+  </section>
+
+  <!-- ===================== NOVA ===================== -->
+  <section class="view" data-view-panel="nova">
+    <div class="card quick">
+      <div class="card-head">
+        <div class="card-title gold">Preencher pelo print</div>
+      </div>
+      <div class="drop" id="slip-drop" role="button" tabindex="0" aria-label="Enviar print do bilhete">
+        <img id="slip-thumb" alt="Print enviado" style="display:none;">
+        <svg id="slip-icon" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h3l2-3h6l2 3h3v12H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+        <div class="drop-text"><strong id="slip-title">Enviar print do bilhete</strong><span id="slip-sub">toque para escolher a imagem · no PC, cole com Ctrl+V ou arraste aqui</span></div>
+      </div>
+      <input type="file" id="slip-file" accept="image/*" style="display:none;">
+      <p class="status-line" id="slip-status"></p>
+      <button type="button" class="link-btn" id="qf-toggle">Ou colar a linha de outra IA ▾</button>
+      <div id="qf-wrap" style="display:none;margin-top:8px;">
+      <div class="quick-row" style="margin-bottom:8px;"><button type="button" class="btn-sm" id="copy-prompt">Copiar pedido p/ IA</button></div>
+      <div class="quick-row">
+        <label class="sr-only" for="qf-input">Linha da IA</label>
+        <input type="text" id="qf-input" placeholder="08/08/2026|Brasileirão|Bet365|Palmeiras|Internacional|Resultado Final: Palmeiras|40|3.25|pendente">
+        <button type="button" class="btn-primary" id="qf-apply">Preencher</button>
+      </div>
+      <p class="help">Mande o print do bilhete para a IA junto com o pedido copiado e cole aqui a linha que ela devolver. Formato: <code>data|competição|casa|time 1|time 2|mercado|stake R$|odd|resultado</code> — pode acrescentar <code>|esporte|tipster</code> no fim.</p>
+      <p class="status-line" id="qf-status"></p>
+      </div>
+    </div>
+
+    <form class="card ticket" id="bet-form" autocomplete="off">
+      <div class="ticket-head">
+        <h2 id="form-title">Nova ficha</h2>
+        <div class="seg" id="kind-toggle">
+          <button type="button" data-kind="simples" class="active">Simples</button>
+          <button type="button" data-kind="multipla">Múltipla</button>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="field"><label for="f-data">Data</label><input type="date" id="f-data" required></div>
+        <div class="field"><label for="f-sport">Esporte</label><input type="text" id="f-sport" list="sport-list" placeholder="Futebol"></div>
+        <div class="field"><label for="f-comp">Competição</label><input type="text" id="f-comp" list="comp-list"></div>
+        <div class="field"><label for="f-bookie">Casa de apostas</label><input type="text" id="f-bookie" list="bookie-list"></div>
+        <div class="field span2"><label for="f-team1">Time 1</label><input type="text" id="f-team1" list="team-list"></div>
+        <div class="field span2"><label for="f-team2">Time 2</label><input type="text" id="f-team2" list="team-list"></div>
+        <div class="field span4"><label for="f-market" id="f-market-label">Mercado</label><input type="text" id="f-market" required></div>
+        <div class="field span2"><label for="f-tipster">Tipster (opcional)</label><input type="text" id="f-tipster" list="tipster-list"></div>
+        <div class="field span2"><label for="f-bank">Banca</label><select id="f-bank"></select></div>
+        <div class="field"><label for="f-odd">Odd</label><input type="number" id="f-odd" step="0.001" min="1" inputmode="decimal" required></div>
+        <div class="field">
+          <div class="label-row"><label for="f-stake" id="f-stake-label">Stake (R$)</label>
+            <span class="mini-toggle" id="stake-mode"><button type="button" data-mode="reais" tabindex="-1">R$</button><button type="button" data-mode="unidades" tabindex="-1">u</button></span>
+          </div>
+          <input type="number" id="f-stake" step="0.01" min="0" inputmode="decimal" required>
+        </div>
+        <div class="field span2" id="cashout-field" style="display:none;"><label for="f-cashout">Valor recebido no cashout (R$)</label><input type="number" id="f-cashout" step="0.01" min="0" inputmode="decimal"></div>
+        <div class="field span4">
+          <span class="label">Resultado</span>
+          <div class="chips" id="result-chips" role="radiogroup" aria-label="Resultado"></div>
+        </div>
+        <div class="field span4"><label for="f-notes">Observações (opcional)</label><input type="text" id="f-notes" placeholder="ex.: entrada ao vivo, odd caiu depois"></div>
+        <div class="field span4"><div class="preview-box"><span class="muted" id="preview-label">Se der green</span><span class="mono" id="preview-value" style="font-weight:700;">R$ 0,00</span></div></div>
+        <div class="field span4" id="form-warn" style="display:none;"></div>
+        <div class="field span4">
+          <div class="form-actions">
+            <button type="submit" class="btn-primary" id="submit-btn">Registrar ficha</button>
+            <button type="button" class="btn-ghost" id="repeat-btn">Repetir último confronto</button>
+            <button type="button" class="btn-ghost" id="cancel-btn" style="display:none;">Cancelar edição</button>
+            <button type="button" class="btn-danger" id="delete-btn" style="display:none;">Mover p/ lixeira</button>
+          </div>
+        </div>
+      </div>
+      <datalist id="comp-list"></datalist><datalist id="bookie-list"></datalist><datalist id="sport-list"></datalist><datalist id="tipster-list"></datalist><datalist id="team-list"></datalist>
+    </form>
+  </section>
+
+  <!-- ===================== ANÁLISE ===================== -->
+  <section class="view" data-view-panel="analise">
+    <div class="seg" id="period-toggle" style="margin-bottom:14px;">
+      <button type="button" data-p="hoje">Hoje</button>
+      <button type="button" data-p="7d">7 dias</button>
+      <button type="button" data-p="30d">30 dias</button>
+      <button type="button" data-p="mes">Mês atual</button>
+      <button type="button" data-p="mesant">Mês anterior</button>
+      <button type="button" data-p="tudo" class="active">Tudo</button>
+    </div>
+    <div class="kpis" id="kpis"></div>
+    <div class="card">
+      <div class="card-head"><div class="card-title">Evolução da banca (u)</div><span class="mono muted" style="font-size:11.5px;" id="dd-label"></span></div>
+      <div id="evo-holder"></div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">Resultado por…</div>
+        <div class="seg" id="group-toggle">
+          <button type="button" data-g="bookie" class="active">Casa</button>
+          <button type="button" data-g="competition">Competição</button>
+          <button type="button" data-g="sport">Esporte</button>
+          <button type="button" data-g="market">Mercado</button>
+          <button type="button" data-g="tipster">Tipster</button>
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table class="data" id="group-table">
+          <thead><tr>
+            <th data-sort="name" id="group-name-head">Casa</th><th data-sort="count">Apostas</th><th data-sort="stakedU">Investido (u)</th><th data-sort="profitU">Lucro (u)</th><th data-sort="roi">ROI</th><th data-sort="winrate">Acerto</th><th class="nosort"></th>
+          </tr></thead>
+          <tbody id="group-body"></tbody><tfoot id="group-foot"></tfoot>
+        </table>
+      </div>
+      <p class="help">Toque no cabeçalho para ordenar. "Renomear" junta nomes escritos de jeitos diferentes (ex.: 7k e 7kbet).</p>
+    </div>
+  </section>
+
+  <!-- ===================== BANCA E DADOS ===================== -->
+  <section class="view" data-view-panel="banca">
+    <div class="cols">
+      <div>
+        <div class="card">
+          <div class="card-head"><div class="card-title gold">Minhas bancas</div><button type="button" class="btn-sm" id="bank-new">+ Nova banca</button></div>
+          <div id="bank-list"></div>
+          <form class="inline-form" id="bank-form" style="display:none;" onsubmit="return false;">
+            <div class="field"><label for="bk-name">Nome</label><input type="text" id="bk-name" required></div>
+            <div class="field"><label for="bk-amount">Banca (R$)</label><input type="number" id="bk-amount" min="0.01" step="0.01" inputmode="decimal"></div>
+            <div class="field"><label for="bk-units">Em quantas unidades</label><input type="number" id="bk-units" min="1" step="1" inputmode="numeric"></div>
+            <div class="form-actions"><button type="button" class="btn-primary" id="bk-save">Salvar</button><button type="button" class="btn-ghost" id="bk-cancel">Cancelar</button></div>
+          </form>
+          <p class="status-line" id="bk-preview"></p>
+        </div>
+
+        <div class="card" id="limits-section">
+          <div class="card-title gold">Limites (anti-tilt)</div>
+          <div class="inline-form" style="margin-top:0;">
+            <div class="field"><label for="lm-day">Stop-loss do dia (u)</label><input type="number" id="lm-day" min="0" step="0.5" inputmode="decimal" placeholder="0 = desligado"></div>
+            <div class="field"><label for="lm-week">Stop-loss da semana (u)</label><input type="number" id="lm-week" min="0" step="0.5" inputmode="decimal" placeholder="0 = desligado"></div>
+            <div class="field"><label for="lm-max">Stake máxima (u)</label><input type="number" id="lm-max" min="0" step="0.25" inputmode="decimal" placeholder="0 = desligado"></div>
+          </div>
+          <div class="form-actions" style="margin-top:12px;"><button type="button" class="btn-primary" id="lm-save">Salvar limites</button></div>
+          <p class="help">Valem para a banca escolhida no topo. A semana começa na segunda. Ao passar de um limite o app avisa e pede confirmação antes de registrar — não bloqueia de vez.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div class="card-title gold">Saldo por casa</div><span class="mono" id="houses-total"></span></div>
+          <div class="table-scroll">
+            <table class="data" id="houses-table">
+              <thead><tr><th class="nosort">Casa</th><th class="nosort">Depósitos</th><th class="nosort">Saques</th><th class="nosort">Lucro apostas</th><th class="nosort">Em aberto</th><th class="nosort">Saldo</th></tr></thead>
+              <tbody id="houses-body"></tbody>
+            </table>
+          </div>
+          <form class="inline-form" id="tx-form" onsubmit="return false;">
+            <div class="field"><label for="tx-house">Casa</label><input type="text" id="tx-house" list="bookie-list"></div>
+            <div class="field"><label for="tx-type">Tipo</label><select id="tx-type"><option value="dep">Depósito</option><option value="saq">Saque</option></select></div>
+            <div class="field"><label for="tx-amount">Valor (R$)</label><input type="number" id="tx-amount" min="0.01" step="0.01" inputmode="decimal"></div>
+            <div class="field"><label for="tx-date">Data</label><input type="date" id="tx-date"></div>
+            <div class="form-actions"><button type="button" class="btn-primary" id="tx-save">Registrar</button></div>
+          </form>
+          <p class="status-line" id="tx-status"></p>
+          <button type="button" class="link-btn" id="tx-toggle">Ver depósitos e saques ▾</button>
+          <div id="tx-list" style="display:none;"></div>
+          <p class="help">Saldo = depósitos − saques + lucro das apostas − o que está em aberto. Considera todas as bancas. Registre o depósito inicial de cada casa para o saldo bater com o da casa.</p>
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <div class="card-title gold">Dados e segurança</div>
+          <div class="row-item" style="border-top:none;padding-top:0;">
+            <div><div class="name">Backup completo (.json)</div><div class="meta" id="backup-meta">Nenhum backup baixado ainda neste aparelho.</div></div>
+            <div class="acts"><button type="button" class="btn-primary btn-sm" id="backup-btn">Baixar</button><button type="button" class="btn-sm" id="restore-btn">Restaurar</button></div>
+          </div>
+          <input type="file" id="restore-file" accept=".json,application/json" style="display:none;">
+          <div class="row-item">
+            <div><div class="name">Exportar planilha</div><div class="meta">Excel no mesmo modelo da importação · CSV no modelo do Pro Stake Manager</div></div>
+            <div class="acts"><button type="button" class="btn-sm" id="export-xlsx">Excel</button><button type="button" class="btn-sm" id="export-csv">CSV</button></div>
+          </div>
+          <div class="row-item" style="display:block;">
+            <div class="name">Importar planilha (.xlsx ou .csv)</div>
+            <div class="meta">Aceita a sua planilha antiga (Data, Competição, Entrada, Mercado, Bookies, Stake, Odd, Status), o Excel exportado por aqui e CSV do Pro Stake Manager (bet_date, bookmaker, event_name, units_bet…).</div>
+            <div class="file-row">
+              <label class="sr-only" for="imp-file">Arquivo</label>
+              <input type="file" id="imp-file" accept=".xlsx,.xls,.csv">
+              <select id="imp-sheet" style="display:none;" aria-label="Aba da planilha"></select>
+            </div>
+            <div class="file-row">
+              <label for="imp-bank" class="muted" style="font-size:12px;">Para a banca</label>
+              <select id="imp-bank"></select>
+              <label for="imp-unit" class="muted" style="font-size:12px;">1u nesse arquivo = R$</label>
+              <input type="number" id="imp-unit" min="0.01" step="0.01" style="width:100px;">
+              <button type="button" class="btn-primary btn-sm" id="imp-run" style="display:none;">Importar</button>
+            </div>
+            <p class="status-line" id="imp-status"></p>
+          </div>
+          <div class="row-item">
+            <div><div class="name">Lixeira</div><div class="meta" id="trash-meta">Vazia</div></div>
+            <div class="acts"><button type="button" class="btn-sm" id="trash-toggle">Abrir</button></div>
+          </div>
+          <div id="trash-list" style="display:none;"></div>
+        </div>
+
+        <div class="card" id="ai-card">
+          <div class="card-title gold">Leitura de print (IA)</div>
+          <div class="inline-form" style="margin-top:0;">
+            <div class="field"><label for="ai-model">Modelo do Gemini</label><input type="text" id="ai-model" autocomplete="off" spellcheck="false"></div>
+            <div class="form-actions"><button type="button" class="btn-sm" id="ai-model-save">Salvar</button><button type="button" class="btn-sm btn-ghost" id="ai-model-reset">Padrão</button></div>
+          </div>
+          <p class="status-line" id="ai-status"></p>
+          <p class="help">O print vai para o Gemini (Google) pelo seu projeto Firebase, no plano gratuito. Para funcionar, ative uma vez no console do Firebase: <b>AI Logic → Começar → Gemini Developer API</b>. Se o Google aposentar o modelo, troque o nome aqui.</p>
+        </div>
+
+        <div class="card" id="cloud-card">
+          <div class="card-head" style="margin-bottom:6px;">
+            <div class="card-title gold">Sincronização na nuvem</div>
+            <button type="button" class="btn-sm" id="cloud-toggle">Entrar</button>
+          </div>
+          <div class="help" id="cloud-status" style="margin:0;">Modo local.</div>
+          <form id="cloud-form" autocomplete="on" onsubmit="return false;" style="display:none;margin-top:12px;">
+            <div class="inline-form" style="margin-top:0;">
+              <div class="field"><label for="cloud-email">E-mail</label><input type="email" id="cloud-email" autocomplete="username"></div>
+              <div class="field"><label for="cloud-password">Senha</label><input type="password" id="cloud-password" autocomplete="current-password" placeholder="mínimo 6 caracteres"></div>
+            </div>
+            <div class="form-actions" style="margin-top:12px;">
+              <button type="button" class="btn-primary" id="cloud-login">Entrar</button>
+              <button type="button" id="cloud-signup">Criar conta</button>
+              <button type="button" id="cloud-logout" style="display:none;">Sair</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title gold">Ferramentas</div>
+      <div class="tool-grid">
+        <div class="tool">
+          <h3>Valor esperado (EV)</h3>
+          <div class="inline-form" style="margin-top:0;">
+            <div class="field"><label for="ev-odd">Odd da casa</label><input type="number" id="ev-odd" step="0.01" min="1" inputmode="decimal"></div>
+            <div class="field"><label for="ev-prob">Sua probabilidade (%)</label><input type="number" id="ev-prob" step="0.1" min="0" max="100" inputmode="decimal"></div>
+          </div>
+          <div class="tool-out" id="ev-out"></div>
+        </div>
+        <div class="tool">
+          <h3>Odd justa (tirar a margem)</h3>
+          <div class="inline-form" style="margin-top:0;grid-template-columns:repeat(3,minmax(0,1fr));">
+            <div class="field"><label for="fo-a">Odd A</label><input type="number" id="fo-a" step="0.01" min="1" inputmode="decimal"></div>
+            <div class="field"><label for="fo-b">Odd B</label><input type="number" id="fo-b" step="0.01" min="1" inputmode="decimal"></div>
+            <div class="field"><label for="fo-c">Odd C</label><input type="number" id="fo-c" step="0.01" min="1" inputmode="decimal" placeholder="opcional"></div>
+          </div>
+          <div class="tool-out" id="fo-out"></div>
+        </div>
+        <div class="tool">
+          <h3>Surebet (2 resultados)</h3>
+          <div class="inline-form" style="margin-top:0;grid-template-columns:repeat(3,minmax(0,1fr));">
+            <div class="field"><label for="sb-a">Odd A</label><input type="number" id="sb-a" step="0.01" min="1" inputmode="decimal"></div>
+            <div class="field"><label for="sb-b">Odd B</label><input type="number" id="sb-b" step="0.01" min="1" inputmode="decimal"></div>
+            <div class="field"><label for="sb-total">Total R$</label><input type="number" id="sb-total" step="0.01" min="0" inputmode="decimal"></div>
+          </div>
+          <div class="tool-out" id="sb-out"></div>
+        </div>
+      </div>
+    </div>
+    <p class="foot-note">salvo neste aparelho + sincronizado no Firebase quando logado</p>
+  </section>
+</main>
+
+<nav class="bottomnav" aria-label="Navegação principal">
+  <button type="button" class="nav-btn" data-nav="painel"><svg><use href="#i-home"/></svg><span>Painel</span></button>
+  <button type="button" class="nav-btn" data-nav="historico"><svg><use href="#i-list"/></svg><span>Histórico</span></button>
+  <button type="button" class="nav-btn nav-new" data-nav="nova"><svg><use href="#i-plus"/></svg><span>Nova</span></button>
+  <button type="button" class="nav-btn" data-nav="analise"><svg><use href="#i-chart"/></svg><span>Análise</span></button>
+  <button type="button" class="nav-btn" data-nav="banca"><svg><use href="#i-wallet"/></svg><span>Banca</span></button>
+</nav>
+
+<div id="toast" role="status" aria-live="polite">
+  <div style="flex:1;"><div class="t-title" id="toast-title"></div><div class="t-msg" id="toast-msg"></div></div>
+  <button type="button" class="t-close" id="toast-close" aria-label="Fechar">&times;</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+  import { getFirestore, collection, doc, getDoc, getDocs, setDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+  // Mesmo projeto Firebase do HTML anterior: as apostas já salvas continuam aparecendo.
+  const firebaseConfig = {
+    apiKey: "AIzaSyAQzt3gydHmeaPKV7iRn74ssqq6VfUff9E",
+    authDomain: "apostas-e3512.firebaseapp.com",
+    projectId: "apostas-e3512",
+    storageBucket: "apostas-e3512.firebasestorage.app",
+    messagingSenderId: "113361708696",
+    appId: "1:113361708696:web:0b11f785a1e949149152ed",
+    measurementId: "G-N0GYF01F8R"
+  };
+
+  const configured = !Object.values(firebaseConfig).some(v => String(v).startsWith('COLE_'));
+  const cb = window.cloudBets = { configured, user:null };
+  const clean = (o) => { const c = {}; Object.keys(o).forEach(k => { if(o[k] !== undefined) c[k] = o[k]; }); return c; };
+  if(!configured){
+    window.dispatchEvent(new CustomEvent('cloud-ready',{detail:{configured:false}}));
+  } else {
+    try{
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app), db = getFirestore(app);
+      const betsCol = () => collection(db,'users',auth.currentUser.uid,'bets');
+      cb.load = async () => (await getDocs(betsCol())).docs.map(d => d.data());
+      cb.loadSince = async (ms) => (await getDocs(query(betsCol(), where('updatedAt','>',ms)))).docs.map(d => d.data());
+      cb.loadDeletedSince = async (ms) => (await getDocs(query(collection(db,'users',auth.currentUser.uid,'tombstones'), where('deletedAt','>',ms)))).docs.map(d => d.id);
+      cb.save = (bet) => setDoc(doc(db,'users',auth.currentUser.uid,'bets',bet.id), clean(bet));
+      cb.remove = async (id) => { await Promise.all([
+        deleteDoc(doc(db,'users',auth.currentUser.uid,'bets',id)),
+        setDoc(doc(db,'users',auth.currentUser.uid,'tombstones',id), { deletedAt: Date.now() })
+      ]); };
+      cb.loadSetting = async (key) => { const s = await getDoc(doc(db,'users',auth.currentUser.uid,'settings',key)); return s.exists() ? s.data() : null; };
+      cb.saveSetting = (key, data) => setDoc(doc(db,'users',auth.currentUser.uid,'settings',key), clean(data));
+      // Leitura de print com o Gemini via Firebase AI Logic (plano gratuito, sem chave no código).
+      // Carregado só quando usado: se falhar, o resto do app continua funcionando.
+      cb.readSlip = async ({ data, mimeType, prompt, model }) => {
+        const { getAI, getGenerativeModel, GoogleAIBackend } = await import("https://www.gstatic.com/firebasejs/12.1.0/firebase-ai.js");
+        const ai = getAI(app, { backend: new GoogleAIBackend() });
+        const m = getGenerativeModel(ai, { model, generationConfig: { responseMimeType: 'application/json', temperature: 0 } });
+        const res = await m.generateContent([prompt, { inlineData: { data, mimeType } }]);
+        return res.response.text();
+      };
+      cb.login = (e,p) => signInWithEmailAndPassword(auth,e,p);
+      cb.signup = (e,p) => createUserWithEmailAndPassword(auth,e,p);
+      cb.logout = () => signOut(auth);
+      onAuthStateChanged(auth, user => { cb.user = user; window.dispatchEvent(new CustomEvent('cloud-auth',{detail:{user}})); });
+      window.dispatchEvent(new CustomEvent('cloud-ready',{detail:{configured:true}}));
+    }catch(e){
+      console.error('Firebase:', e);
+      cb.configured = false;
+      window.dispatchEvent(new CustomEvent('cloud-ready',{detail:{configured:false,error:e}}));
+    }
+  }
+</script>
+<script>
+(function(){
+'use strict';
+
+/* ============================================================
+   UTILIDADES
+   ============================================================ */
+const $ = (id) => document.getElementById(id);
+const $$ = (sel, root) => Array.from((root||document).querySelectorAll(sel));
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad = (n) => String(n).padStart(2,'0');
+const isoOf = (d) => d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+const todayISO = () => isoOf(new Date());
+const fmtNum = (n, d) => (Number(n)||0).toLocaleString('pt-BR',{minimumFractionDigits:d??2, maximumFractionDigits:d??2});
+const fmtBRL = (n) => (n < -0.004 ? '-' : '') + 'R$ ' + fmtNum(Math.abs(n));
+const fmtBRLs = (n) => (n > 0.004 ? '+' : n < -0.004 ? '-' : '') + 'R$ ' + fmtNum(Math.abs(n));
+const fmtU = (n) => (n > 0.004 ? '+' : n < -0.004 ? '-' : '') + fmtNum(Math.abs(n)) + 'u';
+const fmtUabs = (n) => fmtNum(Math.abs(n)) + 'u';
+const fmtPct = (n, signed) => (signed && n > 0.04 ? '+' : '') + fmtNum(n, 1) + '%';
+const cls = (n) => n > 0.004 ? 'pos' : n < -0.004 ? 'neg' : '';
+const dateBR = (iso) => iso ? iso.split('-').reverse().join('/') : '';
+const newId = () => (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(36).slice(2));
+const clone = (o) => JSON.parse(JSON.stringify(o));
+const round2 = (v) => Math.round(v * 100) / 100;
+function parseNum(v){
+  if(typeof v === 'number') return isFinite(v) ? v : 0;
+  let s = String(v ?? '').trim().replace(/R\$|\s|%/g,'');
+  if(!s) return 0;
+  if(s.includes(',') && s.includes('.')) s = s.lastIndexOf(',') > s.lastIndexOf('.') ? s.replace(/\./g,'').replace(',','.') : s.replace(/,/g,'');
+  else if(s.includes(',')) s = s.replace(',','.');
+  const n = parseFloat(s);
+  return isNaN(n) ? 0 : n;
+}
+const MONTHS = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+const MONTHS_FULL = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const monthLabel = (key) => { const [y,m] = key.split('-'); return MONTHS_FULL[parseInt(m,10)-1] + ' ' + y; };
+
+let toastTimer = null;
+function showToast(title, msg, kind){
+  $('toast-title').textContent = title || '';
+  $('toast-msg').textContent = msg || '';
+  $('toast').className = 'show' + (kind ? ' ' + kind : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => $('toast').classList.remove('show'), kind === 'err' ? 9000 : 4500);
+}
+$('toast-close').addEventListener('click', () => { $('toast').classList.remove('show'); clearTimeout(toastTimer); });
+
+function downloadBlob(blob, name){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+/* ============================================================
+   RESULTADOS E LUCRO
+   ============================================================ */
+const RESULTS = [['pendente','Pendente'],['win','Green'],['loss','Red'],['halfwin','½ Green'],['halfloss','½ Red'],['void','Push'],['cashout','Cashout']];
+const RESULT_LABEL = Object.fromEntries(RESULTS);
+function calcProfit(stake, odd, result, cashout){
+  stake = Number(stake)||0; odd = Number(odd)||0;
+  switch(result){
+    case 'win': return round2(stake * (odd - 1));
+    case 'loss': return -round2(stake);
+    case 'halfwin': return round2(stake / 2 * (odd - 1));
+    case 'halfloss': return -round2(stake / 2);
+    case 'cashout': return round2((Number(cashout)||0) - stake);
+    default: return 0;
+  }
+}
+
+/* ============================================================
+   CONFIGURAÇÕES (bancas, limites, casas, preferências)
+   ============================================================ */
+const SETTINGS_KEY = 'apostas_settings_v2';
+const DEFAULTS = {
+  banks: { list: [{ id:'principal', name:'Principal', amount:2000, units:100 }], active:'principal' },
+  limits: { stopDay:0, stopWeek:0, maxStake:0 },
+  houses: { txs: [] },
+  prefs: { stakeMode:'reais', aiModel:'' }
+};
+const AI_MODELS = ['gemini-3.8-flash', 'gemini-flash-latest', 'gemini-2.5-flash'];
+const CLOUD_KEY = { banks:'banks', limits:'limits', houses:'houses', prefs:'preferences' };
+function normalizeSettings(s){
+  s = s || {};
+  for(const k of Object.keys(DEFAULTS)) s[k] = Object.assign(clone(DEFAULTS[k]), s[k] || {});
+  if(!Array.isArray(s.banks.list) || !s.banks.list.length) s.banks = clone(DEFAULTS.banks);
+  s.banks.list = s.banks.list.filter(b => b && b.id).map(b => ({ id:String(b.id), name:String(b.name||'Banca'), amount:Number(b.amount)>0?Number(b.amount):2000, units:Number(b.units)>0?Number(b.units):100 }));
+  if(!s.banks.list.length) s.banks = clone(DEFAULTS.banks);
+  if(s.banks.active !== '__all' && !s.banks.list.some(b => b.id === s.banks.active)) s.banks.active = s.banks.list[0].id;
+  if(!Array.isArray(s.houses.txs)) s.houses.txs = [];
+  if(s.prefs.stakeMode !== 'unidades') s.prefs.stakeMode = 'reais';
+  return s;
+}
+function loadSettings(){
+  let s = null;
+  try{ s = JSON.parse(localStorage.getItem(SETTINGS_KEY) || 'null'); }catch(e){}
+  if(!s){
+    // migra do HTML antigo
+    s = clone(DEFAULTS);
+    try{ const old = JSON.parse(localStorage.getItem('apostas_bankroll_v1') || 'null'); if(old && old.amount > 0 && old.units > 0){ s.banks.list[0].amount = +old.amount; s.banks.list[0].units = +old.units; } }catch(e){}
+    try{ const m = localStorage.getItem('apostas_stake_mode_v1'); if(m === 'unidades') s.prefs.stakeMode = 'unidades'; }catch(e){}
+  }
+  return normalizeSettings(s);
+}
+let settings = loadSettings();
+function saveSettingsLocal(){ try{ localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); }catch(e){} }
+function persistSetting(key){
+  saveSettingsLocal();
+  const c = window.cloudBets;
+  if(c?.user && c.saveSetting){
+    c.saveSetting(CLOUD_KEY[key], settings[key]).catch(e => { console.warn(e); showToast('Configuração não sincronizou', 'Ficou salva neste aparelho. Tente de novo com internet estável.', 'err'); });
+  }
+}
+async function syncSettingsFromCloud(){
+  const c = window.cloudBets;
+  if(!(c?.user && c.loadSetting)) return;
+  for(const key of Object.keys(DEFAULTS)){
+    try{
+      const remote = await c.loadSetting(CLOUD_KEY[key]);
+      if(remote){ settings[key] = remote; continue; }
+      if(key === 'banks'){
+        const old = await c.loadSetting('bankroll');
+        if(old && old.amount > 0 && old.units > 0){ settings.banks.list[0].amount = +old.amount; settings.banks.list[0].units = +old.units; }
+      }
+      await c.saveSetting(CLOUD_KEY[key], settings[key]);
+    }catch(e){ console.warn('Configuração', key, e); }
+  }
+  settings = normalizeSettings(settings);
+  saveSettingsLocal();
+}
+
+const banks = () => settings.banks.list;
+const firstBankId = () => banks()[0].id;
+const isAll = () => settings.banks.active === '__all';
+const bankById = (id) => banks().find(b => b.id === id) || banks()[0];
+const betBankId = (b) => (b.bankId && banks().some(x => x.id === b.bankId)) ? b.bankId : firstBankId();
+const unitValue = (id) => { const b = bankById(id); return (b.amount / b.units) || 1; };
+const uOf = (b, v) => (Number(v)||0) / unitValue(betBankId(b));
+const targetBankId = () => isAll() ? firstBankId() : settings.banks.active;
+
+/* ============================================================
+   APOSTAS + SINCRONIZAÇÃO (mesmo esquema do HTML anterior)
+   ============================================================ */
+const STORAGE_KEY = 'bets';
+const SYNCED_IDS_KEY = 'apostas_synced_ids_v1';
+const LAST_SYNC_KEY = 'apostas_last_sync_v1';
+const LAST_FULL_SYNC_KEY = 'apostas_last_full_sync_v1';
+const BACKUP_KEY = 'apostas_last_backup_v1';
+const FULL_SYNC_INTERVAL_MS = 24*60*60*1000;
+const TRASH_DAYS = 30;
+let bets = [];
+let loaded = false;
+let syncState = { kind:'', text:'Modo local' };
+
+const live = () => bets.filter(b => !b.deletedAt);
+const scope = () => isAll() ? live() : live().filter(b => betBankId(b) === settings.banks.active);
+const team1Of = (b) => b.team1 || (b.teams ? b.teams.split(' x ')[0] : '') || '';
+const team2Of = (b) => b.team2 || (b.teams ? (b.teams.split(' x ')[1] || '') : '') || '';
+const eventOf = (b) => [team1Of(b), team2Of(b)].filter(Boolean).join(' x ');
+
+function setSync(kind, text){
+  syncState = { kind, text };
+  $$('[data-sync-dot]').forEach(d => d.className = 'dot ' + kind);
+  $$('[data-sync-text]').forEach(t => t.textContent = text);
+}
+
+function saveBets(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(bets)); }
+  catch(e){ console.error(e); showToast('Não foi possível salvar neste aparelho', 'O armazenamento do navegador pode estar cheio. Baixe um backup.', 'err'); }
+}
+
+async function saveBetCloud(bet){
+  if(!bet) return;
+  bet.updatedAt = Date.now();
+  const c = window.cloudBets;
+  if(c?.user && c.save){
+    try{ await c.save(bet); }
+    catch(e){
+      console.warn(e);
+      setSync('err','Falha ao sincronizar');
+      showToast('Falha ao sincronizar com a nuvem', 'Esta ficha ficou salva só neste aparelho. Tente de novo com internet estável, ou veja se algo (bloqueador de anúncios, firewall) está bloqueando o Firebase.', 'err');
+    }
+  } else if(c?.configured && !c?.user){
+    showToast('Você não está logado', 'Esta ficha ficou salva só neste aparelho. Entre na sua conta (aba Banca) para sincronizar.', 'err');
+  }
+}
+
+async function uploadMany(list, onProgress){
+  const c = window.cloudBets;
+  if(!(c?.user && c.save)) return;
+  for(let i = 0; i < list.length; i += 150){
+    const chunk = list.slice(i, i + 150);
+    await Promise.all(chunk.map(b => { b.updatedAt = b.updatedAt || Date.now(); return c.save(b).catch(e => console.warn(e)); }));
+    if(onProgress) onProgress(Math.min(i + 150, list.length), list.length);
+  }
+}
+
+async function fullSyncFromCloud(){
+  const c = window.cloudBets;
+  const remote = await c.load();
+  const remoteIds = new Set(remote.map(b => b.id));
+  let lastSynced = [];
+  try{ lastSynced = JSON.parse(localStorage.getItem(SYNCED_IDS_KEY) || '[]'); }catch(e){}
+  const lastSyncedSet = new Set(lastSynced);
+  const localOnly = bets.filter(b => !remoteIds.has(b.id));
+  const toUpload = localOnly.filter(b => !lastSyncedSet.has(b.id));
+  const needsBackfill = remote.filter(b => !b.updatedAt);
+  needsBackfill.forEach(b => { b.updatedAt = b.createdAt || Date.now(); });
+  if(needsBackfill.length) await uploadMany(needsBackfill);
+  if(toUpload.length) await uploadMany(toUpload.map(b => { b.updatedAt = Date.now(); return b; }));
+  bets = [...remote, ...toUpload];
+  saveBets();
+  try{ localStorage.setItem(SYNCED_IDS_KEY, JSON.stringify(bets.map(b => b.id))); }catch(e){}
+  const now = Date.now();
+  try{ localStorage.setItem(LAST_SYNC_KEY, String(now)); localStorage.setItem(LAST_FULL_SYNC_KEY, String(now)); }catch(e){}
+}
+
+async function incrementalSyncFromCloud(){
+  const c = window.cloudBets;
+  let last = 0;
+  try{ last = parseInt(localStorage.getItem(LAST_SYNC_KEY) || '0', 10) || 0; }catch(e){}
+  if(!last) return fullSyncFromCloud();
+  const since = last - 2*60*1000;
+  const [changed, deletedIds] = await Promise.all([c.loadSince(since), c.loadDeletedSince(since)]);
+  if(changed.length || deletedIds.length){
+    const byId = new Map(bets.map(b => [b.id, b]));
+    changed.forEach(b => byId.set(b.id, b));
+    deletedIds.forEach(id => byId.delete(id));
+    bets = Array.from(byId.values());
+    saveBets();
+    try{ localStorage.setItem(SYNCED_IDS_KEY, JSON.stringify(bets.map(b => b.id))); }catch(e){}
+  }
+  try{ localStorage.setItem(LAST_SYNC_KEY, String(Date.now())); }catch(e){}
+}
+
+async function loadBets(){
+  try{ const saved = localStorage.getItem(STORAGE_KEY); bets = saved ? JSON.parse(saved) : []; if(!Array.isArray(bets)) bets = []; }
+  catch(e){ bets = []; }
+  const c = window.cloudBets;
+  if(c?.user && c.load){
+    setSync('warn','Sincronizando…');
+    try{
+      let lastFull = 0;
+      try{ lastFull = parseInt(localStorage.getItem(LAST_FULL_SYNC_KEY) || '0', 10) || 0; }catch(e){}
+      if(!lastFull || (Date.now() - lastFull) > FULL_SYNC_INTERVAL_MS) await fullSyncFromCloud();
+      else await incrementalSyncFromCloud();
+      setSync('ok', 'Sincronizado · ' + (c.user.email || 'conta'));
+    }catch(e){
+      console.warn(e);
+      setSync('err','Nuvem indisponível');
+      showToast('Não foi possível carregar da nuvem', 'Mostrando os últimos dados salvos neste aparelho — podem estar desatualizados.', 'err');
+    }
+  }
+  purgeOldTrash();
+  loaded = true;
+  render();
+}
+
+function purgeOldTrash(){
+  const limit = Date.now() - TRASH_DAYS*24*60*60*1000;
+  const old = bets.filter(b => b.deletedAt && b.deletedAt < limit);
+  old.forEach(b => purgeBet(b.id, true));
+}
+
+/* ============================================================
+   ESTATÍSTICAS
+   ============================================================ */
+function stats(list){
+  const s = { count:list.length, pending:0, pendingStake:0, pendingU:0, settled:0, staked:0, stakedU:0, totalStaked:0, totalStakedU:0,
+    profit:0, profitU:0, wins:0, losses:0, voids:0, grossWin:0, grossLoss:0, maxOdd:0 };
+  for(const b of list){
+    const st = Number(b.stake)||0, su = uOf(b, st);
+    s.totalStaked += st; s.totalStakedU += su;
+    if(b.result === 'pendente'){ s.pending++; s.pendingStake += st; s.pendingU += su; continue; }
+    s.settled++; s.staked += st; s.stakedU += su;
+    const p = Number(b.profit)||0;
+    s.profit += p; s.profitU += uOf(b, p);
+    if(p > 0) s.grossWin += p; else s.grossLoss -= p;
+    if(b.result === 'win' || b.result === 'halfwin'){ s.wins++; if((b.odd||0) > s.maxOdd) s.maxOdd = b.odd; }
+    else if(b.result === 'loss' || b.result === 'halfloss') s.losses++;
+    else s.voids++;
+  }
+  s.roi = s.staked ? s.profit / s.staked * 100 : 0;
+  s.winrate = (s.wins + s.losses) ? s.wins / (s.wins + s.losses) * 100 : 0;
+  s.factor = s.grossLoss ? s.grossWin / s.grossLoss : null;
+  s.avgStakeU = s.count ? s.totalStakedU / s.count : 0;
+  s.avgStake = s.count ? s.totalStaked / s.count : 0;
+  s.perBetU = s.settled ? s.profitU / s.settled : 0;
+  return s;
+}
+const availableMonths = (list) => [...new Set(list.map(b => b.date ? b.date.slice(0,7) : null).filter(Boolean))].sort();
+function weekStartISO(){ const d = new Date(); const day = (d.getDay() + 6) % 7; d.setDate(d.getDate() - day); return isoOf(d); }
+function lossU(list){ const net = list.filter(b => b.result !== 'pendente').reduce((s,b) => s + uOf(b, b.profit), 0); return Math.max(0, -net); }
+
+/* ============================================================
+   NAVEGAÇÃO
+   ============================================================ */
+const VIEWS = { painel:['Ledger pessoal','Painel'], historico:['Todas as fichas','Histórico'], nova:['Registrar','Nova ficha'], analise:['Desempenho','Análise'], banca:['Configuração','Banca e dados'] };
+let view = 'painel';
+function setView(v, opts){
+  if(!VIEWS[v]) v = 'painel';
+  view = v;
+  $$('[data-view-panel]').forEach(p => p.classList.toggle('active', p.dataset.viewPanel === v));
+  $$('[data-nav]').forEach(b => b.classList.toggle('active', b.dataset.nav === v));
+  $('view-eyebrow').textContent = VIEWS[v][0];
+  $('view-title').textContent = v === 'nova' && editingId ? 'Editar ficha' : VIEWS[v][1];
+  if(location.hash !== '#' + v) history.replaceState(null, '', '#' + v);
+  if(!(opts && opts.keepScroll)) window.scrollTo(0, 0);
+  render();
+}
+$$('[data-nav]').forEach(b => b.addEventListener('click', () => {
+  if(b.dataset.nav === 'nova' && editingId && view !== 'nova') resetForm();
+  setView(b.dataset.nav);
+}));
+$$('[data-goto]').forEach(b => b.addEventListener('click', () => {
+  setView(b.dataset.goto);
+  if(b.dataset.anchor) setTimeout(() => $(b.dataset.anchor)?.scrollIntoView({behavior:'smooth', block:'start'}), 50);
+}));
+window.addEventListener('hashchange', () => { const v = location.hash.slice(1); if(v && v !== view && VIEWS[v]) setView(v); });
+
+$('bank-select').addEventListener('change', (e) => {
+  settings.banks.active = e.target.value;
+  persistSetting('banks');
+  render();
+});
+
+/* ============================================================
+   RENDER GERAL
+   ============================================================ */
+function render(){
+  if(!loaded) return;
+  renderBankSelects();
+  renderDatalists();
+  if(view === 'painel') renderPainel();
+  if(view === 'historico') renderHistorico();
+  if(view === 'nova') { updatePreview(); updateWarnings(); }
+  if(view === 'analise') renderAnalise();
+  if(view === 'banca') renderBanca();
+}
+
+function renderBankSelects(){
+  const opts = banks().map(b => `<option value="${esc(b.id)}">${esc(b.name)}</option>`).join('');
+  const sel = $('bank-select');
+  sel.innerHTML = opts + (banks().length > 1 ? '<option value="__all">Todas as bancas</option>' : '');
+  sel.value = settings.banks.active === '__all' && banks().length < 2 ? firstBankId() : settings.banks.active;
+  const fb = $('f-bank'), fbv = fb.value;
+  fb.innerHTML = opts;
+  fb.value = (fbv && banks().some(b => b.id === fbv)) ? fbv : targetBankId();
+  const ib = $('imp-bank'), ibv = ib.value;
+  ib.innerHTML = opts;
+  ib.value = (ibv && banks().some(b => b.id === ibv)) ? ibv : targetBankId();
+}
+
+function renderDatalists(){
+  const L = live();
+  const uniq = (arr) => [...new Set(arr.filter(Boolean).map(s => String(s).trim()).filter(Boolean))].sort((a,b) => a.localeCompare(b,'pt-BR'));
+  const fill = (id, arr) => { $(id).innerHTML = arr.map(v => `<option value="${esc(v)}">`).join(''); };
+  const bookies = uniq([...L.map(b => b.bookie), ...settings.houses.txs.map(t => t.house)]);
+  fill('bookie-list', bookies);
+  fill('comp-list', uniq(L.map(b => b.competition)));
+  fill('sport-list', uniq(['Futebol','Basquete','Tênis','Futebol Americano','Vôlei','MMA','eSports', ...L.map(b => b.sport)]));
+  fill('tipster-list', uniq(L.map(b => b.tipster)));
+  fill('team-list', uniq(L.slice(-800).flatMap(b => [team1Of(b), team2Of(b)])));
+  const keep = (id, arr, allLabel) => { const s = $(id), v = s.value; s.innerHTML = `<option value="">${allLabel}</option>` + arr.map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join(''); s.value = arr.includes(v) ? v : ''; };
+  keep('f-fbookie', uniq(L.map(b => b.bookie)), 'Todas as casas');
+  keep('f-fsport', uniq(L.map(b => b.sport)), 'Todos os esportes');
+}
+
+/* ============================================================
+   PAINEL
+   ============================================================ */
+let boardMode = 'all', boardMonth = null;
+let chartMode = 'day', chartMonth = null;
+let detailSort = { col:'key', dir:'desc' };
+
+$('board-toggle').addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-mode]'); if(!b) return;
+  boardMode = b.dataset.mode;
+  $$('#board-toggle button').forEach(x => x.classList.toggle('active', x === b));
+  renderPainel();
+});
+$('board-prev').addEventListener('click', () => { const m = availableMonths(scope()); const i = m.indexOf(boardMonth); if(i > 0){ boardMonth = m[i-1]; renderPainel(); } });
+$('board-next').addEventListener('click', () => { const m = availableMonths(scope()); const i = m.indexOf(boardMonth); if(i > -1 && i < m.length-1){ boardMonth = m[i+1]; renderPainel(); } });
+$('chart-toggle').addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-mode]'); if(!b) return;
+  chartMode = b.dataset.mode;
+  $$('#chart-toggle button').forEach(x => x.classList.toggle('active', x === b));
+  $('chart-title').textContent = chartMode === 'day' ? 'Resultados por dia' : 'Resultados por mês';
+  renderPainel();
+});
+$('chart-prev').addEventListener('click', () => { const m = availableMonths(scope()); const i = m.indexOf(chartMonth); if(i > 0){ chartMonth = m[i-1]; renderPainel(); } });
+$('chart-next').addEventListener('click', () => { const m = availableMonths(scope()); const i = m.indexOf(chartMonth); if(i > -1 && i < m.length-1){ chartMonth = m[i+1]; renderPainel(); } });
+$('detail-toggle').addEventListener('click', () => {
+  const w = $('detail-wrap'), hidden = w.style.display === 'none';
+  w.style.display = hidden ? 'block' : 'none';
+  $('detail-toggle').textContent = hidden ? 'Ocultar dados detalhados ▴' : 'Ver dados detalhados ▾';
+});
+$$('#detail-table th[data-sort]').forEach(th => th.addEventListener('click', () => {
+  const c = th.dataset.sort;
+  detailSort = detailSort.col === c ? { col:c, dir: detailSort.dir === 'asc' ? 'desc' : 'asc' } : { col:c, dir:'desc' };
+  renderPainel();
+}));
+$('pend-all').addEventListener('click', () => { $('f-fresult').value = 'pendente'; histDate = ''; setView('historico'); });
+$('backup-banner-btn').addEventListener('click', exportBackup);
+
+function renderPainel(){
+  const S = scope();
+  // saldo
+  const all = stats(S);
+  let initial, initialU, name;
+  if(isAll()){ initial = banks().reduce((s,b) => s + b.amount, 0); initialU = banks().reduce((s,b) => s + b.units, 0); name = 'Todas as bancas'; }
+  else { const b = bankById(settings.banks.active); initial = b.amount; initialU = b.units; name = b.name; }
+  const current = initial + all.profit, currentU = initialU + all.profitU;
+  $('bal-name').textContent = name;
+  $('bal-value').textContent = fmtBRL(current);
+  $('bal-units').textContent = fmtNum(currentU) + 'u';
+  $('bal-initial').textContent = `Inicial ${fmtBRL(initial)} (${fmtNum(initialU, 0)}u) · 1u = ${isAll() ? 'varia por banca' : fmtBRL(unitValue(settings.banks.active))}`;
+  const g = $('bal-growth');
+  g.textContent = `${fmtBRLs(all.profit)} · ${fmtU(all.profitU)} · ${fmtPct(initial ? all.profit/initial*100 : 0, true)}`;
+  g.className = 'mono ' + cls(all.profit);
+
+  // backup
+  const lastBk = parseInt(localStorage.getItem(BACKUP_KEY) || '0', 10) || 0;
+  $('backup-banner').style.display = (live().length >= 20 && Date.now() - lastBk > 7*24*60*60*1000) ? 'flex' : 'none';
+  $('backup-banner-text').textContent = lastBk ? `Último backup baixado neste aparelho: ${new Date(lastBk).toLocaleDateString('pt-BR')}. Vale baixar outro.` : 'Você ainda não baixou nenhum backup neste aparelho. Vale guardar uma cópia fora da nuvem.';
+
+  // placar
+  const months = availableMonths(S);
+  const nav = $('board-month-nav');
+  let boardList = S;
+  if(boardMode === 'month'){
+    nav.style.display = 'flex';
+    if(!months.length){ $('board-month').textContent = 'sem dados'; $('board-prev').disabled = $('board-next').disabled = true; }
+    else {
+      if(!boardMonth || !months.includes(boardMonth)) boardMonth = months[months.length-1];
+      const i = months.indexOf(boardMonth);
+      $('board-month').textContent = monthLabel(boardMonth);
+      $('board-prev').disabled = i <= 0; $('board-next').disabled = i >= months.length-1;
+      boardList = S.filter(b => b.date && b.date.startsWith(boardMonth));
+    }
+  } else nav.style.display = 'none';
+  const st = stats(boardList);
+  $('st-count').textContent = st.count;
+  $('st-count-sub').textContent = st.pending ? `${st.pending} pendente${st.pending > 1 ? 's' : ''}` : '';
+  $('st-staked').textContent = fmtBRL(st.staked);
+  $('st-staked-u').textContent = fmtUabs(st.stakedU);
+  $('st-profit').textContent = fmtBRL(st.profit); $('st-profit').className = 'cell-value ' + cls(st.profit);
+  $('st-profit-u').textContent = fmtU(st.profitU); $('st-profit-u').className = 'cell-sub ' + cls(st.profit);
+  $('st-roi').textContent = fmtPct(st.roi, true); $('st-roi').className = 'cell-value ' + cls(st.roi);
+  $('st-winrate').textContent = fmtPct(st.winrate);
+  $('st-wl').textContent = `${st.wins}G · ${st.losses}R${st.voids ? ' · ' + st.voids + 'V' : ''}`;
+
+  renderLimitsCard(S);
+  renderPending(S);
+  drawChart(S);
+}
+
+function limitRows(S){
+  const L = settings.limits, rows = [];
+  const today = todayISO(), ws = weekStartISO();
+  if(L.stopDay > 0){ const u = lossU(S.filter(b => b.date === today)); rows.push({ label:'Stop-loss do dia', used:u, max:L.stopDay }); }
+  if(L.stopWeek > 0){ const u = lossU(S.filter(b => b.date && b.date >= ws && b.date <= today)); rows.push({ label:'Stop-loss da semana', used:u, max:L.stopWeek }); }
+  return rows;
+}
+function renderLimitsCard(S){
+  const rows = limitRows(S);
+  const L = settings.limits;
+  if(!rows.length && !(L.maxStake > 0)){
+    $('limits-body').innerHTML = '<p class="help" style="margin:0;">Nenhum limite definido. Defina stop-loss e stake máxima na aba Banca para receber avisos antes de registrar.</p>';
+    return;
+  }
+  $('limits-body').innerHTML = rows.map(r => {
+    const pct = Math.min(100, r.used / r.max * 100);
+    return `<div class="limit"><div class="limit-head"><span>${r.label}</span><span class="mono muted">${fmtNum(r.used)}u de ${fmtNum(r.max)}u</span></div>
+      <div class="bar ${pct >= 75 ? 'hot' : ''}"><div style="width:${pct.toFixed(1)}%"></div></div></div>`;
+  }).join('') + (L.maxStake > 0 ? `<p class="help" style="margin:${rows.length ? '10px' : '0'} 0 0;">Stake máxima: <span class="mono">${fmtNum(L.maxStake)}u</span></p>` : '');
+}
+
+function renderPending(S){
+  const pend = S.filter(b => b.result === 'pendente').sort((a,b) => (b.date||'').localeCompare(a.date||'') || (b.createdAt||0) - (a.createdAt||0));
+  $('pend-title').textContent = `Pendentes (${pend.length})`;
+  if(!pend.length){ $('pend-list').innerHTML = '<div class="empty" style="padding:10px 0;">Nada em aberto.</div>'; return; }
+  $('pend-list').innerHTML = pend.slice(0, 6).map(b => `
+    <div class="pend">
+      <div class="pend-top">
+        <div style="min-width:0;">
+          <div class="pend-meta">${esc(dateBR(b.date))}${b.competition ? ' · ' + esc(b.competition) : ''}${b.bookie ? ' · ' + esc(b.bookie) : ''}</div>
+          <div class="pend-event">${esc(eventOf(b) || '—')}</div>
+          <div class="pend-market">${b.kind === 'multipla' ? '<b class="mono" style="color:var(--gold);font-size:10px;">MÚLT </b>' : ''}${esc(b.market || '')}</div>
+        </div>
+        <div class="pend-nums"><div>@${fmtNum(b.odd)}</div><div class="muted">${fmtUabs(uOf(b, b.stake))}</div></div>
+      </div>
+      <div class="pend-actions">
+        <button type="button" class="q-win" data-quick="win" data-id="${esc(b.id)}">Green</button>
+        <button type="button" class="q-loss" data-quick="loss" data-id="${esc(b.id)}">Red</button>
+        <button type="button" data-edit="${esc(b.id)}">Outro…</button>
+      </div>
+    </div>`).join('') + (pend.length > 6 ? `<p class="help" style="text-align:center;">+${pend.length - 6} no histórico</p>` : '');
+  $$('#pend-list [data-quick]').forEach(btn => btn.addEventListener('click', () => updateStatus(btn.dataset.id, btn.dataset.quick)));
+  $$('#pend-list [data-edit]').forEach(btn => btn.addEventListener('click', () => editBet(btn.dataset.edit)));
+}
+
+function drawChart(S){
+  const holder = $('chart-holder');
+  const months = availableMonths(S);
+  const mnav = $('chart-month-nav');
+  if(chartMode === 'day' && months.length){
+    mnav.style.display = 'flex';
+    if(!chartMonth || !months.includes(chartMonth)) chartMonth = months[months.length-1];
+    const i = months.indexOf(chartMonth);
+    $('chart-month').textContent = monthLabel(chartMonth);
+    $('chart-prev').disabled = i <= 0; $('chart-next').disabled = i >= months.length-1;
+  } else mnav.style.display = 'none';
+  const inScope = (b) => b.date && (chartMode !== 'day' || !chartMonth || b.date.startsWith(chartMonth));
+  const keyOf = (b) => chartMode === 'day' ? b.date : b.date.slice(0,7);
+
+  // tabela detalhada (todas as fichas do período)
+  const groups = {};
+  S.filter(inScope).forEach(b => {
+    const k = keyOf(b);
+    const g = groups[k] || (groups[k] = { key:k, profit:0, profitU:0, stakedU:0, count:0, settled:0 });
+    g.count++; g.stakedU += uOf(b, b.stake);
+    if(b.result !== 'pendente'){ g.settled++; g.profit += b.profit||0; g.profitU += uOf(b, b.profit); }
+  });
+  const asc = Object.values(groups).sort((a,b) => a.key.localeCompare(b.key));
+  let run = 0; asc.forEach(r => { run += r.profitU; r.cumU = run; });
+  const lbl = (k, long) => chartMode === 'day' ? (long ? dateBR(k) : k.slice(8,10) + '/' + k.slice(5,7)) : (long ? monthLabel(k) : MONTHS[parseInt(k.slice(5,7),10)-1] + '/' + k.slice(2,4));
+
+  const bars = asc.filter(r => r.settled > 0);
+  if(!bars.length){
+    holder.innerHTML = '<div class="empty">registre ao menos uma ficha resolvida para ver os resultados</div>';
+    $('chart-info').textContent = 'Toque ou passe o mouse numa barra para ver os detalhes';
+    $('chart-info').className = 'chart-info';
+  } else {
+    const values = bars.map(r => r.profitU);
+    const min = Math.min(0, ...values), max = Math.max(0, ...values);
+    const range = (max - min) || 1, padR = range * .18;
+    const sMin = min - padR, sMax = max + padR, sR = (sMax - sMin) || 1;
+    const barW = 34, gap = 18, pd = 10, h = 180, labelH = 30, chartH = h - labelH;
+    const w = Math.max(320, bars.length * (barW + gap) + pd*2);
+    const toY = (v) => pd + chartH - ((v - sMin) / sR) * (chartH - pd*2) - pd;
+    const zeroY = toY(0);
+    const path = (x, bw, top, bottom, up) => {
+      const r = Math.min(6, (bottom-top)/2, bw/2);
+      return up ? `M${x},${bottom} L${x},${top+r} Q${x},${top} ${x+r},${top} L${x+bw-r},${top} Q${x+bw},${top} ${x+bw},${top+r} L${x+bw},${bottom} Z`
+                : `M${x},${top} L${x+bw},${top} L${x+bw},${bottom-r} Q${x+bw},${bottom} ${x+bw-r},${bottom} L${x+r},${bottom} Q${x},${bottom} ${x},${bottom-r} Z`;
+    };
+    const svg = bars.map((r, i) => {
+      const v = r.profitU, x = pd + i * (barW + gap), y = toY(v);
+      const dh = Math.max(Math.abs(y - zeroY), 12);
+      const top = v >= 0 ? zeroY - dh : zeroY, bottom = v >= 0 ? zeroY : zeroY + dh;
+      const color = v > 0 ? 'var(--win)' : v < 0 ? 'var(--loss)' : 'var(--void)';
+      const vy = v >= 0 ? Math.max(top - 6, 10) : Math.min(bottom + 13, chartH - 2);
+      const info = `${lbl(r.key, true)}: ${fmtU(v)} (${fmtBRLs(r.profit)}) · ${r.settled} aposta${r.settled > 1 ? 's' : ''}`;
+      return `<path class="bar-hit" data-info="${esc(info)}" data-pos="${v >= 0}" d="${path(x, barW, top, bottom, v >= 0)}" fill="${color}"></path>
+        <text x="${x + barW/2}" y="${vy}" text-anchor="middle" font-size="9.5" fill="var(--text-muted)" font-family="JetBrains Mono, monospace">${(v >= 0 ? '+' : '') + fmtNum(v, Math.abs(v) >= 100 ? 0 : 1)}</text>
+        <text x="${x + barW/2}" y="${chartH + 20}" text-anchor="middle" font-size="10.5" fill="var(--text-muted)" font-family="JetBrains Mono, monospace">${lbl(r.key)}</text>`;
+    }).join('');
+    holder.innerHTML = `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" role="img" aria-label="Resultado por ${chartMode === 'day' ? 'dia' : 'mês'}"><line x1="0" y1="${zeroY}" x2="${w}" y2="${zeroY}" stroke="var(--border)" stroke-dasharray="4,4"/>${svg}</svg>`;
+    const show = (el) => { $('chart-info').textContent = el.getAttribute('data-info'); $('chart-info').className = 'chart-info ' + (el.getAttribute('data-pos') === 'true' ? 'win' : 'loss'); };
+    $$('.bar-hit', holder).forEach(el => { el.addEventListener('mouseenter', () => show(el)); el.addEventListener('click', () => show(el)); el.addEventListener('touchstart', () => show(el), {passive:true}); });
+    if(chartMode === 'month') holder.scrollLeft = holder.scrollWidth;
+  }
+
+  const rows = asc.slice();
+  const d = detailSort.dir === 'asc' ? 1 : -1;
+  rows.sort((a,b) => detailSort.col === 'key' ? a.key.localeCompare(b.key) * d : (a[detailSort.col] - b[detailSort.col]) * d);
+  $('detail-body').innerHTML = rows.map(r => `<tr><td>${lbl(r.key, true)}</td><td class="${cls(r.profitU)}">${fmtU(r.profitU)}</td><td>${fmtUabs(r.stakedU)}</td><td>${r.count}</td><td class="${cls(r.cumU)}">${fmtU(r.cumU)}</td></tr>`).join('')
+    || '<tr><td colspan="5" style="text-align:center;" class="muted">sem dados neste período</td></tr>';
+  const tp = asc.reduce((s,r) => s + r.profitU, 0), ts = asc.reduce((s,r) => s + r.stakedU, 0), tc = asc.reduce((s,r) => s + r.count, 0);
+  $('detail-foot').innerHTML = asc.length ? `<tr><td>TOTAL</td><td class="${cls(tp)}">${fmtU(tp)}</td><td>${fmtUabs(ts)}</td><td>${tc}</td><td class="${cls(tp)}">${fmtU(tp)}</td></tr>` : '';
+  $$('#detail-table th[data-sort]').forEach(th => { const base = th.textContent.replace(/ [▾▴]$/,''); th.textContent = base + (th.dataset.sort === detailSort.col ? (detailSort.dir === 'asc' ? ' ▴' : ' ▾') : ''); });
+}
+
+/* ============================================================
+   HISTÓRICO
+   ============================================================ */
+const PAGE = 100;
+let histVisible = PAGE, histDate = '';
+$('f-fresult').innerHTML = '<option value="">Todos os resultados</option>' + RESULTS.map(([k,l]) => `<option value="${k}">${l}</option>`).join('');
+['f-search','f-fbookie','f-fsport','f-fresult'].forEach(id => $(id).addEventListener(id === 'f-search' ? 'input' : 'change', () => { histVisible = PAGE; renderHistorico(); }));
+$('load-more-btn').addEventListener('click', () => { histVisible += PAGE; renderHistorico(); });
+
+function renderHistorico(){
+  const S = scope();
+  const counts = {};
+  S.forEach(b => { if(b.date) counts[b.date] = (counts[b.date]||0) + 1; });
+  const dates = Object.keys(counts).sort((a,b) => b.localeCompare(a));
+  if(histDate && !counts[histDate]) histDate = '';
+  const tabs = $('date-tabs');
+  if(dates.length <= 1) tabs.innerHTML = '';
+  else {
+    tabs.innerHTML = `<button type="button" class="date-tab ${histDate === '' ? 'active' : ''}" data-tab="">Todas<span class="n">${S.length}</span></button>` +
+      dates.slice(0, 45).map(d => `<button type="button" class="date-tab ${histDate === d ? 'active' : ''}" data-tab="${d}">${d.slice(8,10)}/${d.slice(5,7)}<span class="n">${counts[d]}</span></button>`).join('');
+    $$('[data-tab]', tabs).forEach(b => b.addEventListener('click', () => { histDate = b.dataset.tab; histVisible = PAGE; renderHistorico(); }));
+  }
+  const q = $('f-search').value.trim().toLowerCase();
+  const fb = $('f-fbookie').value, fs = $('f-fsport').value, fr = $('f-fresult').value;
+  const list = S.filter(b => {
+    if(histDate && b.date !== histDate) return false;
+    if(fb && b.bookie !== fb) return false;
+    if(fs && b.sport !== fs) return false;
+    if(fr && b.result !== fr) return false;
+    if(q){ const hay = [team1Of(b), team2Of(b), b.competition, b.market, b.tipster, b.sport, b.notes, b.bookie].join(' ').toLowerCase(); if(!hay.includes(q)) return false; }
+    return true;
+  }).sort((a,b) => (b.date||'').localeCompare(a.date||'') || (b.createdAt||0) - (a.createdAt||0));
+  $('f-count').textContent = `${list.length} de ${S.length}`;
+  const ledger = $('ledger');
+  if(!list.length){
+    ledger.innerHTML = `<div class="empty" style="border:1px dashed var(--border);border-radius:10px;padding:36px 10px;">${S.length ? 'Nenhuma ficha com esses filtros.' : 'Nenhuma ficha ainda. Registre a primeira na aba Nova.'}</div>`;
+    $('load-more').style.display = 'none';
+    return;
+  }
+  ledger.innerHTML = list.slice(0, histVisible).map(b => {
+    const meta = [b.competition, b.sport, b.tipster].filter(Boolean).map(esc).join(' · ');
+    const p = b.result === 'pendente' ? '—' : fmtU(uOf(b, b.profit));
+    return `<div class="bet-row">
+      <div class="strip ${b.result}"></div>
+      <div class="r-date">${dateBR(b.date)}</div>
+      <div class="r-event"><span class="r-meta">${meta || '&nbsp;'}</span><span class="r-teams">${esc(eventOf(b) || '—')}</span></div>
+      <div class="r-market">${b.kind === 'multipla' ? '<span class="tag">MÚLT</span>' : ''}${esc(b.market || '')}${b.notes ? ` <span class="muted" style="font-weight:400;">· ${esc(b.notes)}</span>` : ''}</div>
+      <div class="r-bookie">${esc(b.bookie || '')}</div>
+      <div class="r-num r-stake">${fmtUabs(uOf(b, b.stake))}<span class="o"> @${fmtNum(b.odd)}</span></div>
+      <div class="r-num r-odd">${fmtNum(b.odd)}</div>
+      <select class="badge ${b.result}" data-status="${esc(b.id)}" aria-label="Resultado">${RESULTS.map(([k,l]) => `<option value="${k}" ${b.result === k ? 'selected' : ''}>${l}</option>`).join('')}</select>
+      <div class="r-profit ${cls(b.profit)}" title="${b.result === 'pendente' ? '' : fmtBRLs(b.profit)}">${p}</div>
+      <div class="r-actions"><button type="button" class="btn-sm" data-edit="${esc(b.id)}">Editar</button></div>
+    </div>`;
+  }).join('');
+  $$('[data-edit]', ledger).forEach(btn => btn.addEventListener('click', () => editBet(btn.dataset.edit)));
+  $$('[data-status]', ledger).forEach(sel => sel.addEventListener('change', () => updateStatus(sel.dataset.status, sel.value)));
+  const lm = $('load-more');
+  if(list.length > histVisible){ lm.style.display = 'flex'; lm.querySelector('span').textContent = `Mostrando ${histVisible} de ${list.length}`; }
+  else lm.style.display = 'none';
+}
+
+async function updateStatus(id, result){
+  const b = bets.find(x => x.id === id);
+  if(!b) return;
+  if(result === 'cashout'){
+    editBet(id);
+    setResult('cashout');
+    $('f-cashout').focus();
+    showToast('Informe o valor do cashout', 'Digite quanto voltou da casa e salve a ficha.');
+    return;
+  }
+  b.result = result;
+  b.profit = calcProfit(b.stake, b.odd, result, b.cashout);
+  if(result !== 'cashout') delete b.cashout;
+  saveBets();
+  await saveBetCloud(b);
+  render();
+}
+
+/* ============================================================
+   NOVA / EDITAR
+   ============================================================ */
+let editingId = null, formKind = 'simples', formResult = 'pendente', stakeMode = settings.prefs.stakeMode, confirmArmed = false;
+$('result-chips').innerHTML = RESULTS.map(([k,l]) => `<button type="button" class="chip" data-r="${k}" role="radio">${l}</button>`).join('');
+function setResult(r){
+  formResult = r;
+  $$('#result-chips .chip').forEach(c => { const on = c.dataset.r === r; c.classList.toggle('active', on); c.setAttribute('aria-checked', on); });
+  $('cashout-field').style.display = r === 'cashout' ? '' : 'none';
+  updatePreview();
+}
+$('result-chips').addEventListener('click', (e) => { const c = e.target.closest('[data-r]'); if(c) setResult(c.dataset.r); });
+function setKind(k){
+  formKind = k;
+  $$('#kind-toggle button').forEach(b => b.classList.toggle('active', b.dataset.kind === k));
+  $('f-market-label').textContent = k === 'multipla' ? 'Seleções da múltipla (ex.: Palmeiras vence + Flamengo over 1.5)' : 'Mercado';
+}
+$('kind-toggle').addEventListener('click', (e) => { const b = e.target.closest('[data-kind]'); if(b) setKind(b.dataset.kind); });
+
+function formBankId(){ return $('f-bank').value || targetBankId(); }
+function applyStakeMode(mode){
+  stakeMode = mode;
+  $$('#stake-mode button').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+  $('f-stake-label').textContent = mode === 'unidades' ? 'Stake (unidades)' : 'Stake (R$)';
+}
+function stakeReais(){ const raw = parseNum($('f-stake').value); return stakeMode === 'unidades' ? raw * unitValue(formBankId()) : raw; }
+$('stake-mode').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-mode]'); if(!b || b.dataset.mode === stakeMode) return;
+  const raw = $('f-stake').value;
+  if(raw !== ''){
+    const reais = stakeReais();
+    $('f-stake').value = round2(b.dataset.mode === 'unidades' ? reais / unitValue(formBankId()) : reais);
+  }
+  applyStakeMode(b.dataset.mode);
+  settings.prefs.stakeMode = b.dataset.mode;
+  persistSetting('prefs');
+  updatePreview(); updateWarnings();
+});
+['f-stake','f-odd','f-cashout'].forEach(id => $(id).addEventListener('input', () => { confirmArmed = false; updatePreview(); updateWarnings(); }));
+$('f-bank').addEventListener('change', () => { confirmArmed = false; updatePreview(); updateWarnings(); });
+$('f-data').addEventListener('change', updateWarnings);
+
+function updatePreview(){
+  const stake = stakeReais(), odd = parseNum($('f-odd').value), uv = unitValue(formBankId());
+  let label, value;
+  if(formResult === 'pendente'){ label = 'Se der green'; value = calcProfit(stake, odd, 'win'); }
+  else { label = 'Resultado desta ficha'; value = calcProfit(stake, odd, formResult, parseNum($('f-cashout').value)); }
+  $('preview-label').textContent = label;
+  const el = $('preview-value');
+  el.textContent = `${fmtBRLs(value)} · ${fmtU(value / uv)}`;
+  el.className = 'mono ' + cls(value);
+}
+
+function currentWarnings(){
+  const L = settings.limits, out = [];
+  const bankId = formBankId(), uv = unitValue(bankId);
+  const stakeU = stakeReais() / uv;
+  if(L.maxStake > 0 && stakeU > L.maxStake + 1e-9) out.push({ hot:true, text:`Stake de ${fmtNum(stakeU)}u passa do seu máximo de ${fmtNum(L.maxStake)}u.` });
+  const list = live().filter(b => betBankId(b) === bankId && b.id !== editingId);
+  const date = $('f-data').value || todayISO();
+  if(L.stopDay > 0){
+    const used = lossU(list.filter(b => b.date === date));
+    if(used >= L.stopDay) out.push({ hot:true, text:`Stop-loss do dia atingido: ${fmtNum(used)}u de ${fmtNum(L.stopDay)}u perdidos.` });
+    else if(used >= L.stopDay * .75) out.push({ hot:false, text:`Atenção: ${fmtNum(used)}u de ${fmtNum(L.stopDay)}u do stop-loss do dia já foram.` });
+  }
+  if(L.stopWeek > 0){
+    const ws = weekStartISO(), td = todayISO();
+    const used = lossU(list.filter(b => b.date && b.date >= ws && b.date <= td));
+    if(used >= L.stopWeek) out.push({ hot:true, text:`Stop-loss da semana atingido: ${fmtNum(used)}u de ${fmtNum(L.stopWeek)}u perdidos.` });
+    else if(used >= L.stopWeek * .75) out.push({ hot:false, text:`Atenção: ${fmtNum(used)}u de ${fmtNum(L.stopWeek)}u do stop-loss da semana já foram.` });
+  }
+  return out;
+}
+function updateWarnings(){
+  const w = editingId ? [] : currentWarnings();
+  const box = $('form-warn');
+  if(!w.length){ box.style.display = 'none'; box.innerHTML = ''; $('submit-btn').textContent = editingId ? 'Salvar alteração' : 'Registrar ficha'; return; }
+  box.style.display = '';
+  box.innerHTML = w.map(x => `<div class="warn ${x.hot ? 'hot' : ''}" style="margin-bottom:6px;"><span aria-hidden="true">⚠</span><span>${esc(x.text)}</span></div>`).join('');
+  $('submit-btn').textContent = confirmArmed ? 'Registrar mesmo assim' : 'Registrar ficha';
+}
+
+function resetForm(){
+  editingId = null; confirmArmed = false;
+  $('bet-form').reset();
+  $('f-data').value = todayISO();
+  $('f-bank').value = targetBankId();
+  setKind('simples'); setResult('pendente');
+  applyStakeMode(settings.prefs.stakeMode);
+  $('form-title').textContent = 'Nova ficha';
+  $('cancel-btn').style.display = 'none';
+  $('delete-btn').style.display = 'none';
+  $('delete-btn').textContent = 'Mover p/ lixeira';
+  if(view === 'nova') $('view-title').textContent = 'Nova ficha';
+  updatePreview(); updateWarnings();
+}
+
+$('bet-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const odd = parseNum($('f-odd').value), stake = round2(stakeReais());
+  if(!(odd >= 1)){ showToast('Odd inválida', 'A odd precisa ser 1 ou maior.', 'err'); $('f-odd').focus(); return; }
+  if(!(stake > 0)){ showToast('Stake inválida', 'Informe o valor apostado.', 'err'); $('f-stake').focus(); return; }
+  if(formResult === 'cashout' && $('f-cashout').value === ''){ showToast('Falta o valor do cashout', 'Informe quanto voltou da casa.', 'err'); $('f-cashout').focus(); return; }
+  if(!editingId){
+    const hot = currentWarnings().filter(w => w.hot);
+    if(hot.length && !confirmArmed){ confirmArmed = true; updateWarnings(); showToast('Passou de um limite seu', 'Confira o aviso. Se quiser registrar mesmo assim, toque no botão de novo.'); return; }
+  }
+  const t1 = $('f-team1').value.trim(), t2 = $('f-team2').value.trim();
+  const data = {
+    date: $('f-data').value || todayISO(),
+    sport: $('f-sport').value.trim(),
+    competition: $('f-comp').value.trim(),
+    bookie: $('f-bookie').value.trim(),
+    team1: t1, team2: t2, teams: t1 + ' x ' + t2,
+    market: $('f-market').value.trim(),
+    tipster: $('f-tipster').value.trim(),
+    notes: $('f-notes').value.trim(),
+    kind: formKind,
+    bankId: formBankId(),
+    result: formResult,
+    stake, odd
+  };
+  if(formResult === 'cashout') data.cashout = round2(parseNum($('f-cashout').value));
+  data.profit = calcProfit(data.stake, data.odd, data.result, data.cashout);
+  let bet;
+  if(editingId){
+    const i = bets.findIndex(b => b.id === editingId);
+    if(i > -1){ bet = Object.assign({ id: editingId, createdAt: bets[i].createdAt || Date.now() }, data); bets[i] = bet; }
+  } else {
+    bet = Object.assign({ id: newId(), createdAt: Date.now() }, data);
+    bets.push(bet);
+  }
+  const wasEditing = !!editingId;
+  saveBets();
+  await saveBetCloud(bet);
+  resetForm();
+  if(wasEditing){ showToast('Ficha atualizada', '', 'ok'); setView('historico'); }
+  else {
+    showToast('Ficha registrada', `${eventOf(bet) || bet.market} · ${fmtUabs(uOf(bet, bet.stake))} @${fmtNum(bet.odd)}`, 'ok');
+    render();
+    if(!fillNextFromQueue()){ $('slip-status').textContent = ''; window.scrollTo(0,0); }
+  }
+});
+$('cancel-btn').addEventListener('click', () => { resetForm(); setView('historico'); });
+$('repeat-btn').addEventListener('click', () => {
+  const L = live(); if(!L.length) return;
+  const last = L.slice().sort((a,b) => (a.createdAt||0) - (b.createdAt||0))[L.length - 1];
+  $('f-team1').value = team1Of(last); $('f-team2').value = team2Of(last);
+  $('f-comp').value = last.competition || ''; $('f-sport').value = last.sport || '';
+  if(!$('f-bookie').value) $('f-bookie').value = last.bookie || '';
+});
+
+function editBet(id){
+  const b = bets.find(x => x.id === id); if(!b) return;
+  editingId = id; confirmArmed = false;
+  pendingDelete.delete(id);
+  applyStakeMode('reais');
+  $('f-data').value = b.date || todayISO();
+  $('f-sport').value = b.sport || '';
+  $('f-comp').value = b.competition || '';
+  $('f-bookie').value = b.bookie || '';
+  $('f-team1').value = team1Of(b); $('f-team2').value = team2Of(b);
+  $('f-market').value = b.market || '';
+  $('f-tipster').value = b.tipster || '';
+  $('f-notes').value = b.notes || '';
+  renderBankSelects();
+  $('f-bank').value = betBankId(b);
+  $('f-odd').value = b.odd || '';
+  $('f-stake').value = b.stake || '';
+  $('f-cashout').value = b.cashout ?? '';
+  setKind(b.kind === 'multipla' ? 'multipla' : 'simples');
+  setResult(b.result || 'pendente');
+  $('form-title').textContent = 'Editando ficha';
+  $('cancel-btn').style.display = '';
+  $('delete-btn').style.display = '';
+  $('delete-btn').textContent = 'Mover p/ lixeira';
+  setView('nova');
+  $('view-title').textContent = 'Editar ficha';
+  setTimeout(() => $('bet-form').scrollIntoView({behavior:'smooth', block:'start'}), 30);
+}
+
+const pendingDelete = new Set();
+$('delete-btn').addEventListener('click', async () => {
+  if(!editingId) return;
+  const id = editingId, btn = $('delete-btn');
+  if(!pendingDelete.has(id)){ pendingDelete.add(id); btn.textContent = 'Confirmar?'; setTimeout(() => { pendingDelete.delete(id); if(editingId === id) btn.textContent = 'Mover p/ lixeira'; }, 3000); return; }
+  pendingDelete.delete(id);
+  const b = bets.find(x => x.id === id); if(!b) return;
+  b.deletedAt = Date.now();
+  saveBets();
+  await saveBetCloud(b);
+  resetForm();
+  showToast('Ficha na lixeira', `Fica lá por ${TRASH_DAYS} dias — dá para restaurar na aba Banca.`, 'ok');
+  setView('historico');
+});
+
+// ---- colar linha da IA ----
+const AI_PROMPT = 'Leia o print do bilhete de aposta e me responda com UMA linha só, sem explicação, exatamente neste formato:\n' +
+  'data|competição|casa de apostas|time 1|time 2|mercado|stake em R$|odd|resultado|esporte\n' +
+  'Regras: data em DD/MM/AAAA; stake só o número (ex.: 25.50); odd com ponto (ex.: 1.85); resultado = pendente, green, red, push, meia green, meia red ou cashout; ' +
+  'se for múltipla, coloque "Múltipla" em time 1, deixe time 2 vazio e liste as seleções no mercado separadas por " + ". Campo que não aparecer no print fica vazio (mantenha os "|").';
+$('copy-prompt').addEventListener('click', async () => {
+  try{ await navigator.clipboard.writeText(AI_PROMPT); showToast('Pedido copiado', 'Cole na IA junto com o print do bilhete.', 'ok'); }
+  catch(e){ window.prompt('Copie o pedido abaixo:', AI_PROMPT); }
+});
+function parseDateAny(raw){
+  if(raw == null || raw === '') return null;
+  if(raw instanceof Date && !isNaN(raw)) return isoOf(raw);
+  if(typeof raw === 'number' && window.XLSX?.SSF){
+    // arredonda séries "quase meia-noite" (ex.: 46295.9997) geradas por alguns programas
+    const n = Math.abs(raw - Math.round(raw)) < 0.001 ? Math.round(raw) : raw;
+    const d = XLSX.SSF.parse_date_code(n); if(d) return `${d.y}-${pad(d.m)}-${pad(d.d)}`;
+  }
+  const s = String(raw).trim().split(/[T\s]/)[0];
+  let m = s.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})$/);
+  if(m) return `${m[1]}-${pad(m[2])}-${pad(m[3])}`;
+  m = s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})$/);
+  if(m){ const y = m[3].length === 2 ? '20' + m[3] : m[3]; return `${y}-${pad(m[2])}-${pad(m[1])}`; }
+  return null;
+}
+function parseResult(raw){
+  const v = String(raw || '').normalize('NFD').replace(/[̀-ͯ]/g,'').trim().toUpperCase().replace(/[_\-]+/g,' ').replace(/\s+/g,' ');
+  if(!v) return 'pendente';
+  if(/^(MEIA|HALF|1\/2|½)/.test(v)){
+    if(/(GREEN|GANH|WIN|WON)/.test(v)) return 'halfwin';
+    if(/(RED|PERD|LOS)/.test(v)) return 'halfloss';
+  }
+  if(/CASH ?OUT|ENCERR/.test(v)) return 'cashout';
+  if(/^(GREEN|WIN|WON|GANHA|GANHOU|GANHO|VENCEU)$/.test(v)) return 'win';
+  if(/^(RED|LOSS|LOST|LOSE|PERDIDA|PERDEU|PERDIDO)$/.test(v)) return 'loss';
+  if(/^(PUSH|VOID|ANUL|REEMB|REFUND|DEVOL|CANCEL)/.test(v)) return 'void';
+  return 'pendente';
+}
+function applyQuickLine(line){
+  const st = $('qf-status');
+  const parts = line.split('|').map(p => p.trim());
+  if(parts.length < 9 || parts.length > 11){ st.className = 'status-line err'; st.textContent = `Esperava 9 a 11 campos separados por "|", encontrei ${parts.length}.`; return; }
+  const [d, comp, bookie, t1, t2, market, stakeRaw, oddRaw, resRaw, sport, tipster] = parts;
+  const iso = parseDateAny(d);
+  if(!iso){ st.className = 'status-line err'; st.textContent = `Não entendi a data "${d}". Use DD/MM/AAAA.`; return; }
+  slipQueue = [];
+  const r = fillForm({ date:iso, comp, bookie, t1, t2, market, stake:parseNum(stakeRaw), odd:parseNum(oddRaw), result:parseResult(resRaw), sport, tipster });
+  $('qf-input').value = '';
+  st.className = 'status-line ' + (r.ok ? 'ok' : 'err'); st.textContent = r.msg;
+}
+
+// preenche a ficha a partir de um objeto já interpretado (linha colada ou leitura do print)
+function fillForm(o){
+  if(editingId) resetForm();
+  confirmArmed = false;
+  $('f-data').value = o.date || todayISO();
+  $('f-comp').value = o.comp || ''; $('f-bookie').value = o.bookie || '';
+  $('f-team1').value = o.t1 || ''; $('f-team2').value = o.t2 || ''; $('f-market').value = o.market || '';
+  if(o.sport) $('f-sport').value = o.sport;
+  if(o.tipster) $('f-tipster').value = o.tipster;
+  setKind(o.kind === 'multipla' || /^m[uú]ltipla$/i.test(o.t1 || '') || (o.market || '').includes(' + ') ? 'multipla' : 'simples');
+  setResult(o.result || 'pendente');
+  applyStakeMode(settings.prefs.stakeMode);
+  const sr = Number(o.stake) || 0, odd = Number(o.odd) || 0;
+  $('f-stake').value = sr ? (stakeMode === 'unidades' ? round2(sr / unitValue(formBankId())) : sr) : '';
+  $('f-odd').value = odd || '';
+  $('f-cashout').value = o.cashout != null && o.cashout !== '' ? o.cashout : '';
+  updatePreview(); updateWarnings();
+  setTimeout(() => $('bet-form').scrollIntoView({behavior:'smooth', block:'start'}), 30);
+  const missing = [];
+  if(!(odd >= 1)) missing.push('odd');
+  if(!(sr > 0)) missing.push('stake');
+  if(!o.market) missing.push('mercado');
+  if(o.result === 'cashout' && (o.cashout == null || o.cashout === '')) missing.push('valor do cashout');
+  return missing.length ? { ok:false, msg:`Preenchido, mas falta conferir: ${missing.join(', ')}.` } : { ok:true, msg:'Preenchido — confira os campos e registre.' };
+}
+
+/* ---- leitura do print pela IA (Gemini via Firebase AI Logic) ---- */
+let slipQueue = [], slipBusy = false, slipTotal = 0;
+const aiModelName = () => (settings.prefs.aiModel || '').trim() || localStorage.getItem('apostas_ai_model_ok') || AI_MODELS[0];
+function slipPrompt(){
+  const L = live();
+  const uniq = (arr) => [...new Set(arr.filter(Boolean).map(s => String(s).trim()).filter(Boolean))];
+  const houses = uniq([...L.map(b => b.bookie), ...settings.houses.txs.map(t => t.house)]).slice(0, 80);
+  const comps = uniq(L.slice(-600).map(b => b.competition)).slice(0, 60);
+  const sports = uniq(L.map(b => b.sport)).slice(0, 20);
+  return [
+    'Você vai ler um print de bilhete de aposta esportiva (normalmente de casa de apostas brasileira).',
+    'Responda SOMENTE com JSON válido, sem texto antes ou depois, neste formato:',
+    '{"apostas":[{"data":"DD/MM/AAAA ou vazio","esporte":"","competicao":"","casa":"","time1":"","time2":"","mercado":"","multipla":false,"stake":0,"odd":0,"resultado":"pendente","retorno_cashout":null}]}',
+    'Regras:',
+    '- Um item por bilhete. Se o print mostrar vários bilhetes, liste todos, na ordem em que aparecem.',
+    '- stake = valor apostado em reais (número com ponto decimal, ex.: 25.5). odd = odd total do bilhete (ex.: 1.85).',
+    '- Aposta simples: time1 e time2 = os dois lados do jogo (ex.: "Palmeiras" e "Santos"); mercado = a seleção como aparece (ex.: "Resultado Final: Palmeiras", "Mais de 2.5 gols", "Jogador X - 3+ recepções").',
+    '- Múltipla/combinada: multipla=true, time1="Múltipla", time2="", mercado = todas as seleções separadas por " + ", cada uma com o jogo entre parênteses.',
+    '- resultado: "green" se ganhou, "red" se perdeu, "meia green"/"meia red" se for meio ganho/meia perda, "push" se anulada/devolvida, "cashout" se foi encerrada antes (aí retorno_cashout = valor recebido), "pendente" se ainda não tem resultado.',
+    '- casa: identifique pelo nome, logo ou cores.' + (houses.length ? ' Se for uma destas, use exatamente o mesmo nome: ' + houses.join(', ') + '.' : ''),
+    '- competicao e esporte: preencha se aparecerem no print ou se forem óbvios pelos times.' + (comps.length ? ' Nomes de competição que eu já uso: ' + comps.join(', ') + '.' : '') + (sports.length ? ' Esportes que eu já uso: ' + sports.join(', ') + '.' : ''),
+    '- data: a data do evento ou da aposta, se aparecer. Se aparecer sem ano, use ' + new Date().getFullYear() + '.',
+    '- Não invente nada: o que não der para ler fica "" (texto) ou 0 (número).'
+  ].join('\n');
+}
+async function imageToBase64(file){
+  const max = 1600;
+  let bmp;
+  try{ bmp = await createImageBitmap(file); }
+  catch(e){
+    bmp = await new Promise((ok, fail) => { const img = new Image(); img.onload = () => ok(img); img.onerror = fail; img.src = URL.createObjectURL(file); });
+  }
+  const w = bmp.width, h = bmp.height, sc = Math.min(1, max / Math.max(w, h));
+  const cv = document.createElement('canvas');
+  cv.width = Math.round(w * sc); cv.height = Math.round(h * sc);
+  cv.getContext('2d').drawImage(bmp, 0, 0, cv.width, cv.height);
+  const url = cv.toDataURL('image/jpeg', 0.85);
+  return { data: url.split(',')[1], mimeType: 'image/jpeg', preview: url };
+}
+function parseSlipJSON(text){
+  let t = String(text || '').trim().replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '');
+  const a = t.indexOf('{'), b = t.lastIndexOf('}');
+  if(a > -1 && b > a) t = t.slice(a, b + 1);
+  const j = JSON.parse(t);
+  const arr = Array.isArray(j) ? j : (j.apostas || j.bets || [j]);
+  return arr.filter(x => x && typeof x === 'object').map(x => {
+    const multi = x.multipla === true || String(x.multipla).toLowerCase() === 'true';
+    const res = parseResult(x.resultado);
+    return {
+      date: parseDateAny(x.data) || todayISO(),
+      comp: String(x.competicao || '').trim(), bookie: String(x.casa || '').trim(), sport: String(x.esporte || '').trim(),
+      t1: String(x.time1 || '').trim(), t2: String(x.time2 || '').trim(), market: String(x.mercado || '').trim(),
+      kind: multi ? 'multipla' : 'simples', stake: parseNum(x.stake), odd: parseNum(x.odd), result: res,
+      cashout: res === 'cashout' && x.retorno_cashout != null && x.retorno_cashout !== '' ? parseNum(x.retorno_cashout) : null
+    };
+  });
+}
+function aiErrorMessage(e){
+  const m = String(e && (e.message || e.code || e) || '');
+  if(/api[- ]not[- ]enabled|firebasevertexai|firebaseml|AI Logic|PERMISSION_DENIED|403/i.test(m)) return 'O Firebase AI Logic ainda não está ativado no seu projeto. No console do Firebase: AI Logic → Começar → Gemini Developer API. Depois tente de novo.';
+  if(/429|quota|RESOURCE_EXHAUSTED|rate/i.test(m)) return 'O limite gratuito do Gemini acabou por agora. Tente de novo em alguns minutos — ou use a linha de outra IA.';
+  if(/Failed to fetch|NetworkError|network/i.test(m)) return 'Sem conexão com o Gemini. Verifique a internet (ou um bloqueador de anúncios) e tente de novo.';
+  return 'Não consegui ler o print: ' + m.slice(0, 160);
+}
+const isModelMissing = (e) => /404|not found|NOT_FOUND|is not supported|unsupported model|invalid model/i.test(String(e && (e.message || e) || ''));
+function setSlipUI(state, title, sub){
+  $('slip-drop').classList.toggle('busy', state === 'busy');
+  $('slip-title').textContent = title;
+  $('slip-sub').textContent = sub;
+}
+async function handleSlipFile(file){
+  const st = $('slip-status');
+  if(!file || !/^image\//.test(file.type)){ st.className = 'status-line err'; st.textContent = 'Isso não parece uma imagem. Envie o print do bilhete (PNG ou JPG).'; return; }
+  if(slipBusy) return;
+  const c = window.cloudBets;
+  if(!c?.readSlip){ st.className = 'status-line err'; st.textContent = 'A leitura de print precisa do Firebase carregado. Verifique a internet e recarregue a página — ou use a linha de outra IA.'; return; }
+  slipBusy = true;
+  try{
+    const img = await imageToBase64(file);
+    $('slip-thumb').src = img.preview; $('slip-thumb').style.display = ''; $('slip-icon').style.display = 'none';
+    setSlipUI('busy', 'Lendo o print…', 'isso leva alguns segundos');
+    st.className = 'status-line'; st.textContent = '';
+    const prompt = slipPrompt();
+    const tried = [];
+    const candidates = [aiModelName(), ...AI_MODELS].filter((m, i, a) => m && a.indexOf(m) === i);
+    let text = null, lastErr = null;
+    for(const model of candidates){
+      try{
+        text = await c.readSlip({ data: img.data, mimeType: img.mimeType, prompt, model });
+        if(!settings.prefs.aiModel) try{ localStorage.setItem('apostas_ai_model_ok', model); }catch(e){}
+        break;
+      }catch(e){
+        console.warn('IA', model, e); lastErr = e; tried.push(model);
+        if(!isModelMissing(e)) break;
+      }
+    }
+    if(text == null) throw lastErr;
+    const list = parseSlipJSON(text).filter(b => b.market || b.odd || b.stake || b.t1);
+    if(!list.length){ st.className = 'status-line err'; st.textContent = 'A IA não achou nenhum bilhete nesse print. Tente um print mais nítido, só do bilhete.'; return; }
+    slipTotal = list.length;
+    slipQueue = list.slice(1);
+    const r = fillForm(list[0]);
+    st.className = 'status-line ' + (r.ok ? 'ok' : 'err');
+    st.textContent = (list.length > 1 ? `Encontrei ${list.length} bilhetes. Preenchi o 1º — depois de registrar, o próximo entra sozinho.\n` : '') + r.msg;
+  }catch(e){
+    st.className = 'status-line err'; st.textContent = aiErrorMessage(e);
+  }finally{
+    slipBusy = false;
+    setSlipUI('', 'Enviar outro print', 'toque para escolher · no PC, cole com Ctrl+V ou arraste aqui');
+    $('slip-file').value = '';
+  }
+}
+function fillNextFromQueue(){
+  if(!slipQueue.length) return false;
+  const next = slipQueue.shift();
+  const r = fillForm(next);
+  const n = slipTotal - slipQueue.length;
+  const st = $('slip-status');
+  st.className = 'status-line ' + (r.ok ? 'ok' : 'err');
+  st.textContent = `Bilhete ${n} de ${slipTotal} do print.` + (slipQueue.length ? ' ' : ' Último. ') + r.msg;
+  return true;
+}
+$('slip-drop').addEventListener('click', () => { if(!slipBusy) $('slip-file').click(); });
+$('slip-drop').addEventListener('keydown', (e) => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); $('slip-file').click(); } });
+$('slip-file').addEventListener('change', (e) => handleSlipFile(e.target.files[0]));
+$('slip-drop').addEventListener('dragover', (e) => { e.preventDefault(); $('slip-drop').classList.add('over'); });
+$('slip-drop').addEventListener('dragleave', () => $('slip-drop').classList.remove('over'));
+$('slip-drop').addEventListener('drop', (e) => { e.preventDefault(); $('slip-drop').classList.remove('over'); const f = e.dataTransfer.files && e.dataTransfer.files[0]; if(f) handleSlipFile(f); });
+document.addEventListener('paste', (e) => {
+  const items = Array.from((e.clipboardData && e.clipboardData.items) || []);
+  const it = items.find(i => i.kind === 'file' && /^image\//.test(i.type));
+  if(!it) return;
+  e.preventDefault();
+  if(view !== 'nova'){ if(editingId) resetForm(); setView('nova'); }
+  handleSlipFile(it.getAsFile());
+});
+$('qf-toggle').addEventListener('click', () => { const w = $('qf-wrap'), h = w.style.display === 'none'; w.style.display = h ? '' : 'none'; $('qf-toggle').textContent = h ? 'Ocultar linha de outra IA ▴' : 'Ou colar a linha de outra IA ▾'; });
+$('qf-apply').addEventListener('click', () => { const v = $('qf-input').value.trim(); if(v) applyQuickLine(v); });
+$('qf-input').addEventListener('keydown', (e) => { if(e.key === 'Enter'){ e.preventDefault(); $('qf-apply').click(); } });
+
+/* ============================================================
+   ANÁLISE
+   ============================================================ */
+let period = 'tudo', groupMode = 'bookie', groupSort = { col:'profitU', dir:'desc' };
+$('period-toggle').addEventListener('click', (e) => { const b = e.target.closest('[data-p]'); if(!b) return; period = b.dataset.p; $$('#period-toggle button').forEach(x => x.classList.toggle('active', x === b)); renderAnalise(); });
+$('group-toggle').addEventListener('click', (e) => { const b = e.target.closest('[data-g]'); if(!b) return; groupMode = b.dataset.g; $$('#group-toggle button').forEach(x => x.classList.toggle('active', x === b)); renderAnalise(); });
+$$('#group-table th[data-sort]').forEach(th => th.addEventListener('click', () => {
+  const c = th.dataset.sort;
+  groupSort = groupSort.col === c ? { col:c, dir: groupSort.dir === 'asc' ? 'desc' : 'asc' } : { col:c, dir: c === 'name' ? 'asc' : 'desc' };
+  renderAnalise();
+}));
+function periodRange(){
+  const t = new Date(), td = isoOf(t);
+  const back = (n) => { const d = new Date(); d.setDate(d.getDate() - n); return isoOf(d); };
+  switch(period){
+    case 'hoje': return [td, td];
+    case '7d': return [back(6), td];
+    case '30d': return [back(29), td];
+    case 'mes': return [td.slice(0,7) + '-01', td.slice(0,7) + '-31'];
+    case 'mesant': { const d = new Date(t.getFullYear(), t.getMonth() - 1, 1); const k = isoOf(d).slice(0,7); return [k + '-01', k + '-31']; }
+    default: return null;
+  }
+}
+const GROUP_LABEL = { bookie:'Casa', competition:'Competição', sport:'Esporte', market:'Mercado', tipster:'Tipster' };
+function renderAnalise(){
+  const r = periodRange();
+  const S = scope().filter(b => !r || (b.date && b.date >= r[0] && b.date <= r[1]));
+  const s = stats(S);
+  const k = (label, value, sub, c) => `<div class="kpi"><div class="kpi-label">${label}</div><div class="kpi-value ${c||''}">${value}</div><div class="kpi-sub">${sub||''}</div></div>`;
+  $('kpis').innerHTML = [
+    k('Lucro', fmtU(s.profitU), fmtBRLs(s.profit), cls(s.profit)),
+    k('ROI', fmtPct(s.roi, true), 'sobre o valor apostado', cls(s.roi)),
+    k('Taxa de acerto', fmtPct(s.winrate), `${s.wins}G · ${s.losses}R · ${s.voids}V`),
+    k('Fator de lucro', s.factor == null ? '—' : fmtNum(s.factor), 'ganhos ÷ perdas', s.factor == null ? '' : s.factor >= 1 ? 'pos' : 'neg'),
+    k('Lucro por aposta', fmtU(s.perBetU), 'média por ficha resolvida', cls(s.perBetU)),
+    k('Stake média', fmtUabs(s.avgStakeU), fmtBRL(s.avgStake)),
+    k('Maior odd batida', s.maxOdd ? '@' + fmtNum(s.maxOdd) : '—', 'green mais alto'),
+    k('Total apostado', fmtUabs(s.totalStakedU), fmtBRL(s.totalStaked)),
+    k('Apostas', String(s.count), s.pending ? `${s.pending} em aberto (${fmtUabs(s.pendingU)})` : 'nenhuma em aberto')
+  ].join('');
+  drawEvolution(S);
+  renderGroups(S);
+}
+function drawEvolution(S){
+  const holder = $('evo-holder');
+  const settled = S.filter(b => b.result !== 'pendente' && b.date).sort((a,b) => a.date.localeCompare(b.date) || (a.createdAt||0) - (b.createdAt||0));
+  if(settled.length < 2){ holder.innerHTML = '<div class="empty">poucas fichas resolvidas neste período para desenhar a curva</div>'; $('dd-label').textContent = ''; return; }
+  const startU = isAll() ? banks().reduce((s,b) => s + b.units, 0) : bankById(settings.banks.active).units;
+  const pts = [startU]; let cur = startU, peak = startU, dd = 0, ddPct = 0;
+  settled.forEach(b => { cur += uOf(b, b.profit); pts.push(cur); if(cur > peak) peak = cur; if(peak - cur > dd){ dd = peak - cur; ddPct = peak ? dd / peak * 100 : 0; } });
+  $('dd-label').textContent = `Drawdown máx.: ${fmtNum(dd)}u (${fmtNum(ddPct,1)}%)`;
+  const W = 800, H = 200, pl = 8, pr = 8, pt = 14, pb = 22;
+  const min = Math.min(...pts), max = Math.max(...pts), rg = (max - min) || 1;
+  const x = (i) => pl + i / (pts.length - 1) * (W - pl - pr);
+  const y = (v) => pt + (1 - (v - min) / rg) * (H - pt - pb);
+  const line = pts.map((v,i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+  const area = `${x(0)},${H - pb} ${line} ${x(pts.length-1)},${H - pb}`;
+  const baseY = y(startU);
+  holder.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" preserveAspectRatio="none" style="height:200px;display:block;" role="img" aria-label="Banca foi de ${fmtNum(startU)}u para ${fmtNum(cur)}u">
+      <polygon points="${area}" fill="rgba(212,162,76,0.08)"></polygon>
+      <line x1="0" x2="${W}" y1="${baseY}" y2="${baseY}" stroke="var(--border)" stroke-dasharray="5,5" vector-effect="non-scaling-stroke"></line>
+      <polyline points="${line}" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"></polyline>
+    </svg>
+    <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:11px;margin-top:6px;" class="muted">
+      <span>${dateBR(settled[0].date)} · ${fmtNum(startU)}u</span><span>mín ${fmtNum(min)}u · máx ${fmtNum(max)}u</span><span class="${cls(cur - startU)}">${dateBR(settled[settled.length-1].date)} · ${fmtNum(cur)}u</span>
+    </div>`;
+}
+function renderGroups(S){
+  $('group-name-head').textContent = GROUP_LABEL[groupMode];
+  const G = {};
+  S.forEach(b => {
+    const key = String(b[groupMode] || '').trim() || '(sem nome)';
+    const g = G[key] || (G[key] = { name:key, count:0, stakedU:0, settledU:0, profitU:0, profit:0, settledR:0, wins:0, losses:0 });
+    g.count++; g.stakedU += uOf(b, b.stake);
+    if(b.result !== 'pendente'){ g.profitU += uOf(b, b.profit); g.profit += b.profit||0; g.settledU += uOf(b, b.stake); g.settledR += b.stake||0; }
+    if(b.result === 'win' || b.result === 'halfwin') g.wins++;
+    if(b.result === 'loss' || b.result === 'halfloss') g.losses++;
+  });
+  const rows = Object.values(G).map(g => Object.assign(g, { roi: g.settledR ? g.profit / g.settledR * 100 : null, winrate: (g.wins + g.losses) ? g.wins / (g.wins + g.losses) * 100 : null }));
+  const d = groupSort.dir === 'asc' ? 1 : -1;
+  rows.sort((a,b) => {
+    if(groupSort.col === 'name') return a.name.localeCompare(b.name,'pt-BR') * d;
+    return ((a[groupSort.col] ?? -Infinity) - (b[groupSort.col] ?? -Infinity)) * d;
+  });
+  const canRename = groupMode !== 'market';
+  $('group-body').innerHTML = rows.map(r => `<tr>
+      <td>${esc(r.name)}</td><td>${r.count}</td><td>${fmtUabs(r.stakedU)}</td>
+      <td class="${cls(r.profitU)}">${fmtU(r.profitU)}<span class="sub">${fmtBRLs(r.profit)}</span></td>
+      <td class="${cls(r.roi||0)}">${r.roi == null ? '—' : fmtPct(r.roi, true)}</td>
+      <td>${r.winrate == null ? '—' : fmtPct(r.winrate)}</td>
+      <td>${canRename && r.name !== '(sem nome)' ? `<button type="button" class="btn-sm" data-rename="${esc(r.name)}">renomear</button>` : ''}</td></tr>`).join('')
+    || '<tr><td colspan="7" style="text-align:center;" class="muted">sem fichas neste período</td></tr>';
+  const tot = stats(S);
+  $('group-foot').innerHTML = rows.length ? `<tr><td>TOTAL</td><td>${tot.count}</td><td>${fmtUabs(tot.totalStakedU)}</td><td class="${cls(tot.profitU)}">${fmtU(tot.profitU)}</td><td class="${cls(tot.roi)}">${fmtPct(tot.roi, true)}</td><td>${fmtPct(tot.winrate)}</td><td></td></tr>` : '';
+  $$('#group-body [data-rename]').forEach(b => b.addEventListener('click', () => renameGroup(b.dataset.rename)));
+  $$('#group-table th[data-sort]').forEach(th => { const base = th.textContent.replace(/ [▾▴]$/,''); th.textContent = base + (th.dataset.sort === groupSort.col ? (groupSort.dir === 'asc' ? ' ▴' : ' ▾') : ''); });
+}
+async function renameGroup(oldName){
+  const field = groupMode;
+  const nn = window.prompt(`Renomear "${oldName}" para (vale para todas as fichas):`, oldName);
+  if(nn === null) return;
+  const name = nn.trim(); if(!name || name === oldName) return;
+  const affected = bets.filter(b => String(b[field] || '').trim() === oldName);
+  affected.forEach(b => { b[field] = name; });
+  if(field === 'bookie') settings.houses.txs.forEach(t => { if(t.house === oldName) t.house = name; });
+  saveBets();
+  if(field === 'bookie') persistSetting('houses');
+  await uploadMany(affected.map(b => { b.updatedAt = Date.now(); return b; }));
+  showToast('Renomeado', `${affected.length} ficha(s) atualizada(s).`, 'ok');
+  render();
+}
+
+/* ============================================================
+   BANCA E DADOS
+   ============================================================ */
+let bankEditing = null;
+function renderBanca(){
+  // bancas
+  const counts = {};
+  live().forEach(b => { const id = betBankId(b); counts[id] = (counts[id]||0) + 1; });
+  $('bank-list').innerHTML = banks().map(b => {
+    const s = stats(live().filter(x => betBankId(x) === b.id));
+    const active = settings.banks.active === b.id;
+    return `<div class="row-item">
+      <div><div class="name">${esc(b.name)}${active ? '<span class="tag-active">ATIVA</span>' : ''}</div>
+      <div class="meta">${fmtBRL(b.amount)} em ${fmtNum(b.units,0)}u · 1u = ${fmtBRL(b.amount/b.units)} · ${counts[b.id]||0} fichas · <span class="${cls(s.profit)}">${fmtU(s.profitU)}</span></div></div>
+      <div class="acts">${active ? '' : `<button type="button" class="btn-sm" data-bk-use="${esc(b.id)}">Usar</button>`}<button type="button" class="btn-sm" data-bk-edit="${esc(b.id)}">Editar</button>${banks().length > 1 && !counts[b.id] ? `<button type="button" class="btn-sm btn-danger" data-bk-del="${esc(b.id)}">Excluir</button>` : ''}</div>
+    </div>`;
+  }).join('');
+  $$('[data-bk-use]').forEach(b => b.addEventListener('click', () => { settings.banks.active = b.dataset.bkUse; persistSetting('banks'); render(); }));
+  $$('[data-bk-edit]').forEach(b => b.addEventListener('click', () => openBankForm(b.dataset.bkEdit)));
+  $$('[data-bk-del]').forEach(b => b.addEventListener('click', () => {
+    const bk = bankById(b.dataset.bkDel);
+    if(!window.confirm(`Excluir a banca "${bk.name}"? Ela não tem fichas.`)) return;
+    settings.banks.list = banks().filter(x => x.id !== bk.id);
+    if(settings.banks.active === bk.id) settings.banks.active = firstBankId();
+    persistSetting('banks'); render();
+  }));
+
+  // limites
+  const L = settings.limits;
+  if(document.activeElement?.closest?.('#limits-section') == null){
+    $('lm-day').value = L.stopDay || ''; $('lm-week').value = L.stopWeek || ''; $('lm-max').value = L.maxStake || '';
+  }
+
+  // casas
+  const H = {};
+  const get = (n) => H[n] || (H[n] = { name:n, dep:0, saq:0, profit:0, pending:0 });
+  live().forEach(b => { const h = get((b.bookie||'').trim() || '(sem nome)'); if(b.result === 'pendente') h.pending += b.stake||0; else h.profit += b.profit||0; });
+  settings.houses.txs.forEach(t => { const h = get((t.house||'').trim() || '(sem nome)'); if(t.type === 'saq') h.saq += t.amount; else h.dep += t.amount; });
+  const hr = Object.values(H).map(h => Object.assign(h, { saldo: h.dep - h.saq + h.profit - h.pending })).sort((a,b) => b.saldo - a.saldo);
+  $('houses-body').innerHTML = hr.map(h => `<tr><td>${esc(h.name)}</td><td>${h.dep ? fmtBRL(h.dep) : '—'}</td><td>${h.saq ? fmtBRL(h.saq) : '—'}</td><td class="${cls(h.profit)}">${fmtBRLs(h.profit)}</td><td>${h.pending ? fmtBRL(h.pending) : '—'}</td><td class="${h.saldo < 0 ? 'neg' : ''}" style="font-weight:700;">${fmtBRL(h.saldo)}</td></tr>`).join('')
+    || '<tr><td colspan="6" class="muted" style="text-align:center;">nenhuma casa ainda</td></tr>';
+  $('houses-total').textContent = hr.length ? 'Total ' + fmtBRL(hr.reduce((s,h) => s + h.saldo, 0)) : '';
+  if(!$('tx-date').value) $('tx-date').value = todayISO();
+  const txs = settings.houses.txs.slice().sort((a,b) => (b.date||'').localeCompare(a.date||''));
+  $('tx-list').innerHTML = txs.length ? txs.slice(0, 60).map(t => `<div class="row-item"><div><div class="name">${t.type === 'saq' ? 'Saque' : 'Depósito'} · ${esc(t.house)}</div><div class="meta">${dateBR(t.date)}</div></div><div class="acts"><span class="mono ${t.type === 'saq' ? 'neg' : 'pos'}">${t.type === 'saq' ? '-' : '+'}${fmtBRL(t.amount)}</span><button type="button" class="btn-sm" data-tx-del="${esc(t.id)}" aria-label="Apagar lançamento">×</button></div></div>`).join('') : '<p class="help">Nenhum lançamento.</p>';
+  $$('[data-tx-del]').forEach(b => b.addEventListener('click', () => {
+    if(!window.confirm('Apagar este lançamento?')) return;
+    settings.houses.txs = settings.houses.txs.filter(t => t.id !== b.dataset.txDel);
+    persistSetting('houses'); renderBanca();
+  }));
+
+  // backup / lixeira / import
+  const lastBk = parseInt(localStorage.getItem(BACKUP_KEY) || '0', 10) || 0;
+  $('backup-meta').textContent = lastBk ? `Último baixado neste aparelho: ${new Date(lastBk).toLocaleString('pt-BR')}` : 'Nenhum backup baixado ainda neste aparelho.';
+  if(!$('imp-unit').value) $('imp-unit').value = round2(unitValue($('imp-bank').value || targetBankId()));
+  if(document.activeElement !== $('ai-model')) $('ai-model').value = aiModelName();
+  $('ai-status').textContent = settings.prefs.aiModel ? 'Usando o modelo que você escolheu.' : 'Usando o modelo padrão (troca sozinho para outro se este sair do ar).';
+  renderTrash();
+  updateCloudUI();
+}
+
+function openBankForm(id){
+  bankEditing = id || null;
+  const b = id ? bankById(id) : { name:'', amount:'', units:100 };
+  $('bk-name').value = b.name; $('bk-amount').value = b.amount; $('bk-units').value = b.units;
+  $('bank-form').style.display = '';
+  bankPreview();
+  $('bk-name').focus();
+}
+function bankPreview(){
+  const a = parseNum($('bk-amount').value), u = parseNum($('bk-units').value);
+  $('bk-preview').textContent = $('bank-form').style.display === 'none' ? '' : (a > 0 && u > 0 ? `1 unidade = ${fmtBRL(a/u)}` : 'preencha banca e unidades com valores maiores que zero');
+}
+$('bank-new').addEventListener('click', () => openBankForm(null));
+$('bk-amount').addEventListener('input', bankPreview); $('bk-units').addEventListener('input', bankPreview);
+$('bk-cancel').addEventListener('click', () => { $('bank-form').style.display = 'none'; bankEditing = null; bankPreview(); });
+$('bk-save').addEventListener('click', () => {
+  const name = $('bk-name').value.trim() || 'Banca', amount = parseNum($('bk-amount').value), units = parseNum($('bk-units').value);
+  if(!(amount > 0 && units > 0)){ bankPreview(); return; }
+  if(bankEditing){ Object.assign(bankById(bankEditing), { name, amount, units }); }
+  else { const id = 'b' + Date.now().toString(36); settings.banks.list.push({ id, name, amount, units }); settings.banks.active = id; }
+  persistSetting('banks');
+  $('bank-form').style.display = 'none'; bankEditing = null;
+  showToast('Banca salva', `1u = ${fmtBRL(amount/units)}`, 'ok');
+  render();
+});
+
+$('ai-model-save').addEventListener('click', () => {
+  settings.prefs.aiModel = $('ai-model').value.trim();
+  persistSetting('prefs');
+  showToast('Modelo salvo', settings.prefs.aiModel || 'padrão', 'ok');
+  renderBanca();
+});
+$('ai-model-reset').addEventListener('click', () => {
+  settings.prefs.aiModel = '';
+  try{ localStorage.removeItem('apostas_ai_model_ok'); }catch(e){}
+  persistSetting('prefs');
+  $('ai-model').value = '';
+  renderBanca();
+});
+$('lm-save').addEventListener('click', () => {
+  settings.limits = { stopDay: Math.max(0, parseNum($('lm-day').value)), stopWeek: Math.max(0, parseNum($('lm-week').value)), maxStake: Math.max(0, parseNum($('lm-max').value)) };
+  persistSetting('limits');
+  showToast('Limites salvos', '', 'ok');
+  render();
+});
+
+$('tx-save').addEventListener('click', () => {
+  const house = $('tx-house').value.trim(), amount = round2(parseNum($('tx-amount').value));
+  const st = $('tx-status');
+  if(!house || !(amount > 0)){ st.className = 'status-line err'; st.textContent = 'Informe a casa e um valor maior que zero.'; return; }
+  settings.houses.txs.push({ id: newId(), house, type: $('tx-type').value, amount, date: $('tx-date').value || todayISO() });
+  persistSetting('houses');
+  $('tx-amount').value = '';
+  st.className = 'status-line ok'; st.textContent = `${$('tx-type').value === 'saq' ? 'Saque' : 'Depósito'} de ${fmtBRL(amount)} na ${house} registrado.`;
+  renderDatalists(); renderBanca();
+});
+$('tx-toggle').addEventListener('click', () => { const l = $('tx-list'), h = l.style.display === 'none'; l.style.display = h ? 'block' : 'none'; $('tx-toggle').textContent = h ? 'Ocultar depósitos e saques ▴' : 'Ver depósitos e saques ▾'; });
+
+// ---- lixeira ----
+function renderTrash(){
+  const T = bets.filter(b => b.deletedAt).sort((a,b) => b.deletedAt - a.deletedAt);
+  $('trash-meta').textContent = T.length ? `${T.length} ficha(s) · apagadas de vez após ${TRASH_DAYS} dias` : 'Vazia';
+  $('trash-list').innerHTML = T.length ? T.map(b => {
+    const days = Math.max(0, TRASH_DAYS - Math.floor((Date.now() - b.deletedAt) / 864e5));
+    return `<div class="row-item"><div><div class="name">${esc(eventOf(b) || b.market || '—')}</div><div class="meta">${dateBR(b.date)} · ${esc(b.market || '')} · ${RESULT_LABEL[b.result] || ''} · some em ${days} dia(s)</div></div>
+      <div class="acts"><button type="button" class="btn-sm" data-restore="${esc(b.id)}">Restaurar</button><button type="button" class="btn-sm btn-danger" data-purge="${esc(b.id)}">Apagar de vez</button></div></div>`;
+  }).join('') + `<div class="form-actions" style="margin-top:10px;"><button type="button" class="btn-danger btn-sm" id="trash-empty">Esvaziar lixeira</button></div>` : '';
+  $$('[data-restore]').forEach(b => b.addEventListener('click', async () => { const x = bets.find(y => y.id === b.dataset.restore); if(!x) return; delete x.deletedAt; saveBets(); await saveBetCloud(x); showToast('Ficha restaurada', '', 'ok'); render(); }));
+  $$('[data-purge]').forEach(b => b.addEventListener('click', () => { if(window.confirm('Apagar esta ficha para sempre? Não dá para desfazer.')){ purgeBet(b.dataset.purge); render(); } }));
+  const em = $('trash-empty');
+  if(em) em.addEventListener('click', () => { if(window.confirm(`Apagar para sempre as ${T.length} ficha(s) da lixeira? Não dá para desfazer.`)){ T.forEach(b => purgeBet(b.id, true)); saveBets(); render(); } });
+}
+$('trash-toggle').addEventListener('click', () => { const l = $('trash-list'), h = l.style.display === 'none'; l.style.display = h ? 'block' : 'none'; $('trash-toggle').textContent = h ? 'Fechar' : 'Abrir'; });
+function purgeBet(id, silent){
+  bets = bets.filter(b => b.id !== id);
+  if(!silent) saveBets();
+  else saveBets();
+  const c = window.cloudBets;
+  if(c?.user && c.remove) c.remove(id).catch(e => { console.warn(e); showToast('Exclusão não confirmada na nuvem', 'A ficha pode reaparecer ao sincronizar de novo.', 'err'); });
+}
+
+// ---- backup ----
+function markBackup(){ try{ localStorage.setItem(BACKUP_KEY, String(Date.now())); }catch(e){} }
+function exportBackup(){
+  const data = { app:'registro-apostas', version:2, exportedAt:new Date().toISOString(), settings, bets };
+  downloadBlob(new Blob([JSON.stringify(data)], { type:'application/json' }), `apostas-backup-${todayISO()}.json`);
+  markBackup();
+  showToast('Backup baixado', `${bets.length} ficha(s) + configurações. Guarde o arquivo no Drive ou no PC.`, 'ok');
+  render();
+}
+$('backup-btn').addEventListener('click', exportBackup);
+$('restore-btn').addEventListener('click', () => $('restore-file').click());
+$('restore-file').addEventListener('change', async (e) => {
+  const f = e.target.files[0]; e.target.value = '';
+  if(!f) return;
+  let data;
+  try{ data = JSON.parse(await f.text()); }catch(err){ showToast('Arquivo inválido', 'Não é um backup deste app.', 'err'); return; }
+  if(!data || !Array.isArray(data.bets)){ showToast('Arquivo inválido', 'Não é um backup deste app.', 'err'); return; }
+  if(!window.confirm(`Restaurar ${data.bets.length} ficha(s) do backup de ${data.exportedAt ? new Date(data.exportedAt).toLocaleString('pt-BR') : 'data desconhecida'}?\n\nFichas que já existem só são trocadas se a do backup for mais nova. As configurações (bancas, limites, casas) serão substituídas pelas do backup.`)) return;
+  const byId = new Map(bets.map(b => [b.id, b]));
+  const changed = [];
+  data.bets.forEach(b => { if(!b || !b.id) return; const cur = byId.get(b.id); if(!cur || (b.updatedAt||0) > (cur.updatedAt||0)){ byId.set(b.id, b); changed.push(b); } });
+  bets = Array.from(byId.values());
+  saveBets();
+  if(data.settings){ settings = normalizeSettings(data.settings); Object.keys(DEFAULTS).forEach(k => persistSetting(k)); }
+  await uploadMany(changed);
+  showToast('Backup restaurado', `${changed.length} ficha(s) adicionada(s) ou atualizada(s).`, 'ok');
+  render();
+});
+
+// ---- exportar ----
+const STATUS_XLSX = { win:'GREEN', loss:'RED', void:'ANULADO', pendente:'PENDENTE', halfwin:'MEIA GREEN', halfloss:'MEIA RED', cashout:'CASHOUT' };
+$('export-xlsx').addEventListener('click', () => {
+  if(typeof XLSX === 'undefined'){ showToast('Leitor de planilhas não carregou', 'Verifique a internet e recarregue a página.', 'err'); return; }
+  const L = live();
+  if(!L.length){ showToast('Nada para exportar', '', 'err'); return; }
+  const header = ['Data','Competição','Entrada','','Mercado','Bookies','Stake','Odd','Status','Lucro','Esporte','Tipster','Banca','Tipo','Cashout','Observações'];
+  const rows = L.slice().sort((a,b) => (a.date||'').localeCompare(b.date||'')).map(b => [b.date || '', b.competition || '', team1Of(b), team2Of(b), b.market || '', b.bookie || '', b.stake || 0, b.odd || 0, STATUS_XLSX[b.result] || 'PENDENTE', b.profit || 0, b.sport || '', b.tipster || '', bankById(betBankId(b)).name, b.kind === 'multipla' ? 'Múltipla' : 'Simples', b.cashout ?? '', b.notes || '']);
+  const ws = XLSX.utils.aoa_to_sheet([header, ...rows]);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Apostas');
+  XLSX.writeFile(wb, `apostas-${todayISO()}.xlsx`);
+  markBackup();
+  showToast('Excel exportado', `${L.length} ficha(s).`, 'ok');
+});
+const csvField = (v) => { const s = String(v ?? ''); return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s; };
+$('export-csv').addEventListener('click', () => {
+  const L = live();
+  if(!L.length){ showToast('Nada para exportar', '', 'err'); return; }
+  const map = { win:'green', loss:'red', void:'void', pendente:'pending', halfwin:'half_green', halfloss:'half_red', cashout:'cashout' };
+  const header = ['bet_date','bookmaker','event_name','market','sport','tipster','units_bet','odds','result','commission','currency','notes'];
+  const rows = L.map(b => [b.date || '', b.bookie || '', `${team1Of(b)} vs ${team2Of(b)}`, b.market || '', b.sport || b.competition || '', b.tipster || '', uOf(b, b.stake).toFixed(2), (b.odd||0).toFixed(3), map[b.result] || 'pending', '0', 'BRL', b.notes || '']);
+  const csv = '﻿' + [header, ...rows].map(r => r.map(csvField).join(',')).join('\r\n');
+  downloadBlob(new Blob([csv], { type:'text/csv;charset=utf-8;' }), `apostas-${todayISO()}.csv`);
+  showToast('CSV exportado', `${L.length} ficha(s), stake em unidades da banca de cada ficha.`, 'ok');
+});
+
+// ---- importar ----
+let impWorkbook = null, impPreview = [];
+function simpleHash(str){ let h = 0; for(let i = 0; i < str.length; i++){ h = (Math.imul(31, h) + str.charCodeAt(i)) | 0; } return 'imp_' + Math.abs(h).toString(36); }
+const normH = (s) => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g,'').trim().toLowerCase();
+function rowsToBets(rows, opts){
+  let hi = -1;
+  for(let i = 0; i < Math.min(rows.length, 60); i++){
+    const r = (rows[i] || []).map(normH);
+    if(r.includes('data') || r.includes('bet_date') || r.includes('date')){ hi = i; break; }
+  }
+  if(hi === -1) return { list:[], error:'Não achei a linha de cabeçalho (uma coluna "Data" ou "bet_date").' };
+  const head = rows[hi].map(normH);
+  const col = {};
+  const setc = (k, i) => { if(col[k] === undefined) col[k] = i; };
+  head.forEach((h, i) => {
+    if(h === 'data' || h === 'bet_date' || h === 'date') setc('date', i);
+    else if(h.startsWith('compet') || h === 'league' || h === 'liga') setc('competition', i);
+    else if(h === 'entrada' || h === 'time 1' || h === 'time1' || h === 'mandante') setc('team1', i);
+    else if(h === 'time 2' || h === 'time2' || h === 'visitante') setc('team2', i);
+    else if(h === 'event_name' || h === 'evento' || h === 'jogo' || h === 'event') setc('event', i);
+    else if(h.startsWith('mercado') || h === 'market' || h === 'selecao') setc('market', i);
+    else if(h.startsWith('bookie') || h.includes('casa de aposta') || h === 'bookmaker' || h === 'casa') setc('bookie', i);
+    else if(h === 'stake' || h === 'valor' || h === 'amount' || h === 'stake (r$)' || h === 'valor apostado') setc('stake', i);
+    else if(h === 'units_bet' || h === 'unidades apostadas' || h === 'stake (u)' || h === 'units') setc('units', i);
+    else if(h === 'odd' || h === 'odds' || h === 'cotacao') setc('odd', i);
+    else if(h === 'status' || h === 'resultado' || h === 'result') setc('result', i);
+    else if(h === 'esporte' || h === 'sport') setc('sport', i);
+    else if(h === 'tipster') setc('tipster', i);
+    else if(h.startsWith('observ') || h === 'notes' || h === 'notas') setc('notes', i);
+    else if(h.startsWith('cashout')) setc('cashout', i);
+    else if(h === 'lucro' || h === 'profit' || h === 'lucro (r$)') setc('profit', i);
+    else if(h === 'tipo') setc('kind', i);
+    else if(h === 'banca') setc('bank', i);
+  });
+  if(col.team1 !== undefined && col.team2 === undefined && (head[col.team1 + 1] === '' || head[col.team1 + 1] === undefined)) col.team2 = col.team1 + 1;
+  if(col.date === undefined || (col.market === undefined && col.event === undefined)) return { list:[], error:'A planilha precisa ter pelo menos as colunas de data e mercado (ou evento).' };
+  const usesUnits = col.stake === undefined && col.units !== undefined;
+  const get = (row, k) => col[k] === undefined ? '' : row[col[k]];
+  const str = (v) => String(v ?? '').trim();
+  const out = [];
+  for(let i = hi + 1; i < rows.length; i++){
+    const row = rows[i] || [];
+    const iso = parseDateAny(get(row,'date'));
+    const market = str(get(row,'market'));
+    const event = str(get(row,'event'));
+    if(!iso || (!market && !event)) continue;
+    let t1 = str(get(row,'team1')), t2 = str(get(row,'team2'));
+    if(!t1 && !t2 && event){ const p = event.split(/\s+(?:vs\.?|x|@|-|–)\s+/i); t1 = (p[0] || '').trim(); t2 = (p.slice(1).join(' x ') || '').trim(); }
+    const stake = usesUnits ? round2(parseNum(get(row,'units')) * opts.unitValue) : parseNum(get(row,'stake'));
+    const odd = parseNum(get(row,'odd'));
+    const result = parseResult(get(row,'result'));
+    let cashout;
+    if(result === 'cashout'){
+      if(col.cashout !== undefined && str(get(row,'cashout')) !== '') cashout = parseNum(get(row,'cashout'));
+      else if(col.profit !== undefined) cashout = round2(stake + parseNum(get(row,'profit')));
+      else cashout = stake;
+    }
+    const bankName = str(get(row,'bank'));
+    const bankMatch = bankName ? banks().find(b => b.name.toLowerCase() === bankName.toLowerCase()) : null;
+    const b = {
+      id: simpleHash([iso, t1, t2, market, str(get(row,'bookie')), stake, odd].join('|')),
+      date: iso, competition: str(get(row,'competition')), bookie: str(get(row,'bookie')),
+      team1: t1, team2: t2, teams: t1 + ' x ' + t2, market: market || event,
+      sport: str(get(row,'sport')), tipster: str(get(row,'tipster')), notes: str(get(row,'notes')),
+      kind: /m[uú]lt/i.test(str(get(row,'kind'))) ? 'multipla' : 'simples',
+      bankId: bankMatch ? bankMatch.id : opts.bankId,
+      result, stake, odd, createdAt: opts.baseTime + i
+    };
+    if(cashout !== undefined) b.cashout = cashout;
+    b.profit = calcProfit(stake, odd, result, cashout);
+    out.push(b);
+  }
+  return { list: out, usesUnits };
+}
+function impOpts(){ return { unitValue: parseNum($('imp-unit').value) || unitValue($('imp-bank').value), bankId: $('imp-bank').value || targetBankId(), baseTime: Date.now() }; }
+function updateImpPreview(){
+  const st = $('imp-status');
+  if(!impWorkbook){ return; }
+  const ws = impWorkbook.Sheets[$('imp-sheet').value];
+  const rows = XLSX.utils.sheet_to_json(ws, { header:1, raw:true, defval:null });
+  const res = rowsToBets(rows, impOpts());
+  impPreview = res.list;
+  if(!impPreview.length){ st.className = 'status-line err'; st.textContent = res.error || 'Nenhuma ficha reconhecida nessa aba.'; $('imp-run').style.display = 'none'; return; }
+  const ids = new Set(bets.map(b => b.id));
+  const fresh = impPreview.filter(b => !ids.has(b.id)).length;
+  st.className = 'status-line';
+  st.textContent = `${impPreview.length} ficha(s) encontrada(s) — ${fresh} nova(s)${impPreview.length - fresh ? `, ${impPreview.length - fresh} já importada(s) antes (serão ignoradas)` : ''}.` +
+    (res.usesUnits ? `\nO arquivo está em unidades: cada 1u vira ${fmtBRL(impOpts().unitValue)}. Ajuste o campo "1u nesse arquivo" se for outro valor.` : '');
+  $('imp-run').style.display = fresh ? '' : 'none';
+}
+$('imp-file').addEventListener('change', async (e) => {
+  const f = e.target.files[0];
+  const st = $('imp-status');
+  impWorkbook = null; impPreview = []; $('imp-sheet').style.display = 'none'; $('imp-run').style.display = 'none'; st.textContent = '';
+  if(!f) return;
+  if(typeof XLSX === 'undefined'){ st.className = 'status-line err'; st.textContent = 'O leitor de planilhas não carregou. Verifique a internet e recarregue.'; return; }
+  try{
+    if(/\.csv$/i.test(f.name)){
+      let text = await f.text();
+      if(text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+      const firstLine = text.split(/\r?\n/)[0] || '';
+      const FS = (firstLine.split(';').length > firstLine.split(',').length) ? ';' : ',';
+      impWorkbook = XLSX.read(text, { type:'string', raw:true, FS });
+    } else {
+      // sem cellDates: datas chegam como número de série do Excel e são convertidas sem erro de fuso horário
+      impWorkbook = XLSX.read(await f.arrayBuffer(), { type:'array' });
+    }
+    const names = impWorkbook.SheetNames;
+    $('imp-sheet').innerHTML = names.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('');
+    $('imp-sheet').style.display = names.length > 1 ? '' : 'none';
+    updateImpPreview();
+  }catch(err){ console.error(err); st.className = 'status-line err'; st.textContent = 'Não consegui ler esse arquivo. Confira se é .xlsx ou .csv válido.'; }
+});
+$('imp-sheet').addEventListener('change', updateImpPreview);
+$('imp-bank').addEventListener('change', () => { $('imp-unit').value = round2(unitValue($('imp-bank').value)); updateImpPreview(); });
+$('imp-unit').addEventListener('input', updateImpPreview);
+$('imp-run').addEventListener('click', async () => {
+  const st = $('imp-status'), btn = $('imp-run');
+  const ids = new Set(bets.map(b => b.id));
+  const add = impPreview.filter(b => !ids.has(b.id));
+  if(!add.length) return;
+  btn.disabled = true;
+  bets.push(...add);
+  saveBets();
+  st.className = 'status-line'; st.textContent = `Salvo neste aparelho. Enviando ${add.length} ficha(s) para a nuvem…`;
+  await uploadMany(add.map(b => { b.updatedAt = Date.now(); return b; }), (n, t) => { st.textContent = `Enviando para a nuvem… ${n} de ${t}`; });
+  st.className = 'status-line ok'; st.textContent = `${add.length} ficha(s) importada(s)!`;
+  btn.disabled = false; btn.style.display = 'none';
+  $('imp-file').value = ''; impWorkbook = null; impPreview = []; $('imp-sheet').style.display = 'none';
+  render();
+});
+
+// ---- ferramentas ----
+function calcEV(){
+  const o = parseNum($('ev-odd').value), p = parseNum($('ev-prob').value) / 100;
+  if(!(o > 1 && p > 0 && p < 1)){ $('ev-out').innerHTML = '<span class="muted">Informe a odd e a chance que você acredita (ex.: 55%).</span>'; return; }
+  const ev = (p * o - 1) * 100, fair = 1 / p, kelly = Math.max(0, (p * o - 1) / (o - 1)) * 100;
+  $('ev-out').innerHTML = `EV: <b class="${cls(ev)}">${fmtPct(ev, true)}</b> por real apostado<br>Odd justa: <b>${fmtNum(fair)}</b><br>Kelly cheio: ${fmtNum(kelly,1)}% da banca <span class="muted">(¼ Kelly: ${fmtNum(kelly/4,1)}%)</span>`;
+}
+function calcFair(){
+  const odds = ['fo-a','fo-b','fo-c'].map(id => parseNum($(id).value)).filter(o => o > 1);
+  if(odds.length < 2){ $('fo-out').innerHTML = '<span class="muted">Coloque as odds de todos os resultados do mercado.</span>'; return; }
+  const inv = odds.map(o => 1 / o), sum = inv.reduce((a,b) => a + b, 0);
+  $('fo-out').innerHTML = `Margem da casa: <b>${fmtPct((sum - 1) * 100)}</b><br>` + odds.map((o, i) => `${'ABC'[i]}: ${fmtNum(o)} → justa <b>${fmtNum(sum / inv[i])}</b> <span class="muted">(${fmtPct(inv[i] / sum * 100)})</span>`).join('<br>');
+}
+function calcSure(){
+  const a = parseNum($('sb-a').value), b = parseNum($('sb-b').value), t = parseNum($('sb-total').value);
+  if(!(a > 1 && b > 1)){ $('sb-out').innerHTML = '<span class="muted">Informe as duas odds (de casas diferentes).</span>'; return; }
+  const s = 1/a + 1/b, pct = (1/s - 1) * 100;
+  if(!(t > 0)){ $('sb-out').innerHTML = `${s < 1 ? 'É surebet' : 'Não é surebet'}: <b class="${cls(pct)}">${fmtPct(pct, true)}</b><br><span class="muted">Coloque o total para dividir.</span>`; return; }
+  const sa = t * (1/a) / s, sbb = t * (1/b) / s, ret = sa * a;
+  $('sb-out').innerHTML = `${s < 1 ? 'É surebet' : 'Não é surebet'}: <b class="${cls(pct)}">${fmtPct(pct, true)}</b><br>Apostar ${fmtBRL(sa)} na A e ${fmtBRL(sbb)} na B<br>Retorno: ${fmtBRL(ret)} (<span class="${cls(ret - t)}">${fmtBRLs(ret - t)}</span>)`;
+}
+['ev-odd','ev-prob'].forEach(id => $(id).addEventListener('input', calcEV));
+['fo-a','fo-b','fo-c'].forEach(id => $(id).addEventListener('input', calcFair));
+['sb-a','sb-b','sb-total'].forEach(id => $(id).addEventListener('input', calcSure));
+calcEV(); calcFair(); calcSure();
+
+/* ============================================================
+   NUVEM (login)
+   ============================================================ */
+function updateCloudUI(){
+  const c = window.cloudBets;
+  const status = $('cloud-status'), toggle = $('cloud-toggle'), logout = $('cloud-logout');
+  if(!c){ status.textContent = 'Carregando o Firebase… (se não sair daqui, verifique a internet ou um bloqueador de anúncios)'; return; }
+  if(!c.configured){ status.textContent = 'Firebase indisponível — modo local, salvando só neste aparelho.'; toggle.style.display = 'none'; return; }
+  toggle.style.display = '';
+  if(c.user){ status.textContent = 'Sincronizado como ' + c.user.email + '. O que você registrar aqui aparece nos outros aparelhos logados.'; toggle.textContent = 'Conta'; logout.style.display = ''; $('cloud-login').style.display = 'none'; $('cloud-signup').style.display = 'none'; }
+  else { status.textContent = 'Não logado — as fichas ficam só neste aparelho até você entrar.'; toggle.textContent = 'Entrar'; logout.style.display = 'none'; $('cloud-login').style.display = ''; $('cloud-signup').style.display = ''; }
+}
+$('cloud-toggle').addEventListener('click', () => { const f = $('cloud-form'); f.style.display = f.style.display === 'none' ? '' : 'none'; });
+$('cloud-login').addEventListener('click', async () => {
+  try{ await window.cloudBets.login($('cloud-email').value.trim(), $('cloud-password').value); $('cloud-form').style.display = 'none'; }
+  catch(e){ showToast('Não foi possível entrar', 'Verifique e-mail e senha.', 'err'); }
+});
+$('cloud-signup').addEventListener('click', async () => {
+  try{ await window.cloudBets.signup($('cloud-email').value.trim(), $('cloud-password').value); showToast('Conta criada', '', 'ok'); $('cloud-form').style.display = 'none'; }
+  catch(e){ showToast('Não foi possível criar a conta', e.code || e.message, 'err'); }
+});
+$('cloud-logout').addEventListener('click', async () => { await window.cloudBets.logout(); });
+window.addEventListener('cloud-ready', (e) => {
+  if(!e.detail.configured) setSync('', 'Modo local (sem nuvem)');
+  else if(!window.cloudBets.user) setSync('warn', 'Não logado — só neste aparelho');
+  updateCloudUI();
+});
+window.addEventListener('cloud-auth', async () => {
+  const c = window.cloudBets;
+  if(!c.user){ setSync('warn', 'Não logado — só neste aparelho'); updateCloudUI(); render(); return; }
+  updateCloudUI();
+  await syncSettingsFromCloud();
+  stakeMode = settings.prefs.stakeMode;
+  if(!editingId) applyStakeMode(stakeMode);
+  await loadBets();
+});
+
+/* ============================================================
+   INÍCIO
+   ============================================================ */
+resetForm();
+setView((location.hash || '').slice(1) || 'painel', { keepScroll:true });
+loadBets();
+})();
+</script>
+</body>
+</html>

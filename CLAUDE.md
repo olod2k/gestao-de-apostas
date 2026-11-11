@@ -44,7 +44,7 @@ Testado em Chrome headless (modo local, Firebase bloqueado): import da planilha 
 1. Sincronização real com o Firestore (login, sync entre celular e PC).
 2. Chamada real ao Gemini: confirmar que `https://www.gstatic.com/firebasejs/12.1.0/firebase-ai.js` carrega e que o modelo padrão existe no plano gratuito. O Lucas precisa ativar no console: AI Logic → Começar → Gemini Developer API.
 3. Regras de segurança do Firestore: garantir que cada usuário só lê/grava `users/{uid}/**` dele (inclui `settings/*` e `tombstones/*`).
-4. Hospedagem: repositório **privado** → preferir Firebase Hosting com deploy automático pelo GitHub Actions. Adicionar o domínio em Authentication → Settings → Domínios autorizados.
+4. Hospedagem: **no ar** pelo Firebase Hosting em `https://gestaodeapostas.web.app` (e também `https://apostas-e3512.web.app`, mesmo conteúdo). Publicar com `firebase deploy --only hosting` na raiz; o `firebase.json` envia só o `index.html` para os dois endereços. Falta: deploy automático pelo GitHub Actions e testar o login no endereço novo (se reclamar de domínio, adicionar em Authentication → Settings → Domínios autorizados).
 5. Opcional: App Check para proteger a cota do Gemini; manifest/ícone para "Adicionar à tela inicial".
 
 ## Como testar

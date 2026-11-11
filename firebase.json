@@ -1,0 +1,50 @@
+{
+  "hosting": [
+    {
+      "site": "gestaodeapostas",
+      "public": ".",
+      "ignore": [
+        "firebase.json",
+        ".firebaserc",
+        "**/.*",
+        "**/.*/**",
+        ".git/**",
+        "**/node_modules/**",
+        "tests/**",
+        "CLAUDE.md",
+        "README.md"
+      ],
+      "headers": [
+        {
+          "source": "/index.html",
+          "headers": [
+            { "key": "Cache-Control", "value": "no-cache" }
+          ]
+        }
+      ]
+    },
+    {
+      "site": "apostas-e3512",
+      "public": ".",
+      "ignore": [
+        "firebase.json",
+        ".firebaserc",
+        "**/.*",
+        "**/.*/**",
+        ".git/**",
+        "**/node_modules/**",
+        "tests/**",
+        "CLAUDE.md",
+        "README.md"
+      ],
+      "headers": [
+        {
+          "source": "/index.html",
+          "headers": [
+            { "key": "Cache-Control", "value": "no-cache" }
+          ]
+        }
+      ]
+    }
+  ]
+}

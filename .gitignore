@@ -1,4 +1,5 @@
 node_modules/
+.firebase/
 *.png
 !tests/print_exemplo.png
 tests/*.json

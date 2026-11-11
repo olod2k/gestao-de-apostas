@@ -704,8 +704,8 @@
     measurementId: "G-N0GYF01F8R"
   };
 
-  // App Check (reCAPTCHA v3): prova ao Firebase que o pedido vem deste site.
-  // Chave do SITE (pública). Vazia = App Check desligado. A chave secreta fica só no console do Firebase.
+  // App Check (reCAPTCHA Enterprise): prova ao Firebase que o pedido vem deste site.
+  // Chave do SITE (pública), criada no projeto apostas-e3512. Vazia = App Check desligado.
   const APPCHECK_SITE_KEY = "6LfWbhouAAAAAP-X7siRNg2F97gbXkpEoRF1r-Sk";
 
   const configured = !Object.values(firebaseConfig).some(v => String(v).startsWith('COLE_'));
@@ -719,8 +719,8 @@
       // Precisa vir antes do Auth/Firestore/IA. Se falhar, o app segue sem o App Check.
       if(APPCHECK_SITE_KEY){
         try{
-          const { initializeAppCheck, ReCaptchaV3Provider } = await import("https://www.gstatic.com/firebasejs/12.1.0/firebase-app-check.js");
-          initializeAppCheck(app, { provider: new ReCaptchaV3Provider(APPCHECK_SITE_KEY), isTokenAutoRefreshEnabled: true });
+          const { initializeAppCheck, ReCaptchaEnterpriseProvider } = await import("https://www.gstatic.com/firebasejs/12.1.0/firebase-app-check.js");
+          initializeAppCheck(app, { provider: new ReCaptchaEnterpriseProvider(APPCHECK_SITE_KEY), isTokenAutoRefreshEnabled: true });
         }catch(e){ console.warn('App Check indisponível:', e); }
       }
       const auth = getAuth(app), db = getFirestore(app);

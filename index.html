@@ -418,7 +418,6 @@
   .balance{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:24px;align-items:stretch;padding:22px;}
   .balance-info{display:flex;flex-direction:column;gap:4px;min-width:0;}
   .balance-main{margin-top:4px;}
-  .balance-value .cents{color:var(--text-faint);}
   #bal-growth{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;font-weight:500 !important;color:var(--text-muted);margin-top:6px;}
   .trend{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;font-weight:600;font-size:12.5px;background:var(--void-dim);color:var(--void-text);}
   .trend.pos{background:var(--win-dim);color:var(--win-text);} .trend.neg{background:var(--loss-dim);color:var(--loss-text);}
@@ -472,6 +471,52 @@
     .main{padding-bottom:118px;}
     #toast{bottom:calc(98px + env(safe-area-inset-bottom));}
   }
+  /* Calendário do mês */
+  .cal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px;}
+  .cal-title{font-size:16px;font-weight:650;letter-spacing:-.01em;}
+  .cal-sum{font-size:12.5px;color:var(--text-muted);margin-top:4px;display:flex;gap:6px 10px;flex-wrap:wrap;font-variant-numeric:tabular-nums;}
+  .cal-sum b{font-weight:650;}
+  .cal-nav{display:flex;gap:6px;flex:none;}
+  .cal-nav button{width:34px;min-height:34px;padding:0;font-size:17px;background:var(--surface);}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+  .cal-wd{background:var(--surface-2);font-size:11.5px;font-weight:600;color:var(--text-muted);text-align:center;padding:8px 2px;letter-spacing:.04em;}
+  .cal-cell{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:2px;min-height:82px;padding:7px 8px 8px;border:none;border-radius:0;background:var(--surface);color:var(--text);text-align:center;font-variant-numeric:tabular-nums;transition:filter .15s ease;}
+  .cal-cell:hover{background:var(--surface);filter:brightness(1.12);}
+  .cal-cell:active{transform:none;}
+  .cal-cell:disabled{opacity:1;cursor:default;filter:none;}
+  .cal-cell.pos{background:linear-gradient(var(--win-dim),var(--win-dim)),var(--surface);}
+  .cal-cell.neg{background:linear-gradient(var(--loss-dim),var(--loss-dim)),var(--surface);}
+  .cal-cell.out{background:var(--surface-2);}
+  .cal-cell.out>*{opacity:.4;}
+  .cal-top{display:flex;justify-content:space-between;align-items:baseline;gap:4px;min-height:16px;}
+  .cal-top b{font-size:12.5px;font-weight:600;color:var(--text-2);}
+  .cal-cell.today .cal-top b{background:var(--accent-solid);color:var(--on-accent);border-radius:999px;padding:0 6px;margin-left:-3px;}
+  .cal-n{font-size:10.5px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .cal-p{font-size:12.5px;font-weight:650;margin-top:auto;white-space:nowrap;}
+  .cal-u{font-size:11px;color:var(--text-muted);white-space:nowrap;}
+  .cal-us{display:none;}
+  .cal-cell.pos .cal-p,.cal-cell.pos .cal-u,.cal-cell.pos .cal-us{color:var(--win-text);}
+  .cal-cell.neg .cal-p,.cal-cell.neg .cal-u,.cal-cell.neg .cal-us{color:var(--loss-text);}
+  @container (max-width:560px){
+    .cal-cell{min-height:54px;padding:5px 2px 6px;}
+    .cal-top{justify-content:center;}
+    .cal-n,.cal-p,.cal-u{display:none;}
+    .cal-us{display:block;font-size:10.5px;font-weight:650;margin-top:auto;white-space:nowrap;}
+    .cal-wd{font-size:10.5px;padding:7px 0;}
+  }
+  .cal-wrap{container-type:inline-size;}
+  .cols{grid-template-columns:minmax(0,1fr);} .cols>div{min-width:0;}
+  @media(min-width:1024px){.cols{grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);}}
+  .cal-cell{padding-left:6px;padding-right:6px;}
+
+  /* Dica flutuante dos gráficos */
+  #tip{position:fixed;left:0;top:0;z-index:9998;pointer-events:none;max-width:270px;background:var(--surface);color:var(--text);border:1px solid var(--border-strong);border-radius:11px;padding:8px 11px;font-size:12.5px;line-height:1.5;box-shadow:var(--shadow-lg);opacity:0;transition:opacity .12s ease;font-variant-numeric:tabular-nums;}
+  #tip.show{opacity:1;}
+  #tip b{font-weight:650;}
+  #evo-holder{position:relative;}
+  .evo-mark{position:absolute;top:0;height:200px;width:1px;background:var(--border-strong);display:none;pointer-events:none;}
+  .evo-mark i{position:absolute;left:-4px;width:9px;height:9px;margin-top:-4.5px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px var(--surface);}
+  #evo-holder svg,#bal-spark{cursor:crosshair;}
   @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important;}}
 </style>
 </head>
@@ -569,6 +614,19 @@
     <div class="cols">
       <div>
         <div class="card">
+          <div class="cal-head">
+            <div>
+              <div class="cal-title" id="cal-title">—</div>
+              <div class="cal-sum" id="cal-sum"></div>
+            </div>
+            <div class="cal-nav">
+              <button type="button" id="cal-prev" aria-label="Mês anterior">‹</button>
+              <button type="button" id="cal-next" aria-label="Próximo mês">›</button>
+            </div>
+          </div>
+          <div class="cal-wrap"><div class="cal-grid" id="cal-grid"></div></div>
+        </div>
+        <div class="card">
           <div class="card-head">
             <div class="card-title" id="chart-title">Resultados por dia</div>
             <div class="seg" id="chart-toggle">
@@ -581,7 +639,7 @@
             <span id="chart-month">—</span>
             <button type="button" id="chart-next" aria-label="Próximo mês">›</button>
           </div>
-          <div class="chart-info" id="chart-info">Toque ou passe o mouse numa barra para ver os detalhes</div>
+          <div class="chart-info" id="chart-info">Passe o mouse ou toque numa barra para ver os detalhes</div>
           <div class="chart-holder" id="chart-holder"></div>
           <button type="button" class="link-btn" id="detail-toggle">Ver dados detalhados ▾</button>
           <div id="detail-wrap" style="display:none;margin-top:10px;border-top:1px dashed var(--border);padding-top:10px;">
@@ -597,10 +655,6 @@
         </div>
       </div>
       <div>
-        <div class="card" id="limits-card">
-          <div class="card-head"><div class="card-title">Limites (anti-tilt)</div><button type="button" class="link-btn" data-goto="banca" data-anchor="limits-section">ajustar</button></div>
-          <div id="limits-body"></div>
-        </div>
         <div class="card">
           <div class="card-head"><div class="card-title" id="pend-title">Pendentes</div><button type="button" class="link-btn" id="pend-all">ver no histórico</button></div>
           <div id="pend-list"></div>
@@ -865,6 +919,7 @@
   <button type="button" class="nav-btn" data-nav="banca"><svg><use href="#i-wallet"/></svg><span>Banca</span></button>
 </nav>
 
+<div id="tip" role="tooltip"></div>
 <div id="toast" role="status" aria-live="polite">
   <div style="flex:1;"><div class="t-title" id="toast-title"></div><div class="t-msg" id="toast-msg"></div></div>
   <button type="button" class="t-close" id="toast-close" aria-label="Fechar">&times;</button>
@@ -1365,6 +1420,68 @@ $('pend-all').addEventListener('click', () => { $('f-fresult').value = 'pendente
 $('backup-banner-btn').addEventListener('click', exportBackup);
 $('qa-backup').addEventListener('click', exportBackup);
 
+// Dica flutuante usada pelos gráficos e pelo calendário.
+function showTip(html, x, y){
+  const t = $('tip');
+  t.innerHTML = html;
+  const w = t.offsetWidth, h = t.offsetHeight;
+  const left = Math.max(8, Math.min(window.innerWidth - w - 8, x - w / 2));
+  const top = y - h - 14 < 8 ? y + 18 : y - h - 14;
+  t.style.transform = `translate(${Math.round(left)}px,${Math.round(top)}px)`;
+  t.classList.add('show');
+}
+function hideTip(){ $('tip').classList.remove('show'); }
+window.addEventListener('scroll', hideTip, { passive:true });
+const evX = (ev) => ev.touches && ev.touches[0] ? ev.touches[0].clientX : ev.clientX;
+
+// Calendário do mês: lucro de cada dia, com atalho para o histórico daquele dia.
+let calMonth = '';
+const shiftMonth = (key, d) => { const [y, m] = key.split('-').map(Number); return isoOf(new Date(y, m - 1 + d, 1)).slice(0, 7); };
+$('cal-prev').addEventListener('click', () => { calMonth = shiftMonth(calMonth, -1); renderCalendar(scope()); });
+$('cal-next').addEventListener('click', () => { calMonth = shiftMonth(calMonth, 1); renderCalendar(scope()); });
+function renderCalendar(S){
+  const today = todayISO(), cur = today.slice(0, 7);
+  const months = availableMonths(S);
+  const minM = months.length && months[0] < cur ? months[0] : cur;
+  const maxM = months.length && months[months.length - 1] > cur ? months[months.length - 1] : cur;
+  if(!calMonth) calMonth = cur;
+  if(calMonth < minM) calMonth = minM;
+  if(calMonth > maxM) calMonth = maxM;
+  $('cal-prev').disabled = calMonth <= minM; $('cal-next').disabled = calMonth >= maxM;
+  const [Y, M] = calMonth.split('-').map(Number);
+  const days = {};
+  S.forEach(b => {
+    if(!b.date) return;
+    const d = days[b.date] || (days[b.date] = { n:0, settled:0, p:0, u:0 });
+    d.n++;
+    if(b.result !== 'pendente'){ d.settled++; d.p += Number(b.profit) || 0; d.u += uOf(b, b.profit); }
+  });
+  const first = new Date(Y, M - 1, 1), lastDay = new Date(Y, M, 0).getDate();
+  const weeks = Math.ceil((first.getDay() + lastDay) / 7);
+  let mp = 0, mu = 0, greens = 0, reds = 0;
+  let html = ['DOM','SEG','TER','QUA','QUI','SEX','SÁB'].map(w => `<div class="cal-wd">${w}</div>`).join('');
+  for(let i = 0; i < weeks * 7; i++){
+    const dt = new Date(Y, M - 1, 1 - first.getDay() + i), iso = isoOf(dt), inM = dt.getMonth() === M - 1, d = days[iso];
+    const k = d && d.settled ? (d.p > 0.004 ? 'pos' : d.p < -0.004 ? 'neg' : '') : '';
+    if(inM && d && d.settled){ mp += d.p; mu += d.u; if(k === 'pos') greens++; else if(k === 'neg') reds++; }
+    const count = d ? `${d.n} aposta${d.n > 1 ? 's' : ''}` : '';
+    const info = d ? `<b>${dateBR(iso)}</b><br>` + (d.settled ? `<span class="${cls(d.p)}">${fmtBRLs(d.p)} (${fmtU(d.u)})</span> · ` : '') + count + (d.n > d.settled ? ` · ${d.n - d.settled} em aberto` : '') : '';
+    html += `<button type="button" class="cal-cell ${k} ${inM ? '' : 'out'} ${iso === today ? 'today' : ''}" ${d ? `data-cal="${iso}" data-info="${esc(info)}" aria-label="${dateBR(iso)}: ${d.settled ? fmtBRLs(d.p) + ', ' : ''}${count}"` : 'disabled'}>` +
+      `<span class="cal-top"><b>${dt.getDate()}</b>${d ? `<span class="cal-n">${count}</span>` : ''}</span>` +
+      (d && d.settled ? `<span class="cal-p">${fmtBRLs(d.p)}</span><span class="cal-u">(${fmtU(d.u)})</span><span class="cal-us">${(d.u > 0.004 ? '+' : d.u < -0.004 ? '-' : '') + fmtNum(Math.abs(d.u), 1)}u</span>` : d ? '<span class="cal-u" style="margin-top:auto;">em aberto</span><span class="cal-us" style="color:var(--pend-text);">•</span>' : '') +
+      '</button>';
+  }
+  $('cal-title').textContent = monthLabel(calMonth);
+  $('cal-sum').innerHTML = `<span>Lucro: <b class="${cls(mp)}">${fmtBRLs(mp)}</b> (${fmtU(mu)})</span><span class="pos"><b>${greens}</b> dia${greens === 1 ? '' : 's'} green</span><span class="neg"><b>${reds}</b> dia${reds === 1 ? '' : 's'} red</span>`;
+  const grid = $('cal-grid');
+  grid.innerHTML = html;
+  $$('[data-cal]', grid).forEach(el => {
+    el.addEventListener('mousemove', (ev) => showTip(el.getAttribute('data-info'), ev.clientX, el.getBoundingClientRect().top));
+    el.addEventListener('mouseleave', hideTip);
+    el.addEventListener('click', () => { hideTip(); histDate = el.dataset.cal; histVisible = PAGE; ['f-search','f-fbookie','f-fsport','f-fresult'].forEach(id => { $(id).value = ''; }); setView('historico'); });
+  });
+}
+
 // Números que "correm" até o valor novo. Desligado para quem pede menos movimento e em testes automáticos.
 const NO_MOTION = (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) || navigator.webdriver === true;
 function tweenNum(el, to, fmt, asHtml){
@@ -1389,9 +1506,9 @@ function drawSpark(S, initial){
   const holder = $('bal-spark');
   const settled = S.filter(b => b.result !== 'pendente' && b.date).sort((a,b) => a.date.localeCompare(b.date) || (a.createdAt||0) - (b.createdAt||0));
   if(settled.length < 2){ holder.innerHTML = ''; return; }
-  let cur = initial, pts = [cur];
-  settled.forEach(b => { cur += Number(b.profit) || 0; pts.push(cur); });
-  if(pts.length > 80){ const stepN = (pts.length - 1) / 79; pts = Array.from({ length: 80 }, (_, i) => pts[Math.round(i * stepN)]); }
+  let cur = initial, pts = [cur], when = ['Início'];
+  settled.forEach(b => { cur += Number(b.profit) || 0; pts.push(cur); when.push(dateBR(b.date)); });
+  if(pts.length > 80){ const stepN = (pts.length - 1) / 79, idx = Array.from({ length: 80 }, (_, i) => Math.round(i * stepN)); pts = idx.map(i => pts[i]); when = idx.map(i => when[i]); }
   const W = 300, H = 100, px = 8, py = 12;
   const min = Math.min(...pts), max = Math.max(...pts), rg = (max - min) || 1;
   const x = (i) => px + i / (pts.length - 1) * (W - px * 2);
@@ -1404,6 +1521,13 @@ function drawSpark(S, initial){
       <polygon points="${px},${H} ${line} ${lx.toFixed(1)},${H}" fill="url(#spark-g)"></polygon>
       <polyline points="${line}" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"></polyline>
     </svg><span class="spark-dot" style="left:${(lx / W * 100).toFixed(2)}%;top:${(ly / H * 100).toFixed(2)}%;color:${color}"></span>`;
+  const tipAt = (ev) => {
+    const r = holder.getBoundingClientRect(), f = Math.max(0, Math.min(1, (evX(ev) - r.left) / r.width));
+    const i = Math.max(0, Math.min(pts.length - 1, Math.round((f * W - px) / (W - px * 2) * (pts.length - 1))));
+    showTip(`<b>${fmtBRL(pts[i])}</b> <span class="${cls(pts[i] - initial)}">${fmtBRLs(pts[i] - initial)}</span><br><span class="muted">${when[i]}</span>`, r.left + x(i) / W * r.width, r.top + y(pts[i]) / H * r.height);
+  };
+  holder.onmousemove = tipAt; holder.ontouchstart = tipAt; holder.ontouchmove = tipAt;
+  holder.onmouseleave = hideTip; holder.ontouchend = () => setTimeout(hideTip, 1500);
 }
 
 function renderPainel(){
@@ -1455,7 +1579,7 @@ function renderPainel(){
   $('st-ring').style.strokeDashoffset = String(100 - Math.max(0, Math.min(100, st.winrate)));
   $('st-wl').textContent = `${st.wins}G · ${st.losses}R${st.voids ? ' · ' + st.voids + 'V' : ''}`;
 
-  renderLimitsCard(S);
+  renderCalendar(S);
   renderPending(S);
   drawChart(S);
 }
@@ -1467,20 +1591,6 @@ function limitRows(S){
   if(L.stopWeek > 0){ const u = lossU(S.filter(b => b.date && b.date >= ws && b.date <= today)); rows.push({ label:'Stop-loss da semana', used:u, max:L.stopWeek }); }
   return rows;
 }
-function renderLimitsCard(S){
-  const rows = limitRows(S);
-  const L = settings.limits;
-  if(!rows.length && !(L.maxStake > 0)){
-    $('limits-body').innerHTML = '<p class="help" style="margin:0;">Nenhum limite definido. Defina stop-loss e stake máxima na aba Banca para receber avisos antes de registrar.</p>';
-    return;
-  }
-  $('limits-body').innerHTML = rows.map(r => {
-    const pct = Math.min(100, r.used / r.max * 100);
-    return `<div class="limit"><div class="limit-head"><span>${r.label}</span><span class="mono muted">${fmtNum(r.used)}u de ${fmtNum(r.max)}u</span></div>
-      <div class="bar ${pct >= 75 ? 'hot' : ''}"><div style="width:${pct.toFixed(1)}%"></div></div></div>`;
-  }).join('') + (L.maxStake > 0 ? `<p class="help" style="margin:${rows.length ? '10px' : '0'} 0 0;">Stake máxima: <span class="mono">${fmtNum(L.maxStake)}u</span></p>` : '');
-}
-
 function renderPending(S){
   const pend = S.filter(b => b.result === 'pendente').sort((a,b) => (b.date||'').localeCompare(a.date||'') || (b.createdAt||0) - (a.createdAt||0));
   $('pend-title').textContent = `Pendentes (${pend.length})`;
@@ -1563,7 +1673,13 @@ function drawChart(S){
     }).join('');
     holder.innerHTML = `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" role="img" aria-label="Resultado por ${chartMode === 'day' ? 'dia' : 'mês'}"><line x1="0" y1="${zeroY}" x2="${w}" y2="${zeroY}" stroke="var(--border)" stroke-dasharray="4,4"/>${svg}</svg>`;
     const show = (el) => { $('chart-info').textContent = el.getAttribute('data-info'); $('chart-info').className = 'chart-info ' + (el.getAttribute('data-pos') === 'true' ? 'win' : 'loss'); };
-    $$('.bar-hit', holder).forEach(el => { el.addEventListener('mouseenter', () => show(el)); el.addEventListener('click', () => show(el)); el.addEventListener('touchstart', () => show(el), {passive:true}); });
+    const barTip = (el) => { const r = el.getBoundingClientRect(), t = el.getAttribute('data-info'), c = t.indexOf(': '); showTip(`<b>${esc(t.slice(0, c))}</b><br><span class="${el.getAttribute('data-pos') === 'true' ? 'pos' : 'neg'}">${esc(t.slice(c + 2).split(' · ')[0])}</span> · ${esc(t.slice(c + 2).split(' · ')[1] || '')}`, r.left + r.width / 2, r.top); };
+    $$('.bar-hit', holder).forEach(el => {
+      el.addEventListener('mouseenter', () => { show(el); barTip(el); });
+      el.addEventListener('mouseleave', hideTip);
+      el.addEventListener('click', () => { show(el); barTip(el); });
+      el.addEventListener('touchstart', () => { show(el); barTip(el); setTimeout(hideTip, 2500); }, {passive:true});
+    });
     if(chartMode === 'month') holder.scrollLeft = holder.scrollWidth;
   }
 
@@ -2136,6 +2252,20 @@ function drawEvolution(S){
     <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-variant-numeric:tabular-nums;font-size:12px;margin-top:8px;" class="muted">
       <span>${dateBR(settled[0].date)} · ${fmtNum(startU)}u</span><span>mín ${fmtNum(min)}u · máx ${fmtNum(max)}u</span><span class="${cls(cur - startU)}">${dateBR(settled[settled.length-1].date)} · ${fmtNum(cur)}u</span>
     </div>`;
+  const svgEl = holder.querySelector('svg');
+  const mark = document.createElement('div'); mark.className = 'evo-mark'; mark.innerHTML = '<i></i>'; holder.appendChild(mark);
+  const tipAt = (ev) => {
+    const r = svgEl.getBoundingClientRect(), f = Math.max(0, Math.min(1, (evX(ev) - r.left) / r.width));
+    const i = Math.max(0, Math.min(pts.length - 1, Math.round((f * W - pl) / (W - pl - pr) * (pts.length - 1))));
+    const cx = x(i) / W * r.width, cy = y(pts[i]) / H * r.height, b = i ? settled[i - 1] : null;
+    mark.style.display = 'block'; mark.style.left = cx + 'px'; mark.firstChild.style.top = cy + 'px';
+    showTip(`<b>${fmtNum(pts[i])}u</b> <span class="${cls(pts[i] - startU)}">${fmtU(pts[i] - startU)}</span><br>` +
+      (b ? `<span class="muted">${dateBR(b.date)} · ${esc(eventOf(b) || b.market || '')}</span> <span class="${cls(b.profit)}">${fmtU(uOf(b, b.profit))}</span>` : '<span class="muted">Início do período</span>'), r.left + cx, r.top + cy);
+  };
+  const leave = () => { mark.style.display = 'none'; hideTip(); };
+  svgEl.addEventListener('mousemove', tipAt); svgEl.addEventListener('mouseleave', leave);
+  svgEl.addEventListener('touchstart', tipAt, { passive:true }); svgEl.addEventListener('touchmove', tipAt, { passive:true });
+  svgEl.addEventListener('touchend', () => setTimeout(leave, 1800));
 }
 function renderGroups(S){
   $('group-name-head').textContent = GROUP_LABEL[groupMode];

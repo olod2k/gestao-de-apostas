@@ -365,10 +365,6 @@
   .row-item .acts{display:flex;gap:6px;flex-wrap:wrap;}
   .tag-active{margin-left:8px;margin-right:0;}
   .inline-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;align-items:end;margin-top:14px;}
-  .tool-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;}
-  .tool{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:16px;}
-  .tool h3{margin:0 0 12px;font-size:14px;font-weight:600;}
-  .tool-out{font-size:13px;line-height:1.7;margin-top:10px;min-height:20px;font-variant-numeric:tabular-nums;}
   .file-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px;}
   .file-row input[type=file]{max-width:100%;font-size:12.5px;color:var(--text-2);}
   .file-row input[type=file]::file-selector-button{font-family:inherit;font-size:12.5px;font-weight:500;min-height:30px;padding:0 11px;margin-right:10px;border-radius:8px;border:1px solid var(--border-strong);background:var(--surface-2);color:var(--text);cursor:pointer;}
@@ -385,6 +381,98 @@
   @media(min-width:1024px){#toast{bottom:24px;margin-left:calc(var(--side)/2);}}
   .foot-note{text-align:center;color:var(--text-faint);font-size:12px;margin-top:24px;}
   @media (prefers-reduced-motion: reduce){*{transition:none !important;}}
+  /* ============ ACABAMENTO: superfícies macias, blocos e movimento ============ */
+  :root{--radius:18px;--ease-out:cubic-bezier(.2,.8,.2,1);--ease-spring:cubic-bezier(.2,.9,.25,1.2);
+    --shadow:0 1px 1px rgba(0,0,0,.25),0 10px 28px -14px rgba(0,0,0,.55);}
+  @media (prefers-color-scheme: light){
+    :root:not([data-theme="dark"]){--bg:#f1f2f5;--border:#e8eaef;--shadow:0 1px 2px rgba(16,24,40,.04),0 12px 30px -16px rgba(16,24,40,.16);}
+  }
+  :root[data-theme="light"]{--bg:#f1f2f5;--border:#e8eaef;--shadow:0 1px 2px rgba(16,24,40,.04),0 12px 30px -16px rgba(16,24,40,.16);}
+  button{border-radius:10px;}
+  button:active{transform:scale(.96);}
+  .card{padding:20px;}
+  .field input,.field select,.field textarea,.quick-row input,.filters input,.filters select,.bank-pick select,.icon-btn{border-radius:11px;}
+  .pend,.preview-box,.drop{border-radius:14px;}
+  .sidebar .nav-btn.nav-new{box-shadow:0 8px 18px -8px var(--accent-solid);}
+
+  @keyframes riseIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+  @keyframes popIn{from{transform:scale(.9);}to{transform:scale(1);}}
+  @keyframes barGrow{from{transform:scaleY(0);}to{transform:scaleY(1);}}
+  @keyframes barWide{from{transform:scaleX(0);}to{transform:scaleX(1);}}
+  @keyframes ping{0%{transform:scale(1);opacity:.55;}80%,100%{transform:scale(3.2);opacity:0;}}
+  .view.active>*{animation:riseIn .45s var(--ease-out) both;}
+  .view.active>*:nth-child(2){animation-delay:.04s;} .view.active>*:nth-child(3){animation-delay:.08s;}
+  .view.active>*:nth-child(4){animation-delay:.12s;} .view.active>*:nth-child(5){animation-delay:.16s;}
+  .view.active>*:nth-child(n+6){animation-delay:.2s;}
+  .kpi{animation:riseIn .4s var(--ease-out) both;}
+  .kpi:nth-child(2){animation-delay:.03s;} .kpi:nth-child(3){animation-delay:.06s;} .kpi:nth-child(4){animation-delay:.09s;}
+  .kpi:nth-child(5){animation-delay:.12s;} .kpi:nth-child(6){animation-delay:.15s;} .kpi:nth-child(7){animation-delay:.18s;}
+  .kpi:nth-child(8){animation-delay:.21s;} .kpi:nth-child(9){animation-delay:.24s;}
+  .chip.active,.seg button.active,.date-tab.active{animation:popIn .26s var(--ease-spring);}
+  .bar-hit{transform-box:fill-box;transform-origin:50% 100%;animation:barGrow .5s var(--ease-out) both;}
+  .bar-hit[data-pos="false"]{transform-origin:50% 0;}
+  .bar>div{transform-origin:left center;animation:barWide .7s var(--ease-out) both;}
+  #toast{border-radius:14px;transition:transform .35s var(--ease-spring),opacity .25s ease;}
+
+  /* Saldo em destaque com minigráfico */
+  .balance{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:24px;align-items:stretch;padding:22px;}
+  .balance-info{display:flex;flex-direction:column;gap:4px;min-width:0;}
+  .balance-main{margin-top:4px;}
+  .balance-value .cents{color:var(--text-faint);}
+  #bal-growth{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;font-weight:500 !important;color:var(--text-muted);margin-top:6px;}
+  .trend{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;font-weight:600;font-size:12.5px;background:var(--void-dim);color:var(--void-text);}
+  .trend.pos{background:var(--win-dim);color:var(--win-text);} .trend.neg{background:var(--loss-dim);color:var(--loss-text);}
+  .balance-note{font-size:12.5px;margin-top:auto;padding-top:10px;}
+  .balance-spark{position:relative;min-height:104px;}
+  .balance-spark svg{position:absolute;inset:0;width:100%;height:100%;display:block;overflow:visible;animation:riseIn .6s var(--ease-out) both;}
+  .spark-dot{position:absolute;width:9px;height:9px;border-radius:50%;background:currentColor;transform:translate(-50%,-50%);}
+  .spark-dot::after{content:"";position:absolute;inset:0;border-radius:50%;background:currentColor;animation:ping 2.2s ease-out infinite;}
+  @media(max-width:760px){
+    .balance{grid-template-columns:minmax(0,1fr);gap:14px;padding:18px;}
+    .balance-spark{min-height:68px;}
+  }
+
+  /* Ações rápidas */
+  .quick-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px;}
+  .qa{display:flex;align-items:center;justify-content:flex-start;gap:10px;min-height:58px;padding:10px 14px;border-radius:var(--radius);background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow);font-size:13.5px;font-weight:600;text-align:left;transition:transform .22s var(--ease-spring),border-color .15s ease;}
+  .qa:hover{background:var(--surface);transform:translateY(-2px);border-color:var(--border-strong);}
+  .qa:active{transform:scale(.95);}
+  .qa-ico{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:var(--accent-dim);color:var(--accent);flex:none;transition:transform .22s var(--ease-spring);}
+  .qa:hover .qa-ico{transform:scale(1.08) rotate(-4deg);}
+  .qa-ico svg{width:18px;height:18px;}
+  .qa:first-child .qa-ico{background:var(--accent-solid);color:var(--on-accent);}
+  @media(max-width:640px){
+    .quick-actions{gap:8px;}
+    .qa{flex-direction:column;justify-content:center;gap:7px;padding:12px 4px 10px;font-size:11.5px;text-align:center;min-height:0;border-radius:16px;}
+  }
+
+  /* Placar em blocos */
+  .board{background:none;border:none;box-shadow:none;padding:0;gap:12px;grid-template-columns:repeat(5,minmax(0,1fr));}
+  .cell,.cell:last-child{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);}
+  .cell-ring{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+  .cell-ring>div{min-width:0;}
+  .ring{width:46px;height:46px;flex:none;transform:rotate(-90deg);}
+  .ring circle{fill:none;stroke-width:4.5;}
+  .ring-bg{stroke:var(--surface-3);}
+  .ring-fg{stroke:var(--win);stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:100;transition:stroke-dashoffset .9s var(--ease-out);}
+  @media(max-width:1180px) and (min-width:761px){.board{grid-template-columns:repeat(3,minmax(0,1fr));} .board .cell-ring{grid-column:span 2;}}
+  @media(max-width:760px){
+    .board{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+    .cell,.cell:nth-child(even),.cell:last-child{border:1px solid var(--border);padding:14px;}
+    .cell:first-child{grid-column:auto;}
+    .board .cell-ring{grid-column:span 2;}
+  }
+
+  /* Navegação flutuante no celular */
+  @media(max-width:1023px){
+    .bottomnav{left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));border:1px solid var(--border);border-radius:24px;padding:6px;box-shadow:var(--shadow-lg);}
+    .bottomnav .nav-btn{border-radius:18px;transition:background .2s ease,color .2s ease;}
+    .bottomnav .nav-btn.active{background:var(--accent-dim);}
+    .bottomnav .nav-btn.nav-new.active{background:none;}
+    .main{padding-bottom:118px;}
+    #toast{bottom:calc(98px + env(safe-area-inset-bottom));}
+  }
+  @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important;}}
 </style>
 </head>
 <body>
@@ -393,6 +481,8 @@
   <symbol id="i-list" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></symbol>
   <symbol id="i-plus" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" d="M12 5v14M5 12h14"/></symbol>
   <symbol id="i-chart" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M4 7h3l2-3h6l2 3h3v12H4z"/><circle cx="12" cy="13" r="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M12 4v11M7 11l5 5 5-5M5 20h14"/></symbol>
   <symbol id="i-wallet" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M3 7h18v12H3zM16 13h2M3 7l3-3h12l3 3"/></symbol>
 </svg>
 
@@ -438,15 +528,23 @@
     </div>
 
     <div class="card balance">
-      <div class="card-title" style="margin:0;">Saldo atual · <span id="bal-name">Principal</span></div>
-      <div class="balance-main">
-        <span class="balance-value" id="bal-value">R$ 0,00</span>
-        <span class="mono muted" id="bal-units">0,00u</span>
+      <div class="balance-info">
+        <div class="card-title" style="margin:0;">Saldo atual · <span id="bal-name">Principal</span></div>
+        <div class="balance-main">
+          <span class="balance-value" id="bal-value">R$ 0,00</span>
+          <span class="mono muted" id="bal-units">0,00u</span>
+        </div>
+        <div class="mono" id="bal-growth"></div>
+        <div class="muted balance-note" id="bal-initial">Inicial</div>
       </div>
-      <div class="balance-sub">
-        <span class="muted" id="bal-initial">Inicial</span>
-        <span class="mono" id="bal-growth" style="font-weight:700;"></span>
-      </div>
+      <div class="balance-spark" id="bal-spark" aria-hidden="true"></div>
+    </div>
+
+    <div class="quick-actions" aria-label="Ações rápidas">
+      <button type="button" class="qa" data-nav="nova"><span class="qa-ico"><svg><use href="#i-plus"/></svg></span><span>Nova aposta</span></button>
+      <button type="button" class="qa" data-goto="nova" data-anchor="slip-drop"><span class="qa-ico"><svg><use href="#i-camera"/></svg></span><span>Ler print</span></button>
+      <button type="button" class="qa" data-nav="historico"><span class="qa-ico"><svg><use href="#i-list"/></svg></span><span>Histórico</span></button>
+      <button type="button" class="qa" id="qa-backup"><span class="qa-ico"><svg><use href="#i-download"/></svg></span><span>Backup</span></button>
     </div>
 
     <div class="card-head" style="margin-bottom:0;">
@@ -465,7 +563,7 @@
       <div class="cell"><div class="cell-label">Total investido</div><div class="cell-value" id="st-staked">R$ 0,00</div><div class="cell-sub" id="st-staked-u"></div></div>
       <div class="cell"><div class="cell-label">Lucro</div><div class="cell-value" id="st-profit">R$ 0,00</div><div class="cell-sub" id="st-profit-u"></div></div>
       <div class="cell"><div class="cell-label">ROI</div><div class="cell-value" id="st-roi">0,0%</div></div>
-      <div class="cell"><div class="cell-label">Taxa de acerto</div><div class="cell-value" id="st-winrate">0,0%</div><div class="cell-sub" id="st-wl"></div></div>
+      <div class="cell cell-ring"><div><div class="cell-label">Taxa de acerto</div><div class="cell-value" id="st-winrate">0,0%</div><div class="cell-sub" id="st-wl"></div></div><svg class="ring" viewBox="0 0 36 36" aria-hidden="true"><circle class="ring-bg" cx="18" cy="18" r="15"/><circle class="ring-fg" id="st-ring" cx="18" cy="18" r="15" pathLength="100"/></svg></div>
     </div>
 
     <div class="cols">
@@ -755,37 +853,6 @@
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-title gold">Ferramentas</div>
-      <div class="tool-grid">
-        <div class="tool">
-          <h3>Valor esperado (EV)</h3>
-          <div class="inline-form" style="margin-top:0;">
-            <div class="field"><label for="ev-odd">Odd da casa</label><input type="number" id="ev-odd" step="0.01" min="1" inputmode="decimal"></div>
-            <div class="field"><label for="ev-prob">Sua probabilidade (%)</label><input type="number" id="ev-prob" step="0.1" min="0" max="100" inputmode="decimal"></div>
-          </div>
-          <div class="tool-out" id="ev-out"></div>
-        </div>
-        <div class="tool">
-          <h3>Odd justa (tirar a margem)</h3>
-          <div class="inline-form" style="margin-top:0;grid-template-columns:repeat(3,minmax(0,1fr));">
-            <div class="field"><label for="fo-a">Odd A</label><input type="number" id="fo-a" step="0.01" min="1" inputmode="decimal"></div>
-            <div class="field"><label for="fo-b">Odd B</label><input type="number" id="fo-b" step="0.01" min="1" inputmode="decimal"></div>
-            <div class="field"><label for="fo-c">Odd C</label><input type="number" id="fo-c" step="0.01" min="1" inputmode="decimal" placeholder="opcional"></div>
-          </div>
-          <div class="tool-out" id="fo-out"></div>
-        </div>
-        <div class="tool">
-          <h3>Surebet (2 resultados)</h3>
-          <div class="inline-form" style="margin-top:0;grid-template-columns:repeat(3,minmax(0,1fr));">
-            <div class="field"><label for="sb-a">Odd A</label><input type="number" id="sb-a" step="0.01" min="1" inputmode="decimal"></div>
-            <div class="field"><label for="sb-b">Odd B</label><input type="number" id="sb-b" step="0.01" min="1" inputmode="decimal"></div>
-            <div class="field"><label for="sb-total">Total R$</label><input type="number" id="sb-total" step="0.01" min="0" inputmode="decimal"></div>
-          </div>
-          <div class="tool-out" id="sb-out"></div>
-        </div>
-      </div>
-    </div>
     <p class="foot-note">salvo neste aparelho + sincronizado no Firebase quando logado</p>
   </section>
 </main>
@@ -972,7 +1039,9 @@ function normalizeSettings(s){
   s = s || {};
   for(const k of Object.keys(DEFAULTS)) s[k] = Object.assign(clone(DEFAULTS[k]), s[k] || {});
   if(!Array.isArray(s.banks.list) || !s.banks.list.length) s.banks = clone(DEFAULTS.banks);
-  s.banks.list = s.banks.list.filter(b => b && b.id).map(b => ({ id:String(b.id), name:String(b.name||'Banca'), amount:Number(b.amount)>0?Number(b.amount):2000, units:Number(b.units)>0?Number(b.units):100 }));
+  s.banks.list = s.banks.list.filter(b => b && b.id).map(b => ({ id:String(b.id), name:String(b.name||'Banca'), amount:Number(b.amount)>0?Number(b.amount):2000, units:Number(b.units)>0?Number(b.units):100,
+    // hist: valores de unidade anteriores. Cada item vale para as fichas registradas antes de "until" (ms).
+    hist:(Array.isArray(b.hist) ? b.hist : []).filter(h => h && Number(h.until) > 0 && Number(h.uv) > 0).map(h => ({ until:Number(h.until), uv:Number(h.uv) })).sort((x,y) => x.until - y.until) }));
   if(!s.banks.list.length) s.banks = clone(DEFAULTS.banks);
   if(s.banks.active !== '__all' && !s.banks.list.some(b => b.id === s.banks.active)) s.banks.active = s.banks.list[0].id;
   if(!Array.isArray(s.houses.txs)) s.houses.txs = [];
@@ -1023,7 +1092,11 @@ const isAll = () => settings.banks.active === '__all';
 const bankById = (id) => banks().find(b => b.id === id) || banks()[0];
 const betBankId = (b) => (b.bankId && banks().some(x => x.id === b.bankId)) ? b.bankId : firstBankId();
 const unitValue = (id) => { const b = bankById(id); return (b.amount / b.units) || 1; };
-const uOf = (b, v) => (Number(v)||0) / unitValue(betBankId(b));
+// Quando a ficha foi registrada (fichas muito antigas sem createdAt usam a data da aposta).
+const betTime = (b) => Number(b.createdAt) || (b.date ? new Date(b.date + 'T12:00:00').getTime() : 0) || 0;
+// Valor da unidade que valia para uma banca naquele momento: mudar o tamanho da banca não mexe nas fichas já registradas.
+const unitValueAt = (id, t) => { const bk = bankById(id), h = (bk.hist || []).find(x => t < x.until); return h ? h.uv : unitValue(id); };
+const uOf = (b, v) => (Number(v)||0) / unitValueAt(betBankId(b), betTime(b));
 const targetBankId = () => isAll() ? firstBankId() : settings.banks.active;
 
 /* ============================================================
@@ -1290,6 +1363,48 @@ $$('#detail-table th[data-sort]').forEach(th => th.addEventListener('click', () 
 }));
 $('pend-all').addEventListener('click', () => { $('f-fresult').value = 'pendente'; histDate = ''; setView('historico'); });
 $('backup-banner-btn').addEventListener('click', exportBackup);
+$('qa-backup').addEventListener('click', exportBackup);
+
+// Números que "correm" até o valor novo. Desligado para quem pede menos movimento e em testes automáticos.
+const NO_MOTION = (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) || navigator.webdriver === true;
+function tweenNum(el, to, fmt, asHtml){
+  const set = (v) => { if(asHtml) el.innerHTML = fmt(v); else el.textContent = fmt(v); };
+  const from = typeof el._tv === 'number' ? el._tv : 0;
+  el._tv = to;
+  cancelAnimationFrame(el._raf); clearTimeout(el._tend);
+  if(NO_MOTION || document.hidden || Math.abs(to - from) < 0.005){ set(to); return; }
+  const t0 = performance.now(), dur = 650;
+  // garantia: se o navegador pausar a animação (aba em segundo plano), o valor final aparece mesmo assim
+  el._tend = setTimeout(() => { cancelAnimationFrame(el._raf); set(to); }, dur + 150);
+  const step = (now) => {
+    const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+    if(k < 1){ set(from + (to - from) * e); el._raf = requestAnimationFrame(step); } else set(to);
+  };
+  el._raf = requestAnimationFrame(step);
+}
+const moneyHTML = (v) => { const s = fmtBRL(v), i = s.lastIndexOf(','); return esc(s.slice(0, i)) + '<span class="cents">' + esc(s.slice(i)) + '</span>'; };
+
+// Minigráfico do saldo: a banca (R$) ficha a ficha, do valor inicial até hoje.
+function drawSpark(S, initial){
+  const holder = $('bal-spark');
+  const settled = S.filter(b => b.result !== 'pendente' && b.date).sort((a,b) => a.date.localeCompare(b.date) || (a.createdAt||0) - (b.createdAt||0));
+  if(settled.length < 2){ holder.innerHTML = ''; return; }
+  let cur = initial, pts = [cur];
+  settled.forEach(b => { cur += Number(b.profit) || 0; pts.push(cur); });
+  if(pts.length > 80){ const stepN = (pts.length - 1) / 79; pts = Array.from({ length: 80 }, (_, i) => pts[Math.round(i * stepN)]); }
+  const W = 300, H = 100, px = 8, py = 12;
+  const min = Math.min(...pts), max = Math.max(...pts), rg = (max - min) || 1;
+  const x = (i) => px + i / (pts.length - 1) * (W - px * 2);
+  const y = (v) => py + (1 - (v - min) / rg) * (H - py * 2);
+  const line = pts.map((v, i) => x(i).toFixed(1) + ',' + y(v).toFixed(1)).join(' ');
+  const lx = x(pts.length - 1), ly = y(pts[pts.length - 1]);
+  const color = pts[pts.length - 1] >= pts[0] ? 'var(--win-text)' : 'var(--loss-text)';
+  holder.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="color:${color}">
+      <defs><linearGradient id="spark-g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="currentColor" stop-opacity=".26"/><stop offset="1" stop-color="currentColor" stop-opacity="0"/></linearGradient></defs>
+      <polygon points="${px},${H} ${line} ${lx.toFixed(1)},${H}" fill="url(#spark-g)"></polygon>
+      <polyline points="${line}" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"></polyline>
+    </svg><span class="spark-dot" style="left:${(lx / W * 100).toFixed(2)}%;top:${(ly / H * 100).toFixed(2)}%;color:${color}"></span>`;
+}
 
 function renderPainel(){
   const S = scope();
@@ -1300,12 +1415,13 @@ function renderPainel(){
   else { const b = bankById(settings.banks.active); initial = b.amount; initialU = b.units; name = b.name; }
   const current = initial + all.profit, currentU = initialU + all.profitU;
   $('bal-name').textContent = name;
-  $('bal-value').textContent = fmtBRL(current);
+  tweenNum($('bal-value'), current, moneyHTML, true);
   $('bal-units').textContent = fmtNum(currentU) + 'u';
   $('bal-initial').textContent = `Inicial ${fmtBRL(initial)} (${fmtNum(initialU, 0)}u) · 1u = ${isAll() ? 'varia por banca' : fmtBRL(unitValue(settings.banks.active))}`;
   const g = $('bal-growth');
-  g.textContent = `${fmtBRLs(all.profit)} · ${fmtU(all.profitU)} · ${fmtPct(initial ? all.profit/initial*100 : 0, true)}`;
-  g.className = 'mono ' + cls(all.profit);
+  g.innerHTML = `<span class="trend ${cls(all.profit)}">${all.profit > 0.004 ? '↗' : all.profit < -0.004 ? '↘' : '→'} ${fmtPct(initial ? all.profit/initial*100 : 0, true)}</span><span>${fmtBRLs(all.profit)} · ${fmtU(all.profitU)}</span>`;
+  g.className = 'mono';
+  drawSpark(S, initial);
 
   // backup
   const lastBk = parseInt(localStorage.getItem(BACKUP_KEY) || '0', 10) || 0;
@@ -1328,14 +1444,15 @@ function renderPainel(){
     }
   } else nav.style.display = 'none';
   const st = stats(boardList);
-  $('st-count').textContent = st.count;
+  tweenNum($('st-count'), st.count, (v) => String(Math.round(v)));
   $('st-count-sub').textContent = st.pending ? `${st.pending} pendente${st.pending > 1 ? 's' : ''}` : '';
-  $('st-staked').textContent = fmtBRL(st.staked);
+  tweenNum($('st-staked'), st.staked, fmtBRL);
   $('st-staked-u').textContent = fmtUabs(st.stakedU);
-  $('st-profit').textContent = fmtBRL(st.profit); $('st-profit').className = 'cell-value ' + cls(st.profit);
+  tweenNum($('st-profit'), st.profit, fmtBRL); $('st-profit').className = 'cell-value ' + cls(st.profit);
   $('st-profit-u').textContent = fmtU(st.profitU); $('st-profit-u').className = 'cell-sub ' + cls(st.profit);
-  $('st-roi').textContent = fmtPct(st.roi, true); $('st-roi').className = 'cell-value ' + cls(st.roi);
-  $('st-winrate').textContent = fmtPct(st.winrate);
+  tweenNum($('st-roi'), st.roi, (v) => fmtPct(v, true)); $('st-roi').className = 'cell-value ' + cls(st.roi);
+  tweenNum($('st-winrate'), st.winrate, (v) => fmtPct(v));
+  $('st-ring').style.strokeDashoffset = String(100 - Math.max(0, Math.min(100, st.winrate)));
   $('st-wl').textContent = `${st.wins}G · ${st.losses}R${st.voids ? ' · ' + st.voids + 'V' : ''}`;
 
   renderLimitsCard(S);
@@ -1560,18 +1677,19 @@ function setKind(k){
 $('kind-toggle').addEventListener('click', (e) => { const b = e.target.closest('[data-kind]'); if(b) setKind(b.dataset.kind); });
 
 function formBankId(){ return $('f-bank').value || targetBankId(); }
+function formUnitValue(){ const id = formBankId(), e = editingId ? bets.find(x => x.id === editingId) : null; return e ? unitValueAt(id, betTime(e)) : unitValue(id); }
 function applyStakeMode(mode){
   stakeMode = mode;
   $$('#stake-mode button').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
   $('f-stake-label').textContent = mode === 'unidades' ? 'Stake (unidades)' : 'Stake (R$)';
 }
-function stakeReais(){ const raw = parseNum($('f-stake').value); return stakeMode === 'unidades' ? raw * unitValue(formBankId()) : raw; }
+function stakeReais(){ const raw = parseNum($('f-stake').value); return stakeMode === 'unidades' ? raw * formUnitValue() : raw; }
 $('stake-mode').addEventListener('click', (e) => {
   const b = e.target.closest('[data-mode]'); if(!b || b.dataset.mode === stakeMode) return;
   const raw = $('f-stake').value;
   if(raw !== ''){
     const reais = stakeReais();
-    $('f-stake').value = round2(b.dataset.mode === 'unidades' ? reais / unitValue(formBankId()) : reais);
+    $('f-stake').value = round2(b.dataset.mode === 'unidades' ? reais / formUnitValue() : reais);
   }
   applyStakeMode(b.dataset.mode);
   settings.prefs.stakeMode = b.dataset.mode;
@@ -1583,7 +1701,7 @@ $('f-bank').addEventListener('change', () => { confirmArmed = false; updatePrevi
 $('f-data').addEventListener('change', updateWarnings);
 
 function updatePreview(){
-  const stake = stakeReais(), odd = parseNum($('f-odd').value), uv = unitValue(formBankId());
+  const stake = stakeReais(), odd = parseNum($('f-odd').value), uv = formUnitValue();
   let label, value;
   if(formResult === 'pendente'){ label = 'Se der green'; value = calcProfit(stake, odd, 'win'); }
   else { label = 'Resultado desta ficha'; value = calcProfit(stake, odd, formResult, parseNum($('f-cashout').value)); }
@@ -1595,7 +1713,7 @@ function updatePreview(){
 
 function currentWarnings(){
   const L = settings.limits, out = [];
-  const bankId = formBankId(), uv = unitValue(bankId);
+  const bankId = formBankId(), uv = formUnitValue();
   const stakeU = stakeReais() / uv;
   if(L.maxStake > 0 && stakeU > L.maxStake + 1e-9) out.push({ hot:true, text:`Stake de ${fmtNum(stakeU)}u passa do seu máximo de ${fmtNum(L.maxStake)}u.` });
   const list = live().filter(b => betBankId(b) === bankId && b.id !== editingId);
@@ -2135,7 +2253,7 @@ function openBankForm(id){
 }
 function bankPreview(){
   const a = parseNum($('bk-amount').value), u = parseNum($('bk-units').value);
-  $('bk-preview').textContent = $('bank-form').style.display === 'none' ? '' : (a > 0 && u > 0 ? `1 unidade = ${fmtBRL(a/u)}` : 'preencha banca e unidades com valores maiores que zero');
+  $('bk-preview').textContent = $('bank-form').style.display === 'none' ? '' : (a > 0 && u > 0 ? `1 unidade = ${fmtBRL(a/u)}` + (bankEditing && Math.abs(a/u - unitValue(bankEditing)) > 0.0001 ? ` — vale só para as fichas novas; as já registradas continuam com 1u = ${fmtBRL(unitValue(bankEditing))}.` : '') : 'preencha banca e unidades com valores maiores que zero');
 }
 $('bank-new').addEventListener('click', () => openBankForm(null));
 $('bk-amount').addEventListener('input', bankPreview); $('bk-units').addEventListener('input', bankPreview);
@@ -2143,11 +2261,16 @@ $('bk-cancel').addEventListener('click', () => { $('bank-form').style.display = 
 $('bk-save').addEventListener('click', () => {
   const name = $('bk-name').value.trim() || 'Banca', amount = parseNum($('bk-amount').value), units = parseNum($('bk-units').value);
   if(!(amount > 0 && units > 0)){ bankPreview(); return; }
-  if(bankEditing){ Object.assign(bankById(bankEditing), { name, amount, units }); }
-  else { const id = 'b' + Date.now().toString(36); settings.banks.list.push({ id, name, amount, units }); settings.banks.active = id; }
+  let keptUv = 0;
+  if(bankEditing){
+    const bk = bankById(bankEditing), oldUv = (bk.amount / bk.units) || 1;
+    if(Math.abs(oldUv - amount / units) > 0.0001){ bk.hist = (bk.hist || []).concat([{ until: Date.now(), uv: oldUv }]); keptUv = oldUv; }
+    Object.assign(bk, { name, amount, units });
+  }
+  else { const id = 'b' + Date.now().toString(36); settings.banks.list.push({ id, name, amount, units, hist: [] }); settings.banks.active = id; }
   persistSetting('banks');
   $('bank-form').style.display = 'none'; bankEditing = null;
-  showToast('Banca salva', `1u = ${fmtBRL(amount/units)}`, 'ok');
+  showToast('Banca salva', keptUv ? `Novas fichas: 1u = ${fmtBRL(amount/units)}. As já registradas continuam com 1u = ${fmtBRL(keptUv)}.` : `1u = ${fmtBRL(amount/units)}`, 'ok');
   render();
 });
 
@@ -2394,31 +2517,6 @@ $('imp-run').addEventListener('click', async () => {
   render();
 });
 
-// ---- ferramentas ----
-function calcEV(){
-  const o = parseNum($('ev-odd').value), p = parseNum($('ev-prob').value) / 100;
-  if(!(o > 1 && p > 0 && p < 1)){ $('ev-out').innerHTML = '<span class="muted">Informe a odd e a chance que você acredita (ex.: 55%).</span>'; return; }
-  const ev = (p * o - 1) * 100, fair = 1 / p, kelly = Math.max(0, (p * o - 1) / (o - 1)) * 100;
-  $('ev-out').innerHTML = `EV: <b class="${cls(ev)}">${fmtPct(ev, true)}</b> por real apostado<br>Odd justa: <b>${fmtNum(fair)}</b><br>Kelly cheio: ${fmtNum(kelly,1)}% da banca <span class="muted">(¼ Kelly: ${fmtNum(kelly/4,1)}%)</span>`;
-}
-function calcFair(){
-  const odds = ['fo-a','fo-b','fo-c'].map(id => parseNum($(id).value)).filter(o => o > 1);
-  if(odds.length < 2){ $('fo-out').innerHTML = '<span class="muted">Coloque as odds de todos os resultados do mercado.</span>'; return; }
-  const inv = odds.map(o => 1 / o), sum = inv.reduce((a,b) => a + b, 0);
-  $('fo-out').innerHTML = `Margem da casa: <b>${fmtPct((sum - 1) * 100)}</b><br>` + odds.map((o, i) => `${'ABC'[i]}: ${fmtNum(o)} → justa <b>${fmtNum(sum / inv[i])}</b> <span class="muted">(${fmtPct(inv[i] / sum * 100)})</span>`).join('<br>');
-}
-function calcSure(){
-  const a = parseNum($('sb-a').value), b = parseNum($('sb-b').value), t = parseNum($('sb-total').value);
-  if(!(a > 1 && b > 1)){ $('sb-out').innerHTML = '<span class="muted">Informe as duas odds (de casas diferentes).</span>'; return; }
-  const s = 1/a + 1/b, pct = (1/s - 1) * 100;
-  if(!(t > 0)){ $('sb-out').innerHTML = `${s < 1 ? 'É surebet' : 'Não é surebet'}: <b class="${cls(pct)}">${fmtPct(pct, true)}</b><br><span class="muted">Coloque o total para dividir.</span>`; return; }
-  const sa = t * (1/a) / s, sbb = t * (1/b) / s, ret = sa * a;
-  $('sb-out').innerHTML = `${s < 1 ? 'É surebet' : 'Não é surebet'}: <b class="${cls(pct)}">${fmtPct(pct, true)}</b><br>Apostar ${fmtBRL(sa)} na A e ${fmtBRL(sbb)} na B<br>Retorno: ${fmtBRL(ret)} (<span class="${cls(ret - t)}">${fmtBRLs(ret - t)}</span>)`;
-}
-['ev-odd','ev-prob'].forEach(id => $(id).addEventListener('input', calcEV));
-['fo-a','fo-b','fo-c'].forEach(id => $(id).addEventListener('input', calcFair));
-['sb-a','sb-b','sb-total'].forEach(id => $(id).addEventListener('input', calcSure));
-calcEV(); calcFair(); calcSure();
 
 /* ============================================================
    NUVEM (login)

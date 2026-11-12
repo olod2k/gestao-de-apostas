@@ -17,15 +17,15 @@ Converse com ele em português (pt-BR). Ele não é programador: explique em lin
 2. **Histórico** — busca, filtros (casa, esporte, resultado), abas por data, troca de status direto na lista, editar.
 3. **Nova** — leitura do print do bilhete por IA, linha colada de outra IA (formato com `|`), ficha completa (simples/múltipla, R$ ou u, 7 resultados), prévia do lucro, avisos de limite com confirmação.
 4. **Análise** — períodos, KPIs (lucro, ROI, acerto, fator de lucro, lucro/aposta, stake média, maior odd batida…), curva da banca com drawdown, tabela por casa/competição/esporte/mercado/tipster com renomear em massa.
-5. **Banca e dados** — várias bancas, limites, saldo por casa (depósitos/saques), leitura de print (modelo Gemini), backup JSON, exportar Excel/CSV, importar planilha antiga / Excel / CSV do Pro Stake, lixeira (30 dias), login, ferramentas (EV, odd justa, surebet).
+5. **Banca e dados** — várias bancas, limites, saldo por casa (depósitos/saques), leitura de print (modelo Gemini), backup JSON, exportar Excel/CSV, importar planilha antiga / Excel / CSV do Pro Stake, lixeira (30 dias), login. (As ferramentas de EV, odd justa e surebet foram removidas a pedido do Lucas.)
 
 ## Modelo de dados (Firestore: `users/{uid}/...`)
 
 - `bets/{id}`: `id, date (YYYY-MM-DD), competition, bookie, team1, team2, teams ("t1 x t2"), market, sport, tipster, notes, kind ('simples'|'multipla'), bankId, result, stake (R$), odd, cashout (R$, só em cashout), profit (R$), createdAt, updatedAt, deletedAt? (lixeira)`.
 - `result`: `pendente | win | loss | halfwin | halfloss | void | cashout`. Lucro em `calcProfit()`.
-- Unidades **não** são gravadas: calculadas por `stake / (banca.amount / banca.units)` da banca da ficha (`uOf()`).
+- Unidades **não** são gravadas na ficha: `uOf()` divide o valor pelo valor da unidade **que valia quando a ficha foi registrada** (`unitValueAt(banca, createdAt)`). Cada banca guarda em `hist: [{until (ms), uv}]` os valores de unidade anteriores; ao salvar a banca com outro valor de unidade, o antigo entra no `hist` e só as fichas novas usam o novo. O saldo continua sendo `banca.amount + lucro de todas as fichas` (decisão do Lucas).
 - `tombstones/{id}` `{deletedAt}`: exclusão definitiva, para outros aparelhos apagarem também.
-- `settings/banks` `{list:[{id,name,amount,units}], active}`, `settings/limits` `{stopDay, stopWeek, maxStake}` (em u, 0 = desligado), `settings/houses` `{txs:[{id,house,type:'dep'|'saq',amount,date}]}`, `settings/preferences` `{stakeMode, aiModel}`.
+- `settings/banks` `{list:[{id,name,amount,units,hist}], active}`, `settings/limits` `{stopDay, stopWeek, maxStake}` (em u, 0 = desligado), `settings/houses` `{txs:[{id,house,type:'dep'|'saq',amount,date}]}`, `settings/preferences` `{stakeMode, aiModel}`.
   O antigo `settings/bankroll` só é lido para migração.
 - Sincronização: completa a cada 24 h, incremental (`updatedAt > último sync`) nas outras vezes. Ver `fullSyncFromCloud` / `incrementalSyncFromCloud`.
 - Fichas antigas sem `bankId` pertencem à primeira banca.

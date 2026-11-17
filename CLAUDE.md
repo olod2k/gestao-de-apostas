@@ -14,10 +14,10 @@ Converse com ele em português (pt-BR). Ele não é programador: explique em lin
 ## Telas (navegação inferior no celular, barra lateral no PC ≥1024px)
 
 1. **Painel** — saldo da banca (R$ e unidades), placar Geral/Por mês, limites anti-tilt, pendentes com Green/Red em um toque, gráfico de resultado por dia/mês + tabela detalhada.
-2. **Histórico** — busca, filtros (casa, esporte, resultado), abas por data, troca de status direto na lista, editar.
+2. **Histórico** — busca, filtros (casa, esporte, resultado), abas por data, troca de status direto na lista, editar; botão "Selecionar" para seleção múltipla (editar em lote resultado/data/casa/competição/esporte/tipster/banca/tipo, ou mover para a lixeira).
 3. **Nova** — leitura do print do bilhete por IA, linha colada de outra IA (formato com `|`), ficha completa (simples/múltipla, R$ ou u, 7 resultados), prévia do lucro, avisos de limite com confirmação.
 4. **Análise** — períodos, KPIs (lucro, ROI, acerto, fator de lucro, lucro/aposta, stake média, maior odd batida…), curva da banca com drawdown, tabela por casa/competição/esporte/mercado/tipster com renomear em massa.
-5. **Banca e dados** — várias bancas, limites, saldo por casa (depósitos/saques), leitura de print (modelo Gemini), backup JSON, exportar Excel/CSV, importar planilha antiga / Excel / CSV do Pro Stake, lixeira (30 dias), login. (As ferramentas de EV, odd justa e surebet foram removidas a pedido do Lucas.)
+5. **Banca e dados** — várias bancas, limites, saldo por casa (depósitos/saques), leitura de print (modelo Gemini), backup JSON, exportar Excel/CSV, importar planilha antiga / Excel / CSV do Pro Stake, lixeira (30 dias), "Excluir todo o histórico" (baixa backup, pede para digitar EXCLUIR e manda as fichas da banca selecionada para a lixeira), login. (As ferramentas de EV, odd justa e surebet foram removidas a pedido do Lucas.)
 
 ## Modelo de dados (Firestore: `users/{uid}/...`)
 

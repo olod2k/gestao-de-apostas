@@ -517,6 +517,43 @@
   .evo-mark{position:absolute;top:0;height:200px;width:1px;background:var(--border-strong);display:none;pointer-events:none;}
   .evo-mark i{position:absolute;left:-4px;width:9px;height:9px;margin-top:-4.5px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px var(--surface);}
   #evo-holder svg,#bal-spark{cursor:crosshair;}
+  /* Seleção múltipla no Histórico */
+  .bet-row.sel-on{cursor:pointer;user-select:none;}
+  .bet-row.is-sel,.bet-row.is-sel:hover{background:var(--accent-dim);}
+  .sel-box{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--border-strong);background:var(--input-bg);display:inline-grid;place-items:center;cursor:pointer;transition:background .15s ease,border-color .15s ease;}
+  .sel-box[aria-checked="true"]{background:var(--accent-solid);border-color:var(--accent-solid);animation:popIn .2s var(--ease-spring);}
+  .sel-box[aria-checked="true"]::after{content:"";width:9px;height:5px;border:2px solid #fff;border-top:0;border-right:0;transform:translateY(-1px) rotate(-45deg);}
+  #sel-toggle.active{background:var(--accent-dim);border-color:var(--accent-line);color:var(--accent);}
+  #bulk-bar{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));z-index:70;display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border-strong);border-radius:16px;padding:7px 8px 7px 14px;box-shadow:var(--shadow-lg);transform:translate(-50%,180%);opacity:0;pointer-events:none;transition:transform .32s var(--ease-spring),opacity .2s ease;max-width:calc(100vw - 24px);}
+  #bulk-bar.show{transform:translate(-50%,0);opacity:1;pointer-events:auto;}
+  .bulk-count{font-size:13px;font-weight:600;white-space:nowrap;margin-right:4px;font-variant-numeric:tabular-nums;}
+  #bulk-bar button{white-space:nowrap;}
+  #bulk-close{width:30px;padding:0;font-size:15px;}
+  @media(min-width:1024px){#bulk-bar{margin-left:calc(var(--side)/2);}}
+  @media(max-width:1023px){#bulk-bar{bottom:calc(92px + env(safe-area-inset-bottom));}}
+  @media(max-width:900px){
+    .bet-row.is-sel,.bet-row.is-sel:hover{background:linear-gradient(var(--accent-dim),var(--accent-dim)),var(--surface);border-color:var(--accent-line);}
+  }
+  @media(max-width:640px){
+    .filters .count{flex:1 1 auto;text-align:left;margin:0;}
+    .filters select{flex:1 1 calc((100% - 16px) / 3);}
+    #bulk-bar{padding:6px 6px 6px 12px;gap:4px;}
+    #bulk-all .long{display:none;}
+  }
+  #bulk-all .short{display:none;}
+  @media(max-width:640px){#bulk-all .short{display:inline;}}
+
+  /* Janela de edição em lote (folha que sobe no celular) */
+  dialog.sheet{border:1px solid var(--border-strong);border-radius:20px;background:var(--surface);color:var(--text);padding:22px;width:min(580px,calc(100vw - 24px));max-height:calc(100dvh - 32px);overflow:auto;box-shadow:var(--shadow-lg);}
+  dialog.sheet[open]{animation:riseIn .3s var(--ease-out);}
+  dialog.sheet::backdrop{background:rgba(5,7,10,.55);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);}
+  dialog.sheet h2{margin:0 0 4px;font-size:17px;font-weight:650;letter-spacing:-.01em;}
+  .sheet-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px;}
+  .sheet-grid .field input,.sheet-grid .field select{width:100%;}
+  @media(max-width:640px){
+    dialog.sheet{margin:auto 0 0;width:100%;max-width:100%;border-radius:22px 22px 0 0;border-bottom:none;padding-bottom:calc(22px + env(safe-area-inset-bottom));max-height:88dvh;}
+    .sheet-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;}
+  }
   @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important;}}
 </style>
 </head>
@@ -675,6 +712,7 @@
       <label class="sr-only" for="f-fresult">Resultado</label>
       <select id="f-fresult"><option value="">Todos os resultados</option></select>
       <span class="count" id="f-count"></span>
+      <button type="button" class="btn-sm" id="sel-toggle" aria-pressed="false">Selecionar</button>
     </form>
     <div class="date-tabs" id="date-tabs"></div>
     <div class="ledger" id="ledger"></div>
@@ -874,6 +912,10 @@
             <div class="acts"><button type="button" class="btn-sm" id="trash-toggle">Abrir</button></div>
           </div>
           <div id="trash-list" style="display:none;"></div>
+          <div class="row-item">
+            <div><div class="name">Excluir todo o histórico</div><div class="meta" id="wipe-meta">—</div></div>
+            <div class="acts"><button type="button" class="btn-sm btn-danger" id="wipe-btn">Excluir tudo</button></div>
+          </div>
         </div>
 
         <div class="card" id="ai-card">
@@ -919,6 +961,31 @@
   <button type="button" class="nav-btn" data-nav="banca"><svg><use href="#i-wallet"/></svg><span>Banca</span></button>
 </nav>
 
+<div id="bulk-bar" role="toolbar" aria-label="Ações para as fichas selecionadas">
+  <span class="bulk-count" id="bulk-count">0 selecionadas</span>
+  <button type="button" class="btn-sm btn-ghost" id="bulk-all"><span class="long">Selecionar todas</span><span class="short">Todas</span></button>
+  <button type="button" class="btn-sm" id="bulk-edit">Editar</button>
+  <button type="button" class="btn-sm btn-danger" id="bulk-trash">Lixeira</button>
+  <button type="button" class="btn-sm btn-ghost" id="bulk-close" aria-label="Sair da seleção">✕</button>
+</div>
+<dialog class="sheet" id="bulk-dialog" aria-labelledby="bulk-title">
+  <form id="bulk-form" autocomplete="off" onsubmit="return false;">
+    <h2 id="bulk-title">Editar fichas</h2>
+    <p class="help" style="margin:0;">Preencha só o que quer mudar. O que ficar em branco continua como está em cada ficha.</p>
+    <div class="sheet-grid">
+      <div class="field"><label for="be-result">Resultado</label><select id="be-result"></select></div>
+      <div class="field"><label for="be-date">Data</label><input type="date" id="be-date"></div>
+      <div class="field"><label for="be-bookie">Casa de apostas</label><input type="text" id="be-bookie" list="bookie-list" placeholder="manter"></div>
+      <div class="field"><label for="be-comp">Competição</label><input type="text" id="be-comp" list="comp-list" placeholder="manter"></div>
+      <div class="field"><label for="be-sport">Esporte</label><input type="text" id="be-sport" list="sport-list" placeholder="manter"></div>
+      <div class="field"><label for="be-tipster">Tipster</label><input type="text" id="be-tipster" list="tipster-list" placeholder="manter"></div>
+      <div class="field"><label for="be-bank">Banca</label><select id="be-bank"></select></div>
+      <div class="field"><label for="be-kind">Tipo</label><select id="be-kind"><option value="">— manter —</option><option value="simples">Simples</option><option value="multipla">Múltipla</option></select></div>
+    </div>
+    <p class="status-line" id="bulk-status"></p>
+    <div class="form-actions" style="margin-top:16px;"><button type="button" class="btn-primary" id="bulk-apply">Aplicar</button><button type="button" class="btn-ghost" id="bulk-cancel">Cancelar</button></div>
+  </form>
+</dialog>
 <div id="tip" role="tooltip"></div>
 <div id="toast" role="status" aria-live="polite">
   <div style="flex:1;"><div class="t-title" id="toast-title"></div><div class="t-msg" id="toast-msg"></div></div>
@@ -1316,6 +1383,7 @@ let view = 'painel';
 function setView(v, opts){
   if(!VIEWS[v]) v = 'painel';
   view = v;
+  if(v !== 'historico' && selMode) exitSel();
   $$('[data-view-panel]').forEach(p => p.classList.toggle('active', p.dataset.viewPanel === v));
   $$('[data-nav]').forEach(b => b.classList.toggle('active', b.dataset.nav === v));
   $('view-eyebrow').textContent = VIEWS[v][0];
@@ -1726,16 +1794,20 @@ function renderHistorico(){
     return true;
   }).sort((a,b) => (b.date||'').localeCompare(a.date||'') || (b.createdAt||0) - (a.createdAt||0));
   $('f-count').textContent = `${list.length} de ${S.length}`;
+  lastHistList = list;
+  const inScope = new Set(S.map(b => b.id));
+  [...selected].forEach(id => { if(!inScope.has(id)) selected.delete(id); });
   const ledger = $('ledger');
   if(!list.length){
     ledger.innerHTML = `<div class="empty" style="padding:36px 10px;">${S.length ? 'Nenhuma ficha com esses filtros.' : 'Nenhuma ficha ainda. Registre a primeira na aba Nova.'}</div>`;
     $('load-more').style.display = 'none';
+    updateBulkBar();
     return;
   }
   ledger.innerHTML = `<div class="bet-row bet-head" aria-hidden="true"><span></span><span>Data</span><span>Evento</span><span>Mercado</span><span>Casa</span><span class="r">Stake</span><span class="r">Odd</span><span class="c">Resultado</span><span class="r">Lucro</span><span></span></div>` + list.slice(0, histVisible).map(b => {
     const meta = [b.competition, b.sport, b.tipster].filter(Boolean).map(esc).join(' · ');
     const p = b.result === 'pendente' ? '—' : fmtU(uOf(b, b.profit));
-    return `<div class="bet-row">
+    return `<div class="bet-row ${selMode ? 'sel-on' : ''} ${selected.has(b.id) ? 'is-sel' : ''}" data-row="${esc(b.id)}">
       <div class="strip ${b.result}"></div>
       <div class="r-date">${dateBR(b.date)}</div>
       <div class="r-event"><span class="r-meta">${meta || '&nbsp;'}</span><span class="r-teams">${esc(eventOf(b) || '—')}</span></div>
@@ -1745,7 +1817,7 @@ function renderHistorico(){
       <div class="r-num r-odd">${fmtNum(b.odd)}</div>
       <select class="badge ${b.result}" data-status="${esc(b.id)}" aria-label="Resultado">${RESULTS.map(([k,l]) => `<option value="${k}" ${b.result === k ? 'selected' : ''}>${l}</option>`).join('')}</select>
       <div class="r-profit ${cls(b.profit)}" title="${b.result === 'pendente' ? '' : fmtBRLs(b.profit)}">${p}</div>
-      <div class="r-actions"><button type="button" class="btn-sm" data-edit="${esc(b.id)}">Editar</button></div>
+      <div class="r-actions">${selMode ? `<span class="sel-box" role="checkbox" tabindex="0" aria-label="Selecionar ficha" aria-checked="${selected.has(b.id)}"></span>` : `<button type="button" class="btn-sm" data-edit="${esc(b.id)}">Editar</button>`}</div>
     </div>`;
   }).join('');
   $$('[data-edit]', ledger).forEach(btn => btn.addEventListener('click', () => editBet(btn.dataset.edit)));
@@ -1753,7 +1825,96 @@ function renderHistorico(){
   const lm = $('load-more');
   if(list.length > histVisible){ lm.style.display = 'flex'; lm.querySelector('span').textContent = `Mostrando ${histVisible} de ${list.length}`; }
   else lm.style.display = 'none';
+  updateBulkBar();
 }
+
+/* ---- seleção múltipla ---- */
+var selMode = false, selected = new Set(), lastHistList = [];
+function updateBulkBar(){
+  const bar = $('bulk-bar'), nSel = selected.size;
+  bar.classList.toggle('show', selMode && view === 'historico');
+  $('bulk-count').textContent = nSel === 1 ? '1 selecionada' : nSel + ' selecionadas';
+  const allSel = lastHistList.length > 0 && lastHistList.every(b => selected.has(b.id));
+  $('bulk-all').querySelector('.long').textContent = allSel ? 'Limpar seleção' : `Selecionar todas (${lastHistList.length})`;
+  $('bulk-all').querySelector('.short').textContent = allSel ? 'Limpar' : 'Todas';
+  $('bulk-edit').disabled = $('bulk-trash').disabled = nSel === 0;
+  $('sel-toggle').classList.toggle('active', selMode);
+  $('sel-toggle').setAttribute('aria-pressed', String(selMode));
+  $('sel-toggle').textContent = selMode ? 'Cancelar seleção' : 'Selecionar';
+}
+function exitSel(){ selMode = false; selected.clear(); updateBulkBar(); if(view === 'historico') renderHistorico(); }
+function toggleSel(id){
+  if(selected.has(id)) selected.delete(id); else selected.add(id);
+  const row = $('ledger').querySelector(`[data-row="${CSS.escape(id)}"]`);
+  if(row){ row.classList.toggle('is-sel', selected.has(id)); const box = row.querySelector('.sel-box'); if(box) box.setAttribute('aria-checked', String(selected.has(id))); }
+  updateBulkBar();
+}
+$('sel-toggle').addEventListener('click', () => { if(selMode) exitSel(); else { selMode = true; renderHistorico(); } });
+$('bulk-close').addEventListener('click', exitSel);
+$('bulk-all').addEventListener('click', () => {
+  const allSel = lastHistList.length > 0 && lastHistList.every(b => selected.has(b.id));
+  if(allSel) selected.clear(); else lastHistList.forEach(b => selected.add(b.id));
+  renderHistorico();
+});
+$('ledger').addEventListener('click', (e) => {
+  if(!selMode || e.target.closest('select,button,a,input')) return;
+  const row = e.target.closest('[data-row]'); if(row) toggleSel(row.dataset.row);
+});
+$('ledger').addEventListener('keydown', (e) => {
+  const box = e.target.closest('.sel-box'); if(!box || (e.key !== ' ' && e.key !== 'Enter')) return;
+  e.preventDefault(); toggleSel(box.closest('[data-row]').dataset.row);
+});
+document.addEventListener('keydown', (e) => { if(e.key === 'Escape' && selMode && !$('bulk-dialog').open) exitSel(); });
+
+// Move uma lista de fichas para a lixeira (aqui e na nuvem).
+async function trashMany(list){
+  const now = Date.now();
+  list.forEach(b => { b.deletedAt = now; b.updatedAt = now; });
+  saveBets();
+  render();
+  await uploadMany(list);
+}
+$('bulk-trash').addEventListener('click', async () => {
+  const list = bets.filter(b => selected.has(b.id));
+  if(!list.length) return;
+  if(!window.confirm(`Mover ${list.length} ficha(s) para a lixeira?\n\nDá para restaurar por ${TRASH_DAYS} dias em Banca e dados → Lixeira.`)) return;
+  selMode = false; selected.clear();
+  await trashMany(list);
+  showToast('Fichas na lixeira', `${list.length} ficha(s) movida(s). Dá para restaurar por ${TRASH_DAYS} dias.`, 'ok');
+});
+
+// Edição em lote
+$('be-result').innerHTML = '<option value="">— manter —</option>' + RESULTS.filter(([k]) => k !== 'cashout').map(([k,l]) => `<option value="${k}">${l}</option>`).join('');
+$('bulk-edit').addEventListener('click', () => {
+  if(!selected.size) return;
+  $('bulk-title').textContent = selected.size === 1 ? 'Editar 1 ficha' : `Editar ${selected.size} fichas`;
+  ['be-result','be-date','be-bookie','be-comp','be-sport','be-tipster','be-kind'].forEach(id => { $(id).value = ''; });
+  $('be-bank').innerHTML = '<option value="">— manter —</option>' + banks().map(b => `<option value="${esc(b.id)}">${esc(b.name)}</option>`).join('');
+  $('bulk-status').textContent = ''; $('bulk-status').className = 'status-line';
+  $('bulk-dialog').showModal();
+});
+$('bulk-cancel').addEventListener('click', () => $('bulk-dialog').close());
+$('bulk-dialog').addEventListener('click', (e) => { if(e.target === $('bulk-dialog')) $('bulk-dialog').close(); });
+$('bulk-apply').addEventListener('click', async () => {
+  const ch = {
+    result: $('be-result').value, date: $('be-date').value, bookie: $('be-bookie').value.trim(), competition: $('be-comp').value.trim(),
+    sport: $('be-sport').value.trim(), tipster: $('be-tipster').value.trim(), bankId: $('be-bank').value, kind: $('be-kind').value
+  };
+  if(!Object.values(ch).some(Boolean)){ $('bulk-status').className = 'status-line err'; $('bulk-status').textContent = 'Preencha pelo menos um campo para mudar.'; return; }
+  const list = bets.filter(b => selected.has(b.id));
+  const now = Date.now();
+  list.forEach(b => {
+    ['date','bookie','competition','sport','tipster','bankId','kind'].forEach(k => { if(ch[k]) b[k] = ch[k]; });
+    if(ch.result){ b.result = ch.result; delete b.cashout; b.profit = calcProfit(b.stake, b.odd, b.result); }
+    b.updatedAt = now;
+  });
+  saveBets();
+  $('bulk-dialog').close();
+  selMode = false; selected.clear();
+  render();
+  await uploadMany(list);
+  showToast('Fichas atualizadas', `${list.length} ficha(s) alterada(s).`, 'ok');
+});
 
 async function updateStatus(id, result){
   const b = bets.find(x => x.id === id);
@@ -2439,6 +2600,8 @@ $('tx-toggle').addEventListener('click', () => { const l = $('tx-list'), h = l.s
 // ---- lixeira ----
 function renderTrash(){
   const T = bets.filter(b => b.deletedAt).sort((a,b) => b.deletedAt - a.deletedAt);
+  const W = scope();
+  $('wipe-meta').textContent = W.length ? `Move para a lixeira as ${W.length} ficha(s) ${isAll() ? 'de todas as bancas' : 'da banca ' + bankById(settings.banks.active).name}. Baixa um backup antes e dá para restaurar por ${TRASH_DAYS} dias.` : 'Nenhuma ficha para excluir nesta banca.';
   $('trash-meta').textContent = T.length ? `${T.length} ficha(s) · apagadas de vez após ${TRASH_DAYS} dias` : 'Vazia';
   $('trash-list').innerHTML = T.length ? T.map(b => {
     const days = Math.max(0, TRASH_DAYS - Math.floor((Date.now() - b.deletedAt) / 864e5));
@@ -2451,6 +2614,17 @@ function renderTrash(){
   if(em) em.addEventListener('click', () => { if(window.confirm(`Apagar para sempre as ${T.length} ficha(s) da lixeira? Não dá para desfazer.`)){ T.forEach(b => purgeBet(b.id, true)); saveBets(); render(); } });
 }
 $('trash-toggle').addEventListener('click', () => { const l = $('trash-list'), h = l.style.display === 'none'; l.style.display = h ? 'block' : 'none'; $('trash-toggle').textContent = h ? 'Fechar' : 'Abrir'; });
+$('wipe-btn').addEventListener('click', async () => {
+  const W = scope();
+  if(!W.length){ showToast('Nada para excluir', 'Esta banca não tem fichas.', 'err'); return; }
+  const where = isAll() ? 'de todas as bancas' : `da banca "${bankById(settings.banks.active).name}"`;
+  const ans = window.prompt(`Isso vai mover para a lixeira as ${W.length} ficha(s) ${where}.\n\nAntes, um backup completo será baixado. Na lixeira dá para restaurar por ${TRASH_DAYS} dias.\n\nPara confirmar, digite EXCLUIR:`);
+  if(ans === null) return;
+  if(ans.trim().toUpperCase() !== 'EXCLUIR'){ showToast('Nada foi excluído', 'Para confirmar é preciso digitar EXCLUIR.', 'err'); return; }
+  exportBackup();
+  await trashMany(W);
+  showToast('Histórico na lixeira', `${W.length} ficha(s) movida(s). O backup foi baixado; dá para restaurar pela lixeira por ${TRASH_DAYS} dias.`, 'ok');
+});
 function purgeBet(id, silent){
   bets = bets.filter(b => b.id !== id);
   if(!silent) saveBets();

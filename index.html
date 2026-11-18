@@ -296,7 +296,7 @@
   .ledger{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
   .ledger:has(>.empty){border-style:dashed;box-shadow:none;background:transparent;}
   .ledger>.empty{border:none !important;}
-  .bet-row{display:grid;grid-template-columns:3px 82px minmax(110px,1.1fr) minmax(130px,1.3fr) minmax(70px,.7fr) 70px 54px 116px 84px 66px;align-items:center;gap:12px;padding:10px 14px 10px 0;min-height:56px;border-bottom:1px solid var(--border);}
+  .bet-row{display:grid;grid-template-columns:3px 82px minmax(110px,1.1fr) minmax(130px,1.3fr) minmax(70px,.7fr) 70px 54px 116px 84px 76px;align-items:center;gap:12px;padding:10px 14px 10px 0;min-height:56px;border-bottom:1px solid var(--border);}
   .bet-row:last-child{border-bottom:none;}
   .bet-row:hover{background:var(--surface-2);}
   .bet-head{min-height:38px;padding-top:0;padding-bottom:0;font-size:12px;font-weight:500;color:var(--text-muted);background:var(--surface-2);}
@@ -323,6 +323,12 @@
   .r-actions{display:flex;justify-content:flex-end;}
   .r-actions button{background:transparent;border-color:transparent;color:var(--text-muted);}
   .r-actions button:hover{background:var(--surface-3);color:var(--text);}
+  .r-actions{gap:4px;}
+  .icon-act{width:34px;min-height:34px;padding:0;display:grid;place-items:center;border-radius:9px;}
+  .icon-act svg{width:17px;height:17px;}
+  .r-actions .icon-act.danger:hover{background:var(--loss-dim);color:var(--loss-text);}
+  .r-actions .icon-act.armed,.r-actions .icon-act.armed:hover{background:var(--loss);border-color:var(--loss);color:#fff;animation:popIn .2s var(--ease-spring);}
+  @media(max-width:900px){.icon-act{width:40px;min-height:40px;}}
   .load-more{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:14px;font-size:12.5px;color:var(--text-muted);}
   @media(max-width:900px){
     .ledger{background:transparent;border:none;border-radius:0;gap:8px;overflow:visible;box-shadow:none;}
@@ -564,6 +570,8 @@
   <symbol id="i-plus" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" d="M12 5v14M5 12h14"/></symbol>
   <symbol id="i-chart" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></symbol>
   <symbol id="i-camera" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M4 7h3l2-3h6l2 3h3v12H4z"/><circle cx="12" cy="13" r="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M4 20h4L18.5 9.5a2.1 2.1 0 0 0-3-3L5 17v3zM13.5 8.5l3 3"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M10 11v6M14 11v6M5.5 7l1 12a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2l1-12M9 7V4.5A1.5 1.5 0 0 1 10.5 3h3A1.5 1.5 0 0 1 15 4.5V7"/></symbol>
   <symbol id="i-download" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M12 4v11M7 11l5 5 5-5M5 20h14"/></symbol>
   <symbol id="i-wallet" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M3 7h18v12H3zM16 13h2M3 7l3-3h12l3 3"/></symbol>
 </svg>
@@ -1817,10 +1825,25 @@ function renderHistorico(){
       <div class="r-num r-odd">${fmtNum(b.odd)}</div>
       <select class="badge ${b.result}" data-status="${esc(b.id)}" aria-label="Resultado">${RESULTS.map(([k,l]) => `<option value="${k}" ${b.result === k ? 'selected' : ''}>${l}</option>`).join('')}</select>
       <div class="r-profit ${cls(b.profit)}" title="${b.result === 'pendente' ? '' : fmtBRLs(b.profit)}">${p}</div>
-      <div class="r-actions">${selMode ? `<span class="sel-box" role="checkbox" tabindex="0" aria-label="Selecionar ficha" aria-checked="${selected.has(b.id)}"></span>` : `<button type="button" class="btn-sm" data-edit="${esc(b.id)}">Editar</button>`}</div>
+      <div class="r-actions">${selMode ? `<span class="sel-box" role="checkbox" tabindex="0" aria-label="Selecionar ficha" aria-checked="${selected.has(b.id)}"></span>` : `<button type="button" class="icon-act" data-edit="${esc(b.id)}" aria-label="Editar ficha" title="Editar"><svg aria-hidden="true"><use href="#i-edit"/></svg></button><button type="button" class="icon-act danger" data-del="${esc(b.id)}" aria-label="Excluir ficha" title="Excluir"><svg aria-hidden="true"><use href="#i-trash"/></svg></button>`}</div>
     </div>`;
   }).join('');
   $$('[data-edit]', ledger).forEach(btn => btn.addEventListener('click', () => editBet(btn.dataset.edit)));
+  // Excluir direto da lista: apaga para sempre, sem lixeira. Primeiro toque arma, segundo (em até 3 s) confirma.
+  $$('[data-del]', ledger).forEach(btn => btn.addEventListener('click', () => {
+    if(!btn.classList.contains('armed')){
+      $$('[data-del].armed', ledger).forEach(o => o.classList.remove('armed'));
+      btn.classList.add('armed'); btn.title = 'Toque de novo para excluir';
+      showToast('Toque de novo na lixeira para excluir', 'A ficha será apagada para sempre, sem passar pela lixeira.');
+      clearTimeout(btn._t); btn._t = setTimeout(() => { btn.classList.remove('armed'); btn.title = 'Excluir'; }, 3000);
+      return;
+    }
+    clearTimeout(btn._t);
+    const b = bets.find(x => x.id === btn.dataset.del);
+    purgeBet(btn.dataset.del);
+    showToast('Ficha excluída', b ? (eventOf(b) || b.market || '') : '', 'ok');
+    render();
+  }));
   $$('[data-status]', ledger).forEach(sel => sel.addEventListener('change', () => updateStatus(sel.dataset.status, sel.value)));
   const lm = $('load-more');
   if(list.length > histVisible){ lm.style.display = 'flex'; lm.querySelector('span').textContent = `Mostrando ${histVisible} de ${list.length}`; }

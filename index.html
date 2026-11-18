@@ -562,6 +562,31 @@
     dialog.sheet{margin:auto 0 0;width:100%;max-width:100%;border-radius:22px 22px 0 0;border-bottom:none;padding-bottom:calc(22px + env(safe-area-inset-bottom));max-height:88dvh;}
     .sheet-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;}
   }
+  /* Conferência de resultados com IA */
+  .ai-check{display:flex;gap:8px;flex-wrap:wrap;margin:-4px 0 6px;}
+  .ai-check .btn-sm{display:inline-flex;align-items:center;gap:6px;}
+  .ai-check svg{width:15px;height:15px;flex:none;}
+  #ai-check-btn{background:var(--accent-dim);border-color:var(--accent-line);color:var(--accent);}
+  #ai-check-btn:disabled{opacity:.7;cursor:progress;}
+  .ai-sug{margin-top:10px;padding:10px 12px;border-radius:12px;border:1px solid var(--border-strong);background:var(--surface);font-size:12.5px;animation:riseIn .3s var(--ease-out);}
+  .ai-sug.pos{border-color:var(--win);background:linear-gradient(var(--win-dim),var(--win-dim)),var(--surface);}
+  .ai-sug.neg{border-color:var(--loss);background:linear-gradient(var(--loss-dim),var(--loss-dim)),var(--surface);}
+  .ai-sug.void{border-color:var(--void);background:linear-gradient(var(--void-dim),var(--void-dim)),var(--surface);}
+  .ai-sug-top{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:13px;}
+  .ai-sug.pos .ai-res{color:var(--win-text);} .ai-sug.neg .ai-res{color:var(--loss-text);} .ai-sug.void .ai-res{color:var(--void-text);}
+  .ai-res{font-weight:650;}
+  .ai-tag{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-dim);padding:1px 7px;border-radius:999px;}
+  .ai-tag svg{width:11px;height:11px;}
+  .ai-conf{margin-left:auto;font-size:11px;color:var(--text-muted);}
+  .ai-reason{color:var(--text-2);margin-top:4px;line-height:1.45;}
+  .ai-src{display:flex;flex-wrap:wrap;gap:2px 10px;margin-top:6px;font-size:11.5px;color:var(--text-muted);}
+  .ai-src a{color:var(--accent);text-decoration:none;} .ai-src a:hover{text-decoration:underline;}
+  .ai-sug-actions{display:flex;gap:6px;margin-top:9px;}
+  .ai-sug-actions .btn-primary{flex:1;}
+  .ai-none{font-size:12px;color:var(--text-muted);margin-top:8px;}
+  .ai-google-frame{display:block;width:100%;height:64px;border:0;margin-top:10px;border-radius:10px;background:transparent;}
+  .check-row{display:flex;gap:9px;align-items:flex-start;font-size:13px;line-height:1.45;margin-top:14px;cursor:pointer;}
+  .check-row input{margin-top:2px;accent-color:var(--accent-solid);width:16px;height:16px;flex:none;}
   @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important;}}
 </style>
 </head>
@@ -574,6 +599,7 @@
   <symbol id="i-camera" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M4 7h3l2-3h6l2 3h3v12H4z"/><circle cx="12" cy="13" r="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
   <symbol id="i-edit" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M4 20h4L18.5 9.5a2.1 2.1 0 0 0-3-3L5 17v3zM13.5 8.5l3 3"/></symbol>
   <symbol id="i-trash" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M10 11v6M14 11v6M5.5 7l1 12a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2l1-12M9 7V4.5A1.5 1.5 0 0 1 10.5 3h3A1.5 1.5 0 0 1 15 4.5V7"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></symbol>
   <symbol id="i-download" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M12 4v11M7 11l5 5 5-5M5 20h14"/></symbol>
   <symbol id="i-wallet" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M3 7h18v12H3zM16 13h2M3 7l3-3h12l3 3"/></symbol>
 </svg>
@@ -704,7 +730,13 @@
       <div>
         <div class="card">
           <div class="card-head"><div class="card-title" id="pend-title">Pendentes</div><button type="button" class="link-btn" id="pend-all">ver no histórico</button></div>
+          <div class="ai-check">
+            <button type="button" class="btn-sm" id="ai-check-btn"><svg aria-hidden="true"><use href="#i-spark"/></svg><span>Conferir resultados com IA</span></button>
+            <button type="button" class="btn-sm btn-primary" id="ai-apply-all" style="display:none;"></button>
+          </div>
+          <p class="status-line" id="ai-check-status"></p>
           <div id="pend-list"></div>
+          <div id="ai-google"></div>
         </div>
       </div>
     </div>
@@ -766,10 +798,8 @@
       <div class="form-grid">
         <div class="field"><label for="f-data">Data</label><input type="date" id="f-data" required></div>
         <div class="field"><label for="f-sport">Esporte</label><input type="text" id="f-sport" list="sport-list" placeholder="Futebol"></div>
-        <div class="field"><label for="f-comp">Competição</label><input type="text" id="f-comp" list="comp-list"></div>
-        <div class="field"><label for="f-bookie">Casa de apostas</label><input type="text" id="f-bookie" list="bookie-list"></div>
-        <div class="field span2"><label for="f-team1">Time 1</label><input type="text" id="f-team1" list="team-list"></div>
-        <div class="field span2"><label for="f-team2">Time 2</label><input type="text" id="f-team2" list="team-list"></div>
+        <div class="field span2"><label for="f-bookie">Casa de apostas</label><input type="text" id="f-bookie" list="bookie-list"></div>
+        <div class="field span4"><label for="f-event">Evento</label><input type="text" id="f-event" list="team-list" placeholder="LA Clippers x Utah Jazz"></div>
         <div class="field span4"><label for="f-market" id="f-market-label">Mercado</label><input type="text" id="f-market" required></div>
         <div class="field span2"><label for="f-tipster">Tipster (opcional)</label><input type="text" id="f-tipster" list="tipster-list"></div>
         <div class="field span2"><label for="f-bank">Banca</label><select id="f-bank"></select></div>
@@ -935,6 +965,7 @@
             <div class="form-actions"><button type="button" class="btn-sm" id="ai-model-save">Salvar</button><button type="button" class="btn-sm btn-ghost" id="ai-model-reset">Padrão</button></div>
           </div>
           <p class="status-line" id="ai-status"></p>
+          <label class="check-row"><input type="checkbox" id="ai-auto"><span>Conferir sozinho os resultados das apostas pendentes ao abrir o app (no máximo a cada 6 horas). Você sempre confirma antes de mudar qualquer aposta.</span></label>
           <p class="help">O print vai para o Gemini (Google) pelo seu projeto Firebase, no plano gratuito. Para funcionar, ative uma vez no console do Firebase: <b>AI Logic → Começar → Gemini Developer API</b>. Se o Google aposentar o modelo, troque o nome aqui.</p>
         </div>
 
@@ -1058,6 +1089,19 @@
         const m = getGenerativeModel(ai, { model, generationConfig: { responseMimeType: 'application/json', temperature: 0 } });
         const res = await m.generateContent([prompt, { inlineData: { data, mimeType } }]);
         return res.response.text();
+      };
+      // Conferência de resultados: Gemini com pesquisa no Google (grounding). Devolve o texto, as fontes e as sugestões de pesquisa do Google.
+      cb.checkResults = async ({ prompt, model }) => {
+        const { getAI, getGenerativeModel, GoogleAIBackend } = await import("https://www.gstatic.com/firebasejs/12.1.0/firebase-ai.js");
+        const ai = getAI(app, { backend: new GoogleAIBackend() });
+        const m = getGenerativeModel(ai, { model, tools: [{ googleSearch: {} }], generationConfig: { temperature: 0 } });
+        const res = await m.generateContent(prompt);
+        const gm = (res.response.candidates && res.response.candidates[0] && res.response.candidates[0].groundingMetadata) || {};
+        return {
+          text: res.response.text(),
+          sources: (gm.groundingChunks || []).map(c => c.web).filter(Boolean).map(w => ({ uri: w.uri, title: w.title || w.domain || 'fonte' })),
+          google: (gm.searchEntryPoint && gm.searchEntryPoint.renderedContent) || ''
+        };
       };
       cb.login = (e,p) => signInWithEmailAndPassword(auth,e,p);
       cb.signup = (e,p) => createUserWithEmailAndPassword(auth,e,p);
@@ -1454,7 +1498,7 @@ function renderDatalists(){
   fill('comp-list', uniq(L.map(b => b.competition)));
   fill('sport-list', uniq(['Futebol','Basquete','Tênis','Futebol Americano','Vôlei','MMA','eSports', ...L.map(b => b.sport)]));
   fill('tipster-list', uniq(L.map(b => b.tipster)));
-  fill('team-list', uniq(L.slice(-800).flatMap(b => [team1Of(b), team2Of(b)])));
+  fill('team-list', uniq(L.slice(-800).map(eventOf)));
   const keep = (id, arr, allLabel) => { const s = $(id), v = s.value; s.innerHTML = `<option value="">${allLabel}</option>` + arr.map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join(''); s.value = arr.includes(v) ? v : ''; };
   keep('f-fbookie', uniq(L.map(b => b.bookie)), 'Todas as casas');
   keep('f-fsport', uniq(L.map(b => b.sport)), 'Todos os esportes');
@@ -1671,7 +1715,15 @@ function limitRows(S){
   return rows;
 }
 function renderPending(S){
-  const pend = S.filter(b => b.result === 'pendente').sort((a,b) => (b.date||'').localeCompare(a.date||'') || (b.createdAt||0) - (a.createdAt||0));
+  // limpa sugestões de apostas que já não estão pendentes
+  const stillPend = new Set(live().filter(b => b.result === 'pendente').map(b => b.id));
+  let dirty = false; Object.keys(aiSug).forEach(id => { if(!stillPend.has(id)){ delete aiSug[id]; dirty = true; } }); if(dirty) saveSug();
+  const hasSug = (b) => aiSug[b.id] && aiSug[b.id].res !== 'pendente' ? 1 : 0;
+  const pend = S.filter(b => b.result === 'pendente').sort((a,b) => hasSug(b) - hasSug(a) || (b.date||'').localeCompare(a.date||'') || (b.createdAt||0) - (a.createdAt||0));
+  const ready = pend.filter(b => hasSug(b) && aiSug[b.id].conf !== 'baixa');
+  $('ai-apply-all').style.display = ready.length > 1 ? '' : 'none';
+  $('ai-apply-all').textContent = `Confirmar ${ready.length} sugestões`;
+  $('ai-check-btn').style.display = AI_CHECK_ON && pend.length ? '' : 'none';
   $('pend-title').textContent = `Pendentes (${pend.length})`;
   if(!pend.length){ $('pend-list').innerHTML = '<div class="empty" style="padding:10px 0;">Nada em aberto.</div>'; return; }
   $('pend-list').innerHTML = pend.slice(0, 6).map(b => `
@@ -1684,6 +1736,7 @@ function renderPending(S){
         </div>
         <div class="pend-nums"><div>@${fmtNum(b.odd)}</div><div class="muted">${fmtUabs(uOf(b, b.stake))}</div></div>
       </div>
+      ${aiSugHTML(b)}
       <div class="pend-actions">
         <button type="button" class="q-win" data-quick="win" data-id="${esc(b.id)}">Green</button>
         <button type="button" class="q-loss" data-quick="loss" data-id="${esc(b.id)}">Red</button>
@@ -1692,7 +1745,137 @@ function renderPending(S){
     </div>`).join('') + (pend.length > 6 ? `<p class="help" style="text-align:center;">+${pend.length - 6} no histórico</p>` : '');
   $$('#pend-list [data-quick]').forEach(btn => btn.addEventListener('click', () => updateStatus(btn.dataset.id, btn.dataset.quick)));
   $$('#pend-list [data-edit]').forEach(btn => btn.addEventListener('click', () => editBet(btn.dataset.edit)));
+  $$('#pend-list [data-ai-apply]').forEach(btn => btn.addEventListener('click', () => {
+    const id = btn.dataset.aiApply, s = aiSug[id]; if(!s) return;
+    delete aiSug[id]; saveSug();
+    updateStatus(id, s.res);
+  }));
+  $$('#pend-list [data-ai-dismiss]').forEach(btn => btn.addEventListener('click', () => {
+    const id = btn.dataset.aiDismiss;
+    aiSug[id] = { res:'pendente', dismissed:true, at:Date.now() }; saveSug();
+    renderPending(scope());
+  }));
 }
+
+/* ---- conferência de resultados com IA ---- */
+// Desligada até o projeto ter o plano pago do Gemini: no plano gratuito a pesquisa Google da IA responde 429.
+var AI_CHECK_ON = false;
+const AI_SUG_KEY = 'apostas_ai_sug_v1', AI_AUTO_KEY = 'apostas_ai_auto_v1';
+const AI_RES = { green:'win', red:'loss', push:'void', meio_green:'halfwin', meio_red:'halfloss' };
+var aiSug = {}; try{ aiSug = JSON.parse(localStorage.getItem(AI_SUG_KEY) || '{}') || {}; }catch(e){ aiSug = {}; }
+function saveSug(){ try{ localStorage.setItem(AI_SUG_KEY, JSON.stringify(aiSug)); }catch(e){} }
+let aiChecking = false;
+function aiSugHTML(b){
+  const s = aiSug[b.id];
+  if(!s || s.dismissed) return '';
+  if(s.res === 'pendente') return s.reason ? `<div class="ai-none"><span class="ai-tag"><svg aria-hidden="true"><use href="#i-spark"/></svg>IA</span> ainda sem resultado final · ${esc(s.reason)}</div>` : '';
+  const k = s.res === 'win' || s.res === 'halfwin' ? 'pos' : s.res === 'loss' || s.res === 'halfloss' ? 'neg' : 'void';
+  const src = (s.sources || []).slice(0, 3).map(x => `<a href="${esc(x.uri)}" target="_blank" rel="noopener noreferrer">${esc(x.title)}</a>`).join('');
+  return `<div class="ai-sug ${k}">
+      <div class="ai-sug-top"><span class="ai-tag"><svg aria-hidden="true"><use href="#i-spark"/></svg>IA</span><span class="ai-res">${RESULT_LABEL[s.res]}</span>${s.score ? `<span>· ${esc(s.score)}</span>` : ''}<span class="ai-conf">certeza ${esc(s.conf === 'media' ? 'média' : s.conf)}</span></div>
+      ${s.reason ? `<div class="ai-reason">${esc(s.reason)}</div>` : ''}
+      ${src ? `<div class="ai-src">Fontes: ${src}</div>` : ''}
+      <div class="ai-sug-actions"><button type="button" class="btn-sm btn-primary" data-ai-apply="${esc(b.id)}">Confirmar ${RESULT_LABEL[s.res]}</button><button type="button" class="btn-sm btn-ghost" data-ai-dismiss="${esc(b.id)}">Descartar</button></div>
+    </div>`;
+}
+const checkablePending = () => { const t = todayISO(); return live().filter(b => b.result === 'pendente' && b.date && b.date <= t); };
+function resultsPrompt(list){
+  return `Você confere resultados de apostas esportivas. Hoje é ${dateBR(todayISO())}. Para cada aposta abaixo, pesquise no Google o resultado OFICIAL do evento e diga se a aposta ganhou ou perdeu.
+Regras:
+- Só decida se o evento já terminou e você achou o resultado em fonte confiável (site oficial da liga, ESPN, Sofascore, Flashscore, UFC.com etc.). Senão, use "pendente".
+- "green" = a aposta ganhou; "red" = perdeu; "push" = devolvida/anulada (linha exata em total/handicap inteiro, jogador não entrou em quadra, luta cancelada); "meio_green"/"meio_red" só em linhas asiáticas de quarto (.25/.75).
+- Mercados de jogador (pontos, rebotes, assistências etc.) usam a estatística oficial do jogo. "Acima"/"Over" X ganha se o número for maior que X; "Abaixo"/"Under" X ganha se for menor.
+- Lutas (MMA/boxe): KO/TKO, Submission (finalização) e Points/Decision (pontos) são métodos de vitória. "Double Chance" ganha se o lutador citado no início do mercado vencer por qualquer um dos dois métodos citados.
+- Múltipla (seleções separadas por " + "): "red" se qualquer seleção perdeu; "green" só se todas ganharam; se alguma foi anulada e as outras ganharam, use "pendente".
+- A data está no horário de Brasília; fontes de outros fusos podem mostrar o dia seguinte.
+- "placar": o placar ou a estatística que decidiu (curto). "motivo": uma frase curta em português.
+Responda APENAS com JSON, sem nenhum texto antes ou depois, neste formato:
+{"apostas":[{"id":"...","resultado":"green|red|push|meio_green|meio_red|pendente","placar":"...","motivo":"...","certeza":"alta|media|baixa"}]}
+Apostas:
+` + JSON.stringify(list.map(b => ({ id: b.id, data: dateBR(b.date), esporte: b.sport || '', competicao: b.competition || '', evento: eventOf(b), mercado: b.market || '', tipo: b.kind === 'multipla' ? 'múltipla' : 'simples', obs: b.notes || '' })));
+}
+function parseAiJSON(text){
+  let t = String(text || '');
+  const f = t.match(/\`\`\`(?:json)?\s*([\s\S]*?)\`\`\`/i); if(f) t = f[1];
+  const a = t.indexOf('{'), z = t.lastIndexOf('}');
+  if(a < 0 || z < a) return [];
+  try{ const o = JSON.parse(t.slice(a, z + 1)); return Array.isArray(o.apostas) ? o.apostas : []; }catch(e){ return []; }
+}
+async function checkWithModels(c, prompt){
+  const candidates = [aiModelName(), ...AI_MODELS].filter((m, i, a) => m && a.indexOf(m) === i);
+  let lastErr = null;
+  for(const model of candidates){
+    try{ return await c.checkResults({ prompt, model }); }
+    catch(e){ console.warn('IA', model, e); lastErr = e; if(!isModelMissing(e)) break; }
+  }
+  throw lastErr;
+}
+async function runResultCheck(manual){
+  const c = window.cloudBets, st = $('ai-check-status');
+  if(aiChecking) return;
+  if(!c?.checkResults){ if(manual){ st.className = 'status-line err'; st.textContent = 'A conferência precisa do Firebase carregado. Verifique a internet e recarregue a página.'; } return; }
+  const now = Date.now();
+  const list = checkablePending().filter(b => {
+    const s = aiSug[b.id]; if(!s) return true;
+    if(s.res !== 'pendente') return false;
+    if(manual) return true;
+    return now - (s.at || 0) > (s.dismissed ? 24 : 3) * 3600e3;
+  }).sort((a,b) => a.date.localeCompare(b.date)).slice(0, 24);
+  if(!list.length){ if(manual){ st.className = 'status-line'; st.textContent = 'Nenhuma aposta pendente nova para conferir agora.'; } return; }
+  aiChecking = true; $('ai-check-btn').disabled = true;
+  st.className = 'status-line'; st.textContent = `Conferindo ${list.length} aposta(s) com a IA…`;
+  let done = 0, found = 0, google = '';
+  try{
+    for(let i = 0; i < list.length; i += 8){
+      const chunk = list.slice(i, i + 8);
+      const out = await checkWithModels(c, resultsPrompt(chunk));
+      if(out.google) google = out.google;
+      const items = parseAiJSON(out.text);
+      chunk.forEach(b => {
+        const it = items.find(x => String(x.id) === b.id) || {};
+        const res = AI_RES[String(it.resultado || '').toLowerCase()] || 'pendente';
+        aiSug[b.id] = { res, score: String(it.placar || '').slice(0, 120), reason: String(it.motivo || '').slice(0, 240),
+          conf: ['alta','media','baixa'].includes(it.certeza) ? it.certeza : 'baixa', sources: (out.sources || []).slice(0, 4), at: Date.now() };
+        if(res !== 'pendente') found++;
+      });
+      done += chunk.length; saveSug();
+      st.textContent = `Conferindo… ${done} de ${list.length}`;
+      if(view === 'painel') renderPending(scope());
+    }
+    st.className = 'status-line ' + (found ? 'ok' : '');
+    st.textContent = found ? `A IA encontrou ${found} resultado(s). Confira e confirme abaixo.` : 'A IA ainda não encontrou resultados finais para essas apostas.';
+    // O Google pede que as sugestões de pesquisa usadas apareçam junto da resposta.
+    $('ai-google').innerHTML = google ? `<iframe class="ai-google-frame" sandbox="allow-popups allow-popups-to-escape-sandbox" title="Pesquisas do Google usadas pela IA" srcdoc="${esc(google)}"></iframe>` : '';
+  }catch(e){
+    st.className = 'status-line err';
+    st.textContent = /\b429\b|quota|RESOURCE_EXHAUSTED/i.test(String(e && (e.message || e) || ''))
+      ? 'A pesquisa no Google pela IA não está liberada no plano gratuito do Gemini. Ela precisa do plano pago do projeto (que inclui 5 mil pesquisas grátis por mês).'
+      : aiErrorMessage(e).replace('Não consegui ler o print', 'Não consegui conferir').replace(' — ou use a linha de outra IA', '');
+  }finally{
+    aiChecking = false; $('ai-check-btn').disabled = false;
+    if(view === 'painel') renderPending(scope());
+  }
+}
+function maybeAutoCheck(){
+  if(!AI_CHECK_ON || settings.prefs.autoCheck === false || !window.cloudBets?.checkResults) return;
+  let last = 0; try{ last = parseInt(localStorage.getItem(AI_AUTO_KEY) || '0', 10) || 0; }catch(e){}
+  if(Date.now() - last < 6 * 3600e3) return;
+  if(!checkablePending().some(b => !aiSug[b.id] || (aiSug[b.id].res === 'pendente' && !aiSug[b.id].dismissed))) return;
+  try{ localStorage.setItem(AI_AUTO_KEY, String(Date.now())); }catch(e){}
+  runResultCheck(false);
+}
+$('ai-check-btn').addEventListener('click', () => runResultCheck(true));
+$('ai-apply-all').addEventListener('click', async () => {
+  const list = scope().filter(b => b.result === 'pendente' && aiSug[b.id] && aiSug[b.id].res !== 'pendente' && aiSug[b.id].conf !== 'baixa');
+  if(!list.length) return;
+  if(!window.confirm(`Confirmar os ${list.length} resultados sugeridos pela IA?\n\nSugestões com certeza baixa ficam de fora, para você ver uma a uma.`)) return;
+  const now = Date.now();
+  list.forEach(b => { b.result = aiSug[b.id].res; delete b.cashout; b.profit = calcProfit(b.stake, b.odd, b.result); b.updatedAt = now; delete aiSug[b.id]; });
+  saveSug(); saveBets(); render();
+  await uploadMany(list);
+  showToast('Resultados confirmados', `${list.length} aposta(s) atualizada(s).`, 'ok');
+});
+$('ai-auto').addEventListener('change', () => { settings.prefs.autoCheck = $('ai-auto').checked; persistSetting('prefs'); });
 
 function drawChart(S){
   const holder = $('chart-holder');
@@ -2043,8 +2226,17 @@ function updateWarnings(){
   $('submit-btn').textContent = confirmArmed ? 'Registrar mesmo assim' : 'Registrar ficha';
 }
 
+// Competição não aparece mais na ficha, mas continua guardada quando vem do print, da linha colada ou de uma ficha antiga.
+let formComp = '';
+function splitEvent(s){
+  const t = String(s || '').trim().replace(/\s+/g, ' ');
+  const p = t.split(/\s+(?:x|vs\.?|v\.?|×)\s+/i);
+  if(p.length === 2 && p[0].trim() && p[1].trim()) return { team1: p[0].trim(), team2: p[1].trim(), teams: p[0].trim() + ' x ' + p[1].trim() };
+  return { team1: t, team2: '', teams: t };
+}
+const joinEvent = (t1, t2) => [String(t1 || '').trim(), String(t2 || '').trim()].filter(Boolean).join(' x ');
 function resetForm(){
-  editingId = null; confirmArmed = false;
+  editingId = null; confirmArmed = false; formComp = '';
   $('bet-form').reset();
   $('f-data').value = todayISO();
   $('f-bank').value = targetBankId();
@@ -2068,13 +2260,13 @@ $('bet-form').addEventListener('submit', async (e) => {
     const hot = currentWarnings().filter(w => w.hot);
     if(hot.length && !confirmArmed){ confirmArmed = true; updateWarnings(); showToast('Passou de um limite seu', 'Confira o aviso. Se quiser registrar mesmo assim, toque no botão de novo.'); return; }
   }
-  const t1 = $('f-team1').value.trim(), t2 = $('f-team2').value.trim();
+  const ev = splitEvent($('f-event').value);
   const data = {
     date: $('f-data').value || todayISO(),
     sport: $('f-sport').value.trim(),
-    competition: $('f-comp').value.trim(),
+    competition: formComp,
     bookie: $('f-bookie').value.trim(),
-    team1: t1, team2: t2, teams: t1 + ' x ' + t2,
+    team1: ev.team1, team2: ev.team2, teams: ev.teams,
     market: $('f-market').value.trim(),
     tipster: $('f-tipster').value.trim(),
     notes: $('f-notes').value.trim(),
@@ -2108,8 +2300,8 @@ $('cancel-btn').addEventListener('click', () => { resetForm(); setView('historic
 $('repeat-btn').addEventListener('click', () => {
   const L = live(); if(!L.length) return;
   const last = L.slice().sort((a,b) => (a.createdAt||0) - (b.createdAt||0))[L.length - 1];
-  $('f-team1').value = team1Of(last); $('f-team2').value = team2Of(last);
-  $('f-comp').value = last.competition || ''; $('f-sport').value = last.sport || '';
+  $('f-event').value = eventOf(last);
+  formComp = last.competition || ''; $('f-sport').value = last.sport || '';
   if(!$('f-bookie').value) $('f-bookie').value = last.bookie || '';
 });
 
@@ -2120,9 +2312,9 @@ function editBet(id){
   applyStakeMode('reais');
   $('f-data').value = b.date || todayISO();
   $('f-sport').value = b.sport || '';
-  $('f-comp').value = b.competition || '';
+  formComp = b.competition || '';
   $('f-bookie').value = b.bookie || '';
-  $('f-team1').value = team1Of(b); $('f-team2').value = team2Of(b);
+  $('f-event').value = eventOf(b);
   $('f-market').value = b.market || '';
   $('f-tipster').value = b.tipster || '';
   $('f-notes').value = b.notes || '';
@@ -2212,8 +2404,8 @@ function fillForm(o){
   if(editingId) resetForm();
   confirmArmed = false;
   $('f-data').value = o.date || todayISO();
-  $('f-comp').value = o.comp || ''; $('f-bookie').value = o.bookie || '';
-  $('f-team1').value = o.t1 || ''; $('f-team2').value = o.t2 || ''; $('f-market').value = o.market || '';
+  formComp = o.comp || ''; $('f-bookie').value = o.bookie || '';
+  $('f-event').value = joinEvent(o.t1, o.t2); $('f-market').value = o.market || '';
   if(o.sport) $('f-sport').value = o.sport;
   if(o.tipster) $('f-tipster').value = o.tipster;
   setKind(o.kind === 'multipla' || /^m[uú]ltipla$/i.test(o.t1 || '') || (o.market || '').includes(' + ') ? 'multipla' : 'simples');
@@ -2292,8 +2484,10 @@ function parseSlipJSON(text){
 }
 function aiErrorMessage(e){
   const m = String(e && (e.message || e.code || e) || '');
-  if(/api[- ]not[- ]enabled|firebasevertexai|firebaseml|AI Logic|PERMISSION_DENIED|403/i.test(m)) return 'O Firebase AI Logic ainda não está ativado no seu projeto. No console do Firebase: AI Logic → Começar → Gemini Developer API. Depois tente de novo.';
-  if(/429|quota|RESOURCE_EXHAUSTED|rate/i.test(m)) return 'O limite gratuito do Gemini acabou por agora. Tente de novo em alguns minutos — ou use a linha de outra IA.';
+  // a cota vem antes: a mensagem de erro do Gemini traz o endereço "firebasevertexai", que confundia com "não ativado"
+  if(/\b429\b|quota|RESOURCE_EXHAUSTED/i.test(m)) return 'O limite gratuito do Gemini acabou por agora. Tente de novo em alguns minutos — ou use a linha de outra IA.';
+  if(/\b500\b|\b503\b|high demand|overloaded|UNAVAILABLE/i.test(m)) return 'O Gemini está sobrecarregado agora. Tente de novo em alguns minutos — ou use a linha de outra IA.';
+  if(/api[- ]not[- ]enabled|firebasevertexai\.googleapis\.com has not been used|PERMISSION_DENIED|\b403\b/i.test(m)) return 'O Firebase AI Logic ainda não está ativado no seu projeto. No console do Firebase: AI Logic → Começar → Gemini Developer API. Depois tente de novo.';
   if(/Failed to fetch|NetworkError|network/i.test(m)) return 'Sem conexão com o Gemini. Verifique a internet (ou um bloqueador de anúncios) e tente de novo.';
   return 'Não consegui ler o print: ' + m.slice(0, 160);
 }
@@ -2555,6 +2749,8 @@ function renderBanca(){
   $('backup-meta').textContent = lastBk ? `Último baixado neste aparelho: ${new Date(lastBk).toLocaleString('pt-BR')}` : 'Nenhum backup baixado ainda neste aparelho.';
   if(!$('imp-unit').value) $('imp-unit').value = round2(unitValue($('imp-bank').value || targetBankId()));
   if(document.activeElement !== $('ai-model')) $('ai-model').value = aiModelName();
+  $('ai-auto').checked = settings.prefs.autoCheck !== false;
+  $('ai-auto').closest('.check-row').style.display = AI_CHECK_ON ? '' : 'none';
   $('ai-status').textContent = settings.prefs.aiModel ? 'Usando o modelo que você escolheu.' : 'Usando o modelo padrão (troca sozinho para outro se este sair do ar).';
   renderTrash();
   updateCloudUI();
@@ -2883,6 +3079,7 @@ window.addEventListener('cloud-auth', async () => {
   stakeMode = settings.prefs.stakeMode;
   if(!editingId) applyStakeMode(stakeMode);
   await loadBets();
+  setTimeout(maybeAutoCheck, 1500);
 });
 
 /* ============================================================
@@ -2891,6 +3088,7 @@ window.addEventListener('cloud-auth', async () => {
 resetForm();
 setView((location.hash || '').slice(1) || 'painel', { keepScroll:true });
 loadBets();
+window.addEventListener('cloud-ready', () => setTimeout(maybeAutoCheck, 2500));
 })();
 </script>
 </body>

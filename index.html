@@ -587,6 +587,43 @@
   .ai-google-frame{display:block;width:100%;height:64px;border:0;margin-top:10px;border-radius:10px;background:transparent;}
   .check-row{display:flex;gap:9px;align-items:flex-start;font-size:13px;line-height:1.45;margin-top:14px;cursor:pointer;}
   .check-row input{margin-top:2px;accent-color:var(--accent-solid);width:16px;height:16px;flex:none;}
+  /* Resumo do dia (janela aberta pelo calendário) */
+  dialog.day-sheet{width:min(700px,calc(100vw - 24px));}
+  .day-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
+  .day-head h2{display:flex;align-items:center;gap:9px;}
+  .day-ico{width:20px;height:20px;color:var(--accent);flex:none;}
+  #day-close{width:34px;min-height:34px;font-size:15px;flex:none;}
+  .day-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:16px 0 18px;}
+  .day-stat{background:var(--surface-2);border:1px solid var(--border);border-radius:14px;padding:12px 14px;min-width:0;}
+  .day-stat.pos{background:var(--win-dim);border-color:var(--win);}
+  .day-stat.neg{background:var(--loss-dim);border-color:var(--loss);}
+  .day-stat .l{font-size:12px;color:var(--text-muted);}
+  .day-stat .v{font-size:19px;font-weight:650;margin-top:4px;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .day-stat.pos .v{color:var(--win-text);} .day-stat.neg .v{color:var(--loss-text);}
+  .day-stat .v small{font-size:12.5px;font-weight:500;opacity:.85;}
+  .day-list-title{font-size:11.5px;font-weight:600;color:var(--text-muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;}
+  .day-list{display:flex;flex-direction:column;gap:8px;max-height:min(50dvh,460px);overflow:auto;padding-right:4px;}
+  .day-bet{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 14px;align-items:start;background:var(--surface-2);border:1px solid var(--border);border-radius:14px;padding:12px 14px;text-align:left;width:100%;min-height:0;color:var(--text);font:inherit;font-weight:400;cursor:pointer;flex:none;}
+  .day-bet:hover{border-color:var(--border-strong);background:var(--surface-2);}
+  .day-bet:active{transform:scale(.99);}
+  .day-bet-top{display:flex;align-items:center;gap:8px;min-width:0;}
+  .day-bet .badge{min-height:22px;font-size:11px;padding:0 9px;cursor:inherit;display:inline-flex;align-items:center;flex:none;}
+  .day-bet-ev{font-weight:650;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .day-bet-mk{grid-column:1;font-size:12.5px;color:var(--text-2);line-height:1.45;}
+  .day-bet-mk .m{color:var(--text-muted);}
+  .day-bet-nums{grid-column:2;grid-row:1 / span 2;text-align:right;align-self:center;font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .day-bet-nums .o{font-size:12px;color:var(--text-muted);}
+  .day-bet-nums .o b{color:var(--text);font-weight:600;}
+  .day-bet-nums .p{font-size:15px;font-weight:650;margin-top:3px;}
+  @media(max-width:640px){
+    dialog.day-sheet{width:100%;}
+    .day-stats{grid-template-columns:1fr 1fr;}
+    .day-stat:last-child{grid-column:span 2;}
+    .day-list{max-height:none;overflow:visible;padding-right:0;}
+    .day-bet{grid-template-columns:minmax(0,1fr);}
+    .day-bet-nums{grid-column:1;grid-row:auto;text-align:left;display:flex;justify-content:space-between;align-items:baseline;margin-top:4px;}
+    .day-bet-nums .p{margin-top:0;}
+  }
   @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important;}}
 </style>
 </head>
@@ -599,6 +636,7 @@
   <symbol id="i-camera" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M4 7h3l2-3h6l2 3h3v12H4z"/><circle cx="12" cy="13" r="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
   <symbol id="i-edit" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M4 20h4L18.5 9.5a2.1 2.1 0 0 0-3-3L5 17v3zM13.5 8.5l3 3"/></symbol>
   <symbol id="i-trash" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M10 11v6M14 11v6M5.5 7l1 12a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2l1-12M9 7V4.5A1.5 1.5 0 0 1 10.5 3h3A1.5 1.5 0 0 1 15 4.5V7"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M4 6.5A1.5 1.5 0 0 1 5.5 5h13A1.5 1.5 0 0 1 20 6.5v12a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5zM4 10h16M8 3v4M16 3v4"/></symbol>
   <symbol id="i-spark" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></symbol>
   <symbol id="i-download" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M12 4v11M7 11l5 5 5-5M5 20h14"/></symbol>
   <symbol id="i-wallet" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M3 7h18v12H3zM16 13h2M3 7l3-3h12l3 3"/></symbol>
@@ -1002,6 +1040,19 @@
   <button type="button" class="nav-btn" data-nav="banca"><svg><use href="#i-wallet"/></svg><span>Banca</span></button>
 </nav>
 
+<dialog class="sheet day-sheet" id="day-dialog" aria-labelledby="day-title">
+  <div class="day-head">
+    <div style="min-width:0;">
+      <h2 id="day-title"><svg class="day-ico" aria-hidden="true"><use href="#i-cal"/></svg><span></span></h2>
+      <p class="help" id="day-sub" style="margin:2px 0 0;"></p>
+    </div>
+    <button type="button" class="icon-btn" id="day-close" aria-label="Fechar">✕</button>
+  </div>
+  <div class="day-stats" id="day-stats"></div>
+  <div class="day-list-title" id="day-list-title"></div>
+  <div class="day-list" id="day-list"></div>
+  <div class="form-actions" style="margin-top:14px;justify-content:flex-end;"><button type="button" class="btn-sm btn-ghost" id="day-hist">Ver no histórico</button></div>
+</dialog>
 <div id="bulk-bar" role="toolbar" aria-label="Ações para as fichas selecionadas">
   <span class="bulk-count" id="bulk-count">0 selecionadas</span>
   <button type="button" class="btn-sm btn-ghost" id="bulk-all"><span class="long">Selecionar todas</span><span class="short">Todas</span></button>
@@ -1557,7 +1608,43 @@ function hideTip(){ $('tip').classList.remove('show'); }
 window.addEventListener('scroll', hideTip, { passive:true });
 const evX = (ev) => ev.touches && ev.touches[0] ? ev.touches[0].clientX : ev.clientX;
 
-// Calendário do mês: lucro de cada dia, com atalho para o histórico daquele dia.
+// Resumo do dia: abre ao tocar num dia do calendário.
+let dayIso = '';
+function openDay(iso){
+  const list = scope().filter(b => b.date === iso).sort((a,b) => (a.createdAt||0) - (b.createdAt||0));
+  if(!list.length) return;
+  dayIso = iso;
+  const [y, m, d] = iso.split('-').map(Number);
+  $('day-title').querySelector('span').textContent = `Apostas de ${d} de ${MONTHS_FULL[m-1].toLowerCase()} de ${y}`;
+  const st = stats(list);
+  $('day-sub').textContent = 'Resumo das apostas registradas nesta data' + (st.pending ? ` · ${st.pending} em aberto` : '') + '. Toque numa aposta para editar.';
+  $('day-stats').innerHTML =
+    `<div class="day-stat"><div class="l">Total de apostas</div><div class="v">${st.count}</div></div>` +
+    `<div class="day-stat"><div class="l">Volume apostado</div><div class="v">${fmtBRL(st.totalStaked)}</div></div>` +
+    `<div class="day-stat ${cls(st.profit)}"><div class="l">Lucro do dia</div><div class="v">${fmtBRLs(st.profit)} <small>(${fmtU(st.profitU)})</small></div></div>`;
+  $('day-list-title').textContent = `Apostas realizadas (${list.length})`;
+  $('day-list').innerHTML = list.map(b => {
+    const meta = [b.bookie, b.sport].filter(Boolean).map(x => `<span class="m"> · ${esc(x)}</span>`).join('');
+    const p = b.result === 'pendente' ? '<span class="muted">—</span>' : `<span class="${cls(b.profit)}">${fmtBRLs(b.profit)}</span>`;
+    return `<button type="button" class="day-bet" data-day-edit="${esc(b.id)}">
+        <div class="day-bet-top"><span class="badge ${b.result}">${RESULT_LABEL[b.result] || ''}</span><span class="day-bet-ev">${esc(eventOf(b) || b.market || '—')}</span></div>
+        <div class="day-bet-mk">${b.kind === 'multipla' ? '<span class="tag">MÚLT</span> ' : ''}${esc(b.market || '')}${meta}</div>
+        <div class="day-bet-nums"><div class="o">Odd <b>@${fmtNum(b.odd)}</b> · Stake <b>${fmtBRL(b.stake)}</b></div><div class="p">${p}</div></div>
+      </button>`;
+  }).join('');
+  $$('#day-list [data-day-edit]').forEach(el => el.addEventListener('click', () => { $('day-dialog').close(); editBet(el.dataset.dayEdit); }));
+  if(!$('day-dialog').open) $('day-dialog').showModal();
+  $('day-list').scrollTop = 0;
+}
+$('day-close').addEventListener('click', () => $('day-dialog').close());
+$('day-dialog').addEventListener('click', (e) => { if(e.target === $('day-dialog')) $('day-dialog').close(); });
+$('day-hist').addEventListener('click', () => {
+  $('day-dialog').close();
+  histDate = dayIso; histVisible = PAGE; ['f-search','f-fbookie','f-fsport','f-fresult'].forEach(id => { $(id).value = ''; });
+  setView('historico');
+});
+
+// Calendário do mês: lucro de cada dia; tocar num dia abre o resumo do dia.
 let calMonth = '';
 const shiftMonth = (key, d) => { const [y, m] = key.split('-').map(Number); return isoOf(new Date(y, m - 1 + d, 1)).slice(0, 7); };
 $('cal-prev').addEventListener('click', () => { calMonth = shiftMonth(calMonth, -1); renderCalendar(scope()); });
@@ -1601,7 +1688,7 @@ function renderCalendar(S){
   $$('[data-cal]', grid).forEach(el => {
     el.addEventListener('mousemove', (ev) => showTip(el.getAttribute('data-info'), ev.clientX, el.getBoundingClientRect().top));
     el.addEventListener('mouseleave', hideTip);
-    el.addEventListener('click', () => { hideTip(); histDate = el.dataset.cal; histVisible = PAGE; ['f-search','f-fbookie','f-fsport','f-fresult'].forEach(id => { $(id).value = ''; }); setView('historico'); });
+    el.addEventListener('click', () => { hideTip(); openDay(el.dataset.cal); });
   });
 }
 

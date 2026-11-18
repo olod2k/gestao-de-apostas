@@ -1209,7 +1209,8 @@ const DEFAULTS = {
   houses: { txs: [] },
   prefs: { stakeMode:'reais', aiModel:'' }
 };
-const AI_MODELS = ['gemini-3.8-flash', 'gemini-flash-latest', 'gemini-2.5-flash'];
+// Ordem de tentativa: o Flash lê melhor; os "Lite" respondem rápido e têm cota grátis separada (reserva quando o Flash está lotado).
+const AI_MODELS = ['gemini-3.8-flash', 'gemini-3.5-flash-lite', 'gemini-flash-lite-latest', 'gemini-flash-latest'];
 const CLOUD_KEY = { banks:'banks', limits:'limits', houses:'houses', prefs:'preferences' };
 function normalizeSettings(s){
   s = s || {};
@@ -1805,8 +1806,8 @@ async function checkWithModels(c, prompt){
   const candidates = [aiModelName(), ...AI_MODELS].filter((m, i, a) => m && a.indexOf(m) === i);
   let lastErr = null;
   for(const model of candidates){
-    try{ return await c.checkResults({ prompt, model }); }
-    catch(e){ console.warn('IA', model, e); lastErr = e; if(!isModelMissing(e)) break; }
+    try{ return await withTimeout(c.checkResults({ prompt, model }), 45000); }
+    catch(e){ console.warn('IA', model, e); lastErr = e; if(!isModelMissing(e) && !isBusyOrLimited(e)) break; }
   }
   throw lastErr;
 }
@@ -2492,6 +2493,10 @@ function aiErrorMessage(e){
   return 'Não consegui ler o print: ' + m.slice(0, 160);
 }
 const isModelMissing = (e) => /404|not found|NOT_FOUND|is not supported|unsupported model|invalid model/i.test(String(e && (e.message || e) || ''));
+// Limite do modelo, sobrecarga ou demora: vale tentar o próximo modelo da lista (cada modelo tem sua própria cota grátis).
+const isBusyOrLimited = (e) => /\b429\b|quota|RESOURCE_EXHAUSTED|\b500\b|\b503\b|high demand|overloaded|UNAVAILABLE|demorou demais/i.test(String(e && (e.message || e) || ''));
+const AI_TIMEOUT_MS = 20000;
+const withTimeout = (p, ms) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error('A IA demorou demais para responder')), ms))]);
 function setSlipUI(state, title, sub){
   $('slip-drop').classList.toggle('busy', state === 'busy');
   $('slip-title').textContent = title;
@@ -2515,12 +2520,13 @@ async function handleSlipFile(file){
     let text = null, lastErr = null;
     for(const model of candidates){
       try{
-        text = await c.readSlip({ data: img.data, mimeType: img.mimeType, prompt, model });
+        if(tried.length) setSlipUI('busy', 'Lendo o print…', 'o modelo principal está ocupado — tentando outro');
+        text = await withTimeout(c.readSlip({ data: img.data, mimeType: img.mimeType, prompt, model }), AI_TIMEOUT_MS);
         if(!settings.prefs.aiModel) try{ localStorage.setItem('apostas_ai_model_ok', model); }catch(e){}
         break;
       }catch(e){
         console.warn('IA', model, e); lastErr = e; tried.push(model);
-        if(!isModelMissing(e)) break;
+        if(!isModelMissing(e) && !isBusyOrLimited(e)) break;
       }
     }
     if(text == null) throw lastErr;

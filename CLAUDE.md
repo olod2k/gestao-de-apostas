@@ -28,6 +28,7 @@ Converse com ele em português (pt-BR). Ele não é programador: explique em lin
 - `settings/banks` `{list:[{id,name,amount,units,hist}], active}`, `settings/limits` `{stopDay, stopWeek, maxStake}` (em u, 0 = desligado), `settings/houses` `{txs:[{id,house,type:'dep'|'saq',amount,date}]}`, `settings/preferences` `{stakeMode, aiModel}`.
   O antigo `settings/bankroll` só é lido para migração.
 - Sincronização: completa a cada 24 h, incremental (`updatedAt > último sync`) nas outras vezes. Ver `fullSyncFromCloud` / `incrementalSyncFromCloud`.
+  Depois de carregar, fica em **tempo real**: `cb.watch` (onSnapshot em `bets` com `updatedAt > início` e em `tombstones`) → `applyRemote` (ignora o eco das próprias gravações comparando `updatedAt`). Ao voltar para o app (`visibilitychange`/`focus`/`online`, no máximo a cada 30 s) roda `refreshOnReturn` (configurações + incremental) e religa a escuta se ela caiu.
 - Fichas antigas sem `bankId` pertencem à primeira banca.
 
 ## Leitura do print (IA)

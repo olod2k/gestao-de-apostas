@@ -1088,7 +1088,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
   import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-  import { getFirestore, collection, doc, getDoc, getDocs, setDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+  import { getFirestore, collection, doc, getDoc, getDocs, setDoc, deleteDoc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
   // Mesmo projeto Firebase do HTML anterior: as apostas já salvas continuam aparecendo.
   const firebaseConfig = {
@@ -1124,6 +1124,15 @@
       const betsCol = () => collection(db,'users',auth.currentUser.uid,'bets');
       cb.load = async () => (await getDocs(betsCol())).docs.map(d => d.data());
       cb.loadSince = async (ms) => (await getDocs(query(betsCol(), where('updatedAt','>',ms)))).docs.map(d => d.data());
+      // Escuta em tempo real: só as fichas alteradas (e exclusões) depois de "since". Cada mudança custa 1 leitura.
+      cb.watch = (since, h) => {
+        const uid = auth.currentUser.uid;
+        const u1 = onSnapshot(query(betsCol(), where('updatedAt','>',since)),
+          snap => h.bets(snap.docChanges().filter(ch => ch.type !== 'removed').map(ch => ch.doc.data())), h.error);
+        const u2 = onSnapshot(query(collection(db,'users',uid,'tombstones'), where('deletedAt','>',since)),
+          snap => h.deleted(snap.docChanges().filter(ch => ch.type !== 'removed').map(ch => ch.doc.id)), h.error);
+        return () => { u1(); u2(); };
+      };
       cb.loadDeletedSince = async (ms) => (await getDocs(query(collection(db,'users',auth.currentUser.uid,'tombstones'), where('deletedAt','>',ms)))).docs.map(d => d.id);
       cb.save = (bet) => setDoc(doc(db,'users',auth.currentUser.uid,'bets',bet.id), clean(bet));
       cb.remove = async (id) => { await Promise.all([
@@ -1434,6 +1443,7 @@ async function loadBets(){
       if(!lastFull || (Date.now() - lastFull) > FULL_SYNC_INTERVAL_MS) await fullSyncFromCloud();
       else await incrementalSyncFromCloud();
       setSync('ok', 'Sincronizado · ' + (c.user.email || 'conta'));
+      startWatch();
     }catch(e){
       console.warn(e);
       setSync('err','Nuvem indisponível');
@@ -1444,6 +1454,55 @@ async function loadBets(){
   loaded = true;
   render();
 }
+
+/* ---- tempo real entre aparelhos ---- */
+let watchStop = null, lastRefresh = Date.now(), refreshing = false;
+function stopWatch(){ if(watchStop){ try{ watchStop(); }catch(e){} watchStop = null; } }
+function startWatch(){
+  const c = window.cloudBets;
+  stopWatch();
+  if(!(c?.user && c.watch)) return;
+  try{
+    watchStop = c.watch(Date.now() - 2*60*1000, {
+      bets: (list) => applyRemote(list, []),
+      deleted: (ids) => applyRemote([], ids),
+      error: (e) => { console.warn('Tempo real', e); watchStop = null; }
+    });
+  }catch(e){ console.warn('Tempo real', e); }
+}
+// Junta o que chegou de outro aparelho. Ignora o "eco" das próprias gravações (mesmo updatedAt).
+function applyRemote(changed, deletedIds){
+  const byId = new Map(bets.map(b => [b.id, b]));
+  let dirty = 0;
+  changed.forEach(r => { const l = byId.get(r.id); if(!l || (r.updatedAt || 0) > (l.updatedAt || 0)){ byId.set(r.id, r); dirty++; } });
+  deletedIds.forEach(id => { if(byId.delete(id)) dirty++; });
+  if(!dirty) return;
+  bets = Array.from(byId.values());
+  saveBets();
+  try{ localStorage.setItem(SYNCED_IDS_KEY, JSON.stringify(bets.map(b => b.id))); localStorage.setItem(LAST_SYNC_KEY, String(Date.now())); }catch(e){}
+  lastRefresh = Date.now();
+  if(window.cloudBets?.user) setSync('ok', 'Sincronizado agora · ' + (window.cloudBets.user.email || 'conta'));
+  render();
+  if($('day-dialog').open && dayIso) openDay(dayIso);
+}
+// Ao voltar para o app (celular desbloqueado, aba trocada): confere a nuvem e religa o tempo real se ele caiu.
+async function refreshOnReturn(){
+  const c = window.cloudBets;
+  if(document.hidden || refreshing || !(c?.user && c.loadSince) || Date.now() - lastRefresh < 30*1000) return;
+  refreshing = true;
+  try{
+    await syncSettingsFromCloud();
+    const before = JSON.stringify(bets.map(b => [b.id, b.updatedAt]));
+    await incrementalSyncFromCloud();
+    lastRefresh = Date.now();
+    if(JSON.stringify(bets.map(b => [b.id, b.updatedAt])) !== before) render();
+    if(!watchStop) startWatch();
+  }catch(e){ console.warn('Atualização ao voltar', e); }
+  finally{ refreshing = false; }
+}
+document.addEventListener('visibilitychange', refreshOnReturn);
+window.addEventListener('focus', refreshOnReturn);
+window.addEventListener('online', () => { lastRefresh = 0; refreshOnReturn(); });
 
 function purgeOldTrash(){
   const limit = Date.now() - TRASH_DAYS*24*60*60*1000;
@@ -3166,6 +3225,7 @@ window.addEventListener('cloud-ready', (e) => {
 });
 window.addEventListener('cloud-auth', async () => {
   const c = window.cloudBets;
+  if(!c.user){ stopWatch(); }
   if(!c.user){ setSync('warn', 'Não logado — só neste aparelho'); updateCloudUI(); render(); return; }
   updateCloudUI();
   await syncSettingsFromCloud();

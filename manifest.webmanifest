@@ -1,0 +1,22 @@
+{
+  "name": "Gestão de Apostas",
+  "short_name": "Apostas",
+  "description": "Controle pessoal das suas apostas esportivas: banca, histórico e análise.",
+  "lang": "pt-BR",
+  "id": "/",
+  "start_url": "/#painel",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b0d10",
+  "theme_color": "#0b0d10",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Nova aposta", "short_name": "Nova", "url": "/#nova", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Histórico", "url": "/#historico", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

@@ -6,6 +6,7 @@ Converse com ele em português (pt-BR). Ele não é programador: explique em lin
 ## O que é
 
 - **Um único arquivo**: `index.html` (HTML + CSS + JS puros, sem build, sem framework).
+- **App instalável (PWA)**: `manifest.webmanifest`, ícones em `icons/` (gerados a partir da logo) e `sw.js` (página: internet primeiro, cópia salva sem conexão; bibliotecas com versão fixa — Firebase, SheetJS, fontes — guardadas no cache `apostas-libs-v1`; Firestore/login/IA nunca passam pelo cache). Ao mudar a versão do SDK do Firebase, troque `VERSION` no `sw.js` para limpar o cache antigo. Cartão "Aplicativo no celular" em Banca e dados (botão de instalar no Android/PC, passos no iPhone).
 - Bibliotecas por CDN: SheetJS 0.18.5 (cdnjs) para Excel/CSV e Firebase JS SDK **12.1.0** (gstatic) para login, banco e IA.
 - Dados: `localStorage` no aparelho + **Firestore** do projeto Firebase `apostas-e3512` quando logado (e-mail/senha).
   A config do Firebase no HTML não é segredo (é pública por design no Firebase).

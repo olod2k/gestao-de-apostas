@@ -624,6 +624,68 @@
     .day-bet-nums{grid-column:1;grid-row:auto;text-align:left;display:flex;justify-content:space-between;align-items:baseline;margin-top:4px;}
     .day-bet-nums .p{margin-top:0;}
   }
+  /* Listas suspensas próprias (PC). No celular fica a lista nativa do sistema, que é a melhor ali. */
+  .cs-native{position:absolute !important;width:1px !important;height:1px !important;min-height:0 !important;padding:0 !important;border:0 !important;opacity:0 !important;pointer-events:none !important;clip:rect(0 0 0 0);overflow:hidden;}
+  .cs-trig{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 10px 0 12px;background:var(--input-bg);border:1px solid var(--border-strong);border-radius:11px;color:var(--text);font-size:14px;font-weight:400;text-align:left;max-width:100%;min-width:0;cursor:pointer;transition:border-color .15s ease,box-shadow .15s ease,background .15s ease;}
+  .cs-trig:hover{background:var(--input-bg);border-color:var(--text-faint);}
+  .cs-trig:active{transform:none;}
+  .cs-trig.open,.cs-trig:focus-visible{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);outline:none;}
+  .cs-trig:disabled{opacity:.5;cursor:default;}
+  .cs-val{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .cs-chev{width:16px;height:16px;flex:none;color:var(--text-muted);transition:transform .18s var(--ease-out);}
+  .cs-trig.open .cs-chev{transform:rotate(180deg);}
+  .cs-dot{width:8px;height:8px;border-radius:50%;flex:none;}
+  .field .cs-trig{width:100%;}
+  .filters .cs-trig,.bank-pick .cs-trig{background:var(--surface);}
+  .bank-pick .cs-trig{min-height:38px;min-width:132px;}
+  .file-row .cs-trig{min-height:34px;font-size:13px;}
+  .cs-trig.badge{min-height:28px;padding:0 8px 0 11px;gap:4px;border:1px solid transparent;border-radius:999px;font-size:12px;font-weight:600;justify-content:center;}
+  .cs-trig.badge .cs-dot{display:none;}
+  .cs-trig.badge .cs-val{flex:none;}
+  .cs-trig.badge .cs-chev{width:13px;height:13px;color:currentColor;opacity:.75;}
+  .cs-trig.badge:hover{border-color:currentColor;}
+  .cs-trig.badge.open{box-shadow:0 0 0 3px var(--accent-dim);}
+  .cs-trig.badge.win,.cs-trig.badge.halfwin{background:var(--win-dim);} .cs-trig.badge.loss,.cs-trig.badge.halfloss{background:var(--loss-dim);}
+  .cs-trig.badge.void{background:var(--void-dim);} .cs-trig.badge.cashout{background:var(--cash-dim);} .cs-trig.badge.pendente{background:var(--pend-dim);}
+  #cs-pop{position:fixed;inset:auto;margin:0;z-index:10000;padding:5px;min-width:190px;max-width:min(360px,calc(100vw - 16px));max-height:min(340px,calc(100vh - 24px));overflow:auto;background:var(--surface);color:var(--text);border:1px solid var(--border-strong);border-radius:13px;box-shadow:var(--shadow-lg);font-size:13.5px;animation:csIn .14s var(--ease-out);}
+  #cs-pop.up{animation-name:csInUp;}
+  #cs-pop[hidden]{display:none;}
+  @keyframes csIn{from{opacity:0;transform:translateY(-4px) scale(.98);}to{opacity:1;transform:none;}}
+  @keyframes csInUp{from{opacity:0;transform:translateY(4px) scale(.98);}to{opacity:1;transform:none;}}
+  .cs-opt{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;white-space:nowrap;user-select:none;}
+  .cs-opt.hi{background:var(--surface-3);}
+  .cs-opt.sel{font-weight:600;}
+  .cs-opt.dis{opacity:.45;cursor:default;}
+  .cs-opt .cs-txt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;}
+  .cs-check{width:16px;height:16px;flex:none;color:var(--accent);visibility:hidden;}
+  .cs-opt.sel .cs-check{visibility:visible;}
+  .cs-sep{height:1px;background:var(--border);margin:4px 6px;}
+
+  /* Rolagem fina, no tom do tema */
+  *{scrollbar-width:thin;scrollbar-color:var(--border-strong) transparent;}
+  *::-webkit-scrollbar{width:10px;height:10px;}
+  *::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:10px;border:3px solid transparent;background-clip:padding-box;}
+  *::-webkit-scrollbar-thumb:hover{background-color:var(--text-faint);}
+  *::-webkit-scrollbar-track{background:transparent;}
+
+  /* Campos numéricos sem as setinhas */
+  input[type=number]{-moz-appearance:textfield;appearance:textfield;}
+  input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
+  input[type=date]::-webkit-calendar-picker-indicator{opacity:.6;cursor:pointer;}
+  input[type=date]::-webkit-calendar-picker-indicator:hover{opacity:1;}
+
+  /* Avisos com ícone */
+  .t-ico{width:22px;height:22px;border-radius:50%;flex:none;display:grid;place-items:center;margin-top:-1px;background:var(--accent-dim);color:var(--accent);}
+  .t-ico::before{content:"";width:13px;height:13px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2024%2024'%20fill%3D'none'%20stroke%3D'black'%20stroke-width%3D'2.8'%20stroke-linecap%3D'round'%20stroke-linejoin%3D'round'%3E%3Cpath%20d%3D'M12%2011v6M12%207h.01'%2F%3E%3C%2Fsvg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2024%2024'%20fill%3D'none'%20stroke%3D'black'%20stroke-width%3D'2.8'%20stroke-linecap%3D'round'%20stroke-linejoin%3D'round'%3E%3Cpath%20d%3D'M12%2011v6M12%207h.01'%2F%3E%3C%2Fsvg%3E") center/contain no-repeat;}
+  #toast.ok .t-ico{background:var(--win-dim);color:var(--win-text);}
+  #toast.ok .t-ico::before{-webkit-mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2024%2024'%20fill%3D'none'%20stroke%3D'black'%20stroke-width%3D'2.6'%20stroke-linecap%3D'round'%20stroke-linejoin%3D'round'%3E%3Cpath%20d%3D'M5%2012.5l4.5%204.5L19%207.5'%2F%3E%3C%2Fsvg%3E");mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2024%2024'%20fill%3D'none'%20stroke%3D'black'%20stroke-width%3D'2.6'%20stroke-linecap%3D'round'%20stroke-linejoin%3D'round'%3E%3Cpath%20d%3D'M5%2012.5l4.5%204.5L19%207.5'%2F%3E%3C%2Fsvg%3E");}
+  #toast.err .t-ico{background:var(--loss-dim);color:var(--loss-text);}
+  #toast.err .t-ico::before{-webkit-mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2024%2024'%20fill%3D'none'%20stroke%3D'black'%20stroke-width%3D'2.8'%20stroke-linecap%3D'round'%20stroke-linejoin%3D'round'%3E%3Cpath%20d%3D'M12%207v6M12%2017h.01'%2F%3E%3C%2Fsvg%3E");mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2024%2024'%20fill%3D'none'%20stroke%3D'black'%20stroke-width%3D'2.8'%20stroke-linecap%3D'round'%20stroke-linejoin%3D'round'%3E%3Cpath%20d%3D'M12%207v6M12%2017h.01'%2F%3E%3C%2Fsvg%3E");}
+  #toast{gap:11px;padding:12px 12px 12px 13px;border-left-width:1px;}
+
+  /* Estados vazios com ícone */
+  .empty::before{content:"";display:block;width:30px;height:30px;margin:0 auto 10px;background:var(--text-faint);opacity:.75;-webkit-mask:url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2024%2024'%20fill%3D'none'%20stroke%3D'black'%20stroke-width%3D'1.6'%20stroke-linecap%3D'round'%20stroke-linejoin%3D'round'%3E%3Cpath%20d%3D'M4%2013l2.5-7h11L20%2013M4%2013v5a1%201%200%200%200%201%201h14a1%201%200%200%200%201-1v-5M4%2013h4.5l1.5%202.5h4l1.5-2.5H20'%2F%3E%3C%2Fsvg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2024%2024'%20fill%3D'none'%20stroke%3D'black'%20stroke-width%3D'1.6'%20stroke-linecap%3D'round'%20stroke-linejoin%3D'round'%3E%3Cpath%20d%3D'M4%2013l2.5-7h11L20%2013M4%2013v5a1%201%200%200%200%201%201h14a1%201%200%200%200%201-1v-5M4%2013h4.5l1.5%202.5h4l1.5-2.5H20'%2F%3E%3C%2Fsvg%3E") center/contain no-repeat;}
+
   @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important;}}
 </style>
 </head>
@@ -790,7 +852,7 @@
       <label class="sr-only" for="f-fsport">Esporte</label>
       <select id="f-fsport"><option value="">Todos os esportes</option></select>
       <label class="sr-only" for="f-fresult">Resultado</label>
-      <select id="f-fresult"><option value="">Todos os resultados</option></select>
+      <select id="f-fresult" data-cs-dots="1"><option value="">Todos os resultados</option></select>
       <span class="count" id="f-count"></span>
       <button type="button" class="btn-sm" id="sel-toggle" aria-pressed="false">Selecionar</button>
     </form>
@@ -1065,7 +1127,7 @@
     <h2 id="bulk-title">Editar fichas</h2>
     <p class="help" style="margin:0;">Preencha só o que quer mudar. O que ficar em branco continua como está em cada ficha.</p>
     <div class="sheet-grid">
-      <div class="field"><label for="be-result">Resultado</label><select id="be-result"></select></div>
+      <div class="field"><label for="be-result">Resultado</label><select id="be-result" data-cs-dots="1"></select></div>
       <div class="field"><label for="be-date">Data</label><input type="date" id="be-date"></div>
       <div class="field"><label for="be-bookie">Casa de apostas</label><input type="text" id="be-bookie" list="bookie-list" placeholder="manter"></div>
       <div class="field"><label for="be-comp">Competição</label><input type="text" id="be-comp" list="comp-list" placeholder="manter"></div>
@@ -1080,7 +1142,8 @@
 </dialog>
 <div id="tip" role="tooltip"></div>
 <div id="toast" role="status" aria-live="polite">
-  <div style="flex:1;"><div class="t-title" id="toast-title"></div><div class="t-msg" id="toast-msg"></div></div>
+  <span class="t-ico" aria-hidden="true"></span>
+  <div style="flex:1;min-width:0;"><div class="t-title" id="toast-title"></div><div class="t-msg" id="toast-msg"></div></div>
   <button type="button" class="t-close" id="toast-close" aria-label="Fechar">&times;</button>
 </div>
 
@@ -2156,7 +2219,7 @@ function renderHistorico(){
       <div class="r-bookie">${esc(b.bookie || '')}</div>
       <div class="r-num r-stake">${fmtUabs(uOf(b, b.stake))}<span class="o"> @${fmtNum(b.odd)}</span></div>
       <div class="r-num r-odd">${fmtNum(b.odd)}</div>
-      <select class="badge ${b.result}" data-status="${esc(b.id)}" aria-label="Resultado">${RESULTS.map(([k,l]) => `<option value="${k}" ${b.result === k ? 'selected' : ''}>${l}</option>`).join('')}</select>
+      <select class="badge ${b.result}" data-status="${esc(b.id)}" data-cs-dots="1" aria-label="Resultado">${RESULTS.map(([k,l]) => `<option value="${k}" ${b.result === k ? 'selected' : ''}>${l}</option>`).join('')}</select>
       <div class="r-profit ${cls(b.profit)}" title="${b.result === 'pendente' ? '' : fmtBRLs(b.profit)}">${p}</div>
       <div class="r-actions">${selMode ? `<span class="sel-box" role="checkbox" tabindex="0" aria-label="Selecionar ficha" aria-checked="${selected.has(b.id)}"></span>` : `<button type="button" class="icon-act" data-edit="${esc(b.id)}" aria-label="Editar ficha" title="Editar"><svg aria-hidden="true"><use href="#i-edit"/></svg></button><button type="button" class="icon-act danger" data-del="${esc(b.id)}" aria-label="Excluir ficha" title="Excluir"><svg aria-hidden="true"><use href="#i-trash"/></svg></button>`}</div>
     </div>`;
@@ -3238,6 +3301,123 @@ window.addEventListener('cloud-auth', async () => {
 /* ============================================================
    INÍCIO
    ============================================================ */
+/* ---- listas suspensas próprias (só com mouse; no celular fica a do sistema) ---- */
+const CS_ON = !!(window.matchMedia && matchMedia('(hover: hover) and (pointer: fine)').matches);
+const CS_DOT = { pendente:'var(--pend)', win:'var(--win)', halfwin:'var(--win)', loss:'var(--loss)', halfloss:'var(--loss)', void:'var(--void)', cashout:'var(--cash)' };
+const CS_CHEV = '<svg class="cs-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const CS_CHECK = '<svg class="cs-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const csValueDesc = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
+const csIndexDesc = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'selectedIndex');
+const csPop = document.createElement('div');
+csPop.id = 'cs-pop'; csPop.setAttribute('role', 'listbox');
+const CS_POPOVER = 'popover' in HTMLElement.prototype;
+if(CS_POPOVER) csPop.popover = 'manual'; else csPop.hidden = true;
+document.body.appendChild(csPop);
+let csOpen = null;
+function csSync(sel){
+  const t = sel._csTrig; if(!t) return;
+  const o = sel.options[sel.selectedIndex];
+  t.querySelector('.cs-val').textContent = o ? o.textContent : '';
+  const dot = t.querySelector('.cs-dot'), c = sel.dataset.csDots && CS_DOT[sel.value];
+  dot.style.background = c || ''; dot.hidden = !c;
+  t.className = 'cs-trig' + (sel.classList.contains('badge') ? ' ' + sel.className.replace('cs-native', '').trim() : '') + (csOpen && csOpen.sel === sel ? ' open' : '');
+  t.disabled = sel.disabled;
+  t.style.display = sel.style.display === 'none' ? 'none' : '';
+  t.style.width = sel.style.width || '';
+}
+function csEnhance(sel){
+  if(sel._csTrig || sel.multiple || sel.size > 1) return;
+  const t = document.createElement('button');
+  t.type = 'button';
+  t.setAttribute('aria-haspopup', 'listbox'); t.setAttribute('aria-expanded', 'false');
+  const lab = sel.getAttribute('aria-label') || (sel.id && document.querySelector(`label[for="${sel.id}"]`)?.textContent) || '';
+  if(lab.trim()) t.setAttribute('aria-label', lab.trim());
+  t.innerHTML = '<span class="cs-dot" hidden></span><span class="cs-val"></span>' + CS_CHEV;
+  sel.after(t); sel.classList.add('cs-native'); sel.tabIndex = -1; sel._csTrig = t;
+  // valor trocado pelo código (sel.value = …) também atualiza o botão
+  Object.defineProperty(sel, 'value', { configurable:true, get(){ return csValueDesc.get.call(this); }, set(v){ csValueDesc.set.call(this, v); csSync(this); } });
+  Object.defineProperty(sel, 'selectedIndex', { configurable:true, get(){ return csIndexDesc.get.call(this); }, set(v){ csIndexDesc.set.call(this, v); csSync(this); } });
+  sel.addEventListener('change', () => csSync(sel));
+  new MutationObserver(() => csSync(sel)).observe(sel, { childList:true, subtree:true, characterData:true, attributes:true, attributeFilter:['disabled','class','style'] });
+  t.addEventListener('click', () => { if(csOpen && csOpen.sel === sel) csClose(); else csOpenFor(sel); });
+  t.addEventListener('keydown', (e) => { if(!csOpen && ['ArrowDown','ArrowUp','Enter',' '].includes(e.key)){ e.preventDefault(); csOpenFor(sel); } });
+  csSync(sel);
+}
+function csEnhanceAll(root){ if(!CS_ON) return; (root || document).querySelectorAll('select').forEach(csEnhance); }
+function csOpenFor(sel){
+  csClose();
+  const t = sel._csTrig; if(t.disabled) return;
+  const dots = !!sel.dataset.csDots;
+  csPop.innerHTML = [...sel.options].map((o, i) =>
+    `<div class="cs-opt${o.selected ? ' sel' : ''}${o.disabled ? ' dis' : ''}" role="option" aria-selected="${o.selected}" data-i="${i}">` +
+    (dots ? (CS_DOT[o.value] ? `<span class="cs-dot" style="background:${CS_DOT[o.value]}"></span>` : '<span class="cs-dot"></span>') : '') +
+    `<span class="cs-txt">${esc(o.textContent)}</span>${CS_CHECK}</div>` + (dots && i === 0 && o.value === '' ? '<div class="cs-sep"></div>' : '')).join('');
+  // dentro de uma janela (dialog), a lista precisa estar nela para não ficar por trás
+  const host = t.closest('dialog[open]') || document.body;
+  if(csPop.parentNode !== host) host.appendChild(csPop);
+  csOpen = { sel, t, idx: Math.max(0, sel.selectedIndex) };
+  if(CS_POPOVER){ try{ csPop.showPopover(); }catch(e){} } else csPop.hidden = false;
+  t.classList.add('open'); t.setAttribute('aria-expanded', 'true');
+  csPlace(); csHi(csOpen.idx, true);
+}
+function csPlace(){
+  const r = csOpen.t.getBoundingClientRect();
+  csPop.style.minWidth = Math.max(r.width, 190) + 'px';
+  const w = csPop.offsetWidth, h = csPop.offsetHeight;
+  csPop.style.left = Math.max(8, Math.min(r.left, innerWidth - w - 8)) + 'px';
+  const below = innerHeight - r.bottom - 10;
+  const up = h > below && r.top > below;
+  csPop.classList.toggle('up', up);
+  csPop.style.top = (up ? Math.max(8, r.top - h - 6) : r.bottom + 6) + 'px';
+}
+function csHi(i, scroll){
+  const items = csPop.querySelectorAll('.cs-opt'); if(!items.length) return;
+  i = (i + items.length) % items.length;
+  items.forEach(x => x.classList.remove('hi')); items[i].classList.add('hi');
+  csOpen.idx = i; if(scroll) items[i].scrollIntoView({ block:'nearest' });
+}
+function csPick(i){
+  const { sel, t } = csOpen; const o = sel.options[i];
+  if(!o || o.disabled) return;
+  csClose(); t.focus({ preventScroll:true });
+  if(sel.selectedIndex !== i){ sel.selectedIndex = i; sel.dispatchEvent(new Event('input', { bubbles:true })); sel.dispatchEvent(new Event('change', { bubbles:true })); }
+}
+function csClose(){
+  if(!csOpen) return;
+  csOpen.t.classList.remove('open'); csOpen.t.setAttribute('aria-expanded', 'false');
+  if(CS_POPOVER){ try{ csPop.hidePopover(); }catch(e){} } else csPop.hidden = true;
+  csOpen = null;
+}
+csPop.addEventListener('mousedown', (e) => e.preventDefault());
+csPop.addEventListener('click', (e) => { const o = e.target.closest('.cs-opt'); if(o && csOpen) csPick(+o.dataset.i); });
+csPop.addEventListener('mousemove', (e) => { const o = e.target.closest('.cs-opt'); if(o && csOpen && +o.dataset.i !== csOpen.idx) csHi(+o.dataset.i); });
+document.addEventListener('mousedown', (e) => { if(csOpen && !csPop.contains(e.target) && !csOpen.t.contains(e.target)) csClose(); }, true);
+document.addEventListener('keydown', (e) => {
+  if(!csOpen) return;
+  const opts = [...csOpen.sel.options];
+  // teclas tratadas aqui não seguem para o botão (senão o Enter reabriria a lista)
+  if(['ArrowDown','ArrowUp','Home','End','Enter',' ','Escape'].includes(e.key)) e.stopPropagation();
+  if(e.key === 'ArrowDown'){ e.preventDefault(); csHi(csOpen.idx + 1, true); }
+  else if(e.key === 'ArrowUp'){ e.preventDefault(); csHi(csOpen.idx - 1, true); }
+  else if(e.key === 'Home'){ e.preventDefault(); csHi(0, true); }
+  else if(e.key === 'End'){ e.preventDefault(); csHi(opts.length - 1, true); }
+  else if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); csPick(csOpen.idx); }
+  else if(e.key === 'Escape'){ e.preventDefault(); e.stopPropagation(); const t = csOpen.t; csClose(); t.focus({ preventScroll:true }); }
+  else if(e.key === 'Tab'){ csClose(); }
+  else if(e.key.length === 1 && !e.ctrlKey && !e.metaKey){
+    const k = e.key.toLowerCase();
+    for(let j = 1; j <= opts.length; j++){ const ii = (csOpen.idx + j) % opts.length; if(opts[ii].textContent.trim().toLowerCase().startsWith(k)){ csHi(ii, true); break; } }
+  }
+}, true);
+window.addEventListener('resize', csClose);
+window.addEventListener('scroll', (e) => { if(csOpen && !csPop.contains(e.target)) csClose(); }, true);
+if(CS_ON){
+  csEnhanceAll();
+  // listas criadas depois (linhas do histórico, janelas) também ganham o visual novo
+  new MutationObserver((muts) => { for(const m of muts) for(const nd of m.addedNodes){ if(nd.nodeType !== 1) continue; if(nd.tagName === 'SELECT') csEnhance(nd); else if(nd.querySelector && nd.querySelector('select')) csEnhanceAll(nd); } })
+    .observe(document.body, { childList:true, subtree:true });
+}
+
 resetForm();
 setView((location.hash || '').slice(1) || 'painel', { keepScroll:true });
 loadBets();

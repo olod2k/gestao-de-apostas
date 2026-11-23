@@ -42,6 +42,7 @@ Converse com ele em português (pt-BR). Ele não é programador: explique em lin
 Testado em Chrome headless (modo local, Firebase bloqueado): import da planilha antiga e do CSV do Pro Stake, registro, limites, Green/Red pelo painel, cashout, lixeira, várias bancas, backup/export, e a leitura de print com resposta **simulada**. Todos os cálculos conferidos.
 
 **Ainda não testado de verdade / pendente:**
+0. **Lembrar o Lucas:** a sincronização pelo relógio do servidor (download completo só em aparelho novo, a cada 30 dias ou por botão) está pronta mas **não publicada** — ele pediu para publicar depois. Está no `git stash` ("sincronizacao pelo relogio do servidor") e no arquivo `../sincronizacao-servidor.patch`. Para retomar: `git stash pop`, testar e publicar.
 1. Sincronização real com o Firestore (login, sync entre celular e PC).
 2. Gemini (novembro de 2026): o AI Logic **já está ativado** — chamadas reais chegam ao Gemini. `gemini-2.5-flash` não existe mais para projetos novos (404); `gemini-3.8-flash` às vezes responde 500 por alta demanda. A leitura de print real ainda não foi testada com um print de verdade.
    **Conferência de resultados** (`cb.checkResults`, `runResultCheck`): Gemini + `googleSearch` (grounding). No plano gratuito do Gemini a pesquisa Google **não está disponível** (resposta 429); exige o plano pago do projeto (Blaze), que inclui 5 mil pesquisas grátis por mês. As sugestões ficam só no aparelho (`localStorage` `apostas_ai_sug_v1`) e o Lucas confirma cada uma (ou "Confirmar N sugestões", que ignora as de certeza baixa). **Está desligada (`AI_CHECK_ON = false`)** até o projeto ter o plano pago; para ligar, trocar para `true`. Conferência automática ao abrir: no máximo a cada 6 h (`apostas_ai_auto_v1`), desligável em Banca → Leitura de print (`settings.prefs.autoCheck`).
@@ -68,3 +69,4 @@ Os testes usam o Chrome do sistema (`/usr/bin/google-chrome`); ajuste o caminho 
 - Datas são strings `YYYY-MM-DD` no fuso local (`todayISO()` usa a data local, não UTC).
 - Planilhas: datas do Excel são lidas como número de série (sem `cellDates`) para não perder um dia por causa do fuso.
 - Mantenha tudo num arquivo só, a menos que o Lucas peça outra estrutura.
+- Listas suspensas: no PC (mouse) cada `<select>` ganha um botão + lista própria (`csEnhance`, `#cs-pop`, via Popover API para ficar por cima das janelas); o `<select>` original continua escondido e é ele que guarda o valor e dispara `change`. No celular fica a lista nativa. `data-cs-dots` mostra a bolinha de cor dos resultados.

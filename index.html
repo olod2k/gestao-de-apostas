@@ -706,6 +706,20 @@
   .install-steps{margin:10px 0 0;padding-left:20px;font-size:13px;line-height:1.7;color:var(--text-2);}
   .install-steps b{color:var(--text);}
   .install-ok{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--win-text);background:var(--win-dim);padding:4px 10px;border-radius:999px;}
+  /* Cartão para definir a banca (aparece enquanto ela está zerada) */
+  .setup-bank{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:14px 16px;border-color:var(--accent-line);background:radial-gradient(120% 160% at 0% 0%,var(--accent-dim),transparent 60%),var(--surface);}
+  .setup-ico{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:var(--accent-solid);color:var(--on-accent);}
+  .setup-ico svg{width:21px;height:21px;}
+  .setup-form{display:flex;align-items:flex-end;gap:10px;}
+  .setup-form .field{width:130px;}
+  .setup-form .btn-primary{min-height:40px;white-space:nowrap;}
+  @media(max-width:900px){
+    .setup-bank{grid-template-columns:auto minmax(0,1fr);}
+    .setup-form{grid-column:1/-1;flex-wrap:wrap;}
+    .setup-form .field{flex:1 1 120px;width:auto;}
+    .setup-form .btn-primary{flex:1 1 100%;}
+  }
+  .bal-unset{color:var(--pend-text);font-weight:600;}
   @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important;}}
 </style>
 </head>
@@ -765,6 +779,20 @@
       <button type="button" class="btn-primary btn-sm" id="backup-banner-btn">Baixar backup</button>
     </div>
 
+    <div class="card setup-bank" id="setup-bank" style="display:none;">
+      <div class="setup-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-wallet"/></svg></div>
+      <div class="setup-body">
+        <div class="card-title" style="margin:0;">Defina sua banca</div>
+        <p class="help" style="margin:3px 0 0;">Informe quanto você separou para apostar e em quantas unidades dividir. Isso define o saldo e o valor de 1u.</p>
+      </div>
+      <form class="setup-form" onsubmit="return false;">
+        <div class="field"><label for="setup-amount">Banca (R$)</label><input type="number" id="setup-amount" min="0.01" step="0.01" inputmode="decimal" placeholder="1000"></div>
+        <div class="field"><label for="setup-units">Unidades</label><input type="number" id="setup-units" min="1" step="1" inputmode="numeric" value="100"></div>
+        <button type="button" class="btn-primary" id="setup-save">Salvar banca</button>
+      </form>
+      <p class="status-line" id="setup-status" style="grid-column:1/-1;margin:0;"></p>
+    </div>
+
     <div class="card balance">
       <div class="balance-info">
         <div class="card-title" style="margin:0;">Saldo atual · <span id="bal-name">Principal</span></div>
@@ -787,8 +815,8 @@
 
     <div class="card-head" style="margin-bottom:0;">
       <div class="seg" id="board-toggle">
-        <button type="button" data-mode="all" class="active">Geral</button>
-        <button type="button" data-mode="month">Por mês</button>
+        <button type="button" data-mode="month" class="active">Por mês</button>
+        <button type="button" data-mode="all">Geral</button>
       </div>
       <div class="month-nav" id="board-month-nav" style="display:none;">
         <button type="button" id="board-prev" aria-label="Mês anterior">‹</button>
@@ -1356,7 +1384,7 @@ function calcProfit(stake, odd, result, cashout){
    ============================================================ */
 const SETTINGS_KEY = 'apostas_settings_v2';
 const DEFAULTS = {
-  banks: { list: [{ id:'principal', name:'Principal', amount:2000, units:100 }], active:'principal' },
+  banks: { list: [{ id:'principal', name:'Principal', amount:0, units:100 }], active:'principal' },
   limits: { stopDay:0, stopWeek:0, maxStake:0 },
   houses: { txs: [] },
   prefs: { stakeMode:'reais', aiModel:'' }
@@ -1368,7 +1396,7 @@ function normalizeSettings(s){
   s = s || {};
   for(const k of Object.keys(DEFAULTS)) s[k] = Object.assign(clone(DEFAULTS[k]), s[k] || {});
   if(!Array.isArray(s.banks.list) || !s.banks.list.length) s.banks = clone(DEFAULTS.banks);
-  s.banks.list = s.banks.list.filter(b => b && b.id).map(b => ({ id:String(b.id), name:String(b.name||'Banca'), amount:Number(b.amount)>0?Number(b.amount):2000, units:Number(b.units)>0?Number(b.units):100,
+  s.banks.list = s.banks.list.filter(b => b && b.id).map(b => ({ id:String(b.id), name:String(b.name||'Banca'), amount:Number(b.amount)>0?Number(b.amount):0, units:Number(b.units)>0?Number(b.units):100,
     // hist: valores de unidade anteriores. Cada item vale para as fichas registradas antes de "until" (ms).
     hist:(Array.isArray(b.hist) ? b.hist : []).filter(h => h && Number(h.until) > 0 && Number(h.uv) > 0).map(h => ({ until:Number(h.until), uv:Number(h.uv) })).sort((x,y) => x.until - y.until) }));
   if(!s.banks.list.length) s.banks = clone(DEFAULTS.banks);
@@ -1710,7 +1738,7 @@ function renderDatalists(){
 /* ============================================================
    PAINEL
    ============================================================ */
-let boardMode = 'all', boardMonth = null;
+let boardMode = 'month', boardMonth = null;
 let chartMode = 'day', chartMonth = null;
 let detailSort = { col:'key', dir:'desc' };
 
@@ -1743,6 +1771,17 @@ $$('#detail-table th[data-sort]').forEach(th => th.addEventListener('click', () 
 }));
 $('pend-all').addEventListener('click', () => { $('f-fresult').value = 'pendente'; histDate = ''; setView('historico'); });
 $('backup-banner-btn').addEventListener('click', exportBackup);
+$('setup-save').addEventListener('click', () => {
+  const amount = parseNum($('setup-amount').value), units = parseNum($('setup-units').value);
+  const st = $('setup-status');
+  if(!(amount > 0 && units > 0)){ st.className = 'status-line err'; st.textContent = 'Informe o valor da banca e as unidades (maiores que zero).'; $('setup-amount').focus(); return; }
+  const bk = isAll() ? banks()[0] : bankById(settings.banks.active);
+  bk.amount = amount; bk.units = units;
+  persistSetting('banks');
+  st.textContent = ''; $('setup-amount').value = '';
+  showToast('Banca definida', `${fmtBRL(amount)} em ${fmtNum(units, 0)} unidades · 1u = ${fmtBRL(amount / units)}`, 'ok');
+  render();
+});
 $('qa-backup').addEventListener('click', exportBackup);
 
 // Dica flutuante usada pelos gráficos e pelo calendário.
@@ -1903,7 +1942,11 @@ function renderPainel(){
   $('bal-name').textContent = name;
   tweenNum($('bal-value'), current, moneyHTML, true);
   $('bal-units').textContent = fmtNum(currentU) + 'u';
-  $('bal-initial').textContent = `Inicial ${fmtBRL(initial)} (${fmtNum(initialU, 0)}u) · 1u = ${isAll() ? 'varia por banca' : fmtBRL(unitValue(settings.banks.active))}`;
+  const bankSet = isAll() ? banks().some(b => b.amount > 0) : bankById(settings.banks.active).amount > 0;
+  $('setup-bank').style.display = bankSet ? 'none' : '';
+  if(!bankSet) $('bal-units').textContent = '';
+  if(bankSet) $('bal-initial').textContent = `Inicial ${fmtBRL(initial)} (${fmtNum(initialU, 0)}u) · 1u = ${isAll() ? 'varia por banca' : fmtBRL(unitValue(settings.banks.active))}`;
+  else $('bal-initial').innerHTML = '<span class="bal-unset">Banca ainda não definida</span> · defina acima para ver o saldo e as unidades';
   const g = $('bal-growth');
   g.innerHTML = `<span class="trend ${cls(all.profit)}">${all.profit > 0.004 ? '↗' : all.profit < -0.004 ? '↘' : '→'} ${fmtPct(initial ? all.profit/initial*100 : 0, true)}</span><span class="${cls(all.profit)}">${fmtBRLs(all.profit)} · ${fmtU(all.profitU)}</span>`;
   g.className = 'mono';
@@ -1922,7 +1965,7 @@ function renderPainel(){
     nav.style.display = 'flex';
     if(!months.length){ $('board-month').textContent = 'sem dados'; $('board-prev').disabled = $('board-next').disabled = true; }
     else {
-      if(!boardMonth || !months.includes(boardMonth)) boardMonth = months[months.length-1];
+      if(!boardMonth || !months.includes(boardMonth)) boardMonth = months.includes(todayISO().slice(0,7)) ? todayISO().slice(0,7) : months[months.length-1];
       const i = months.indexOf(boardMonth);
       $('board-month').textContent = monthLabel(boardMonth);
       $('board-prev').disabled = i <= 0; $('board-next').disabled = i >= months.length-1;
